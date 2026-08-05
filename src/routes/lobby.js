@@ -1,4 +1,5 @@
 const express = require("express");
+const { v4: uuidv4 } = require("uuid");
 
 const router = express.Router();
 
@@ -9,14 +10,14 @@ router.get("/", (req, res) => {
   console.log("All lobbies requested");
 
   res.json({
-    lobbies: Array.from(lobbies),
+    lobbies: Array.from(lobbies.values()),
   });
 });
 
 // Create lobby
 router.post("/", (req, res) => {
   const { name } = req.body;
-  console.log(`Creating lobby "${name}`);
+  console.log(`Creating lobby "${name}"`);
 
   const lobby = {
     id: uuidv4(),
