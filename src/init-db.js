@@ -8,7 +8,7 @@ async function init() {
 
     DROP TABLE IF EXISTS users CASCADE;
 
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       username VARCHAR(30) UNIQUE NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
