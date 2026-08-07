@@ -9,22 +9,62 @@
   </head>
   <body>
     <div class="container">
-      <div>Username</div>
-      <input type="text" placeholder="Username" />
+      <form id="registrationForm">
+        <div class="inputWithError">
+          <div>Username</div>
+          <input
+            id="usernameInput"
+            type="text"
+            required
+            minlength="3"
+            maxlength="30"
+            ="Username"
+          />
+          <div id="usernameInputError" class="inputError" style="display: none">
+            Username already taken
+          </div>
+        </div>
 
-      <div>Email</div>
-      <input type="text" placeholder="Email" />
+        <div class="inputWithError">
+          <div>Email</div>
+          <input id="emailInput" type="email" required placeholder="Email" />
+          <div id="emailInputError" class="inputError" style="display: none">
+            Email already in use
+          </div>
+        </div>
 
-      <div>Password</div>
-      <input type="password" placeholder="Password" />
+        <div class="inputWithError">
+          <div>Password</div>
+          <input
+            id="passwordInput"
+            type="password"
+            required
+            placeholder="Password"
+          />
+        </div>
 
-      <div>Repeat password</div>
-      <input type="password" placeholder="Password" />
+        <div class="inputWithError">
+          <div>Repeat password</div>
+          <input
+            id="repeatedPasswordInput"
+            type="password"
+            required
+            placeholder="Password"
+          />
+          <div
+            id="repeatedPasswordInputError"
+            class="inputError"
+            style="display: none"
+          >
+            The passwords do not match
+          </div>
+        </div>
 
-      <br /><br />
-
-      <button onclick="alert('Register')">Register</button>
-      <button><a href="login.html">Go to login</a></button>
+        <button type="submit">Register</button>
+        <button><a href="login.html">Go to login</a></button>
+      </form>
     </div>
+
+    <script src="scripts/register.js"></script>
   </body>
 </html>

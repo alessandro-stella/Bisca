@@ -5,10 +5,32 @@
   color: white;
 }
 
+#registrationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.inputWithError {
+  border: 1px solid green;
+}
+
+.inputError {
+  font-size: 0.75em;
+  color: red;
+}
+
 input[type="text"],
+input[type="email"],
 input[type="password"] {
   background-color: white;
   padding: 0.5em 1em;
+}
+
+input[type="text"]:read-only,
+input[type="email"]:read-only,
+input[type="password"]:read-only {
+  background-color: grey;
 }
 
 button {

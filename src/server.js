@@ -6,6 +6,7 @@ const path = require("path");
 
 const db = require("./db");
 const lobbyRouter = require("./routes/lobby");
+const usersRouter = require("./routes/users");
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/lobby", lobbyRouter);
+app.use("/api/users", usersRouter);
 
 app.use(express.static(path.join(__dirname, "../public")));
 
