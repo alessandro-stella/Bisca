@@ -8,6 +8,12 @@ const db = require("./db");
 const lobbyRouter = require("./routes/lobby");
 
 const app = express();
+
+app.use((req, res, next) => {
+  console.log("REQUEST:", req.method, req.url);
+  next();
+});
+
 const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
