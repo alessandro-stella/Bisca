@@ -111,11 +111,15 @@ async function registerUser(username, email, password) {
       }),
     });
 
+    const registrationResponse = await res.json();
+
     if (!res.ok) {
-      const registerResponse = await res.json();
-      addErrors(registerResponse.errors);
+      addErrors(registrationResponse.errors);
     } else {
-      window.location.replace("index.html");
+      console.log(registrationResponse);
+
+      // TODO: add way to save user data
+      // window.location.replace("index.html");
     }
   } catch (e) {
     console.log("Internal server error");

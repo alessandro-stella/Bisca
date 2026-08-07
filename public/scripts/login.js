@@ -40,6 +40,8 @@ form.addEventListener("submit", async (event) => {
       loginError.style.display = "block";
     } else {
       console.log(loginResponse);
+
+      // TODO: add way to save user data
       // window.location.replace("index.html");
     }
   } catch (e) {
