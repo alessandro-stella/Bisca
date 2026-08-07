@@ -1,11 +1,11 @@
 const PORT = 8000;
-const serverUrl = `http://localhost:${PORT}/api/lobby`;
+const apiEndpoint = `/api/lobby`;
 
 async function createLobby() {
   const name = document.getElementById("lobbyName").value;
 
   try {
-    const rawRes = await fetch(serverUrl, {
+    const rawRes = await fetch(apiEndpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -28,7 +28,7 @@ async function getLobbies() {
   const lobbiesContainer = document.getElementById("lobbies");
 
   try {
-    const rawRes = await fetch(serverUrl, {
+    const rawRes = await fetch(apiEndpoint, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
