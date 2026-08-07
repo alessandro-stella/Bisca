@@ -8,10 +8,6 @@ const db = require("./db");
 const lobbyRouter = require("./routes/lobby");
 
 const app = express();
-app.get("/check", (req, res) => {
-  console.log("CHECK");
-  res.status(200).send("OK");
-});
 
 const PORT = process.env.PORT || 8000;
 
@@ -21,14 +17,6 @@ app.use(cors());
 app.use("/api/lobby", lobbyRouter);
 
 app.use(express.static(path.join(__dirname, "../public")));
-
-// app.get("/", (req, res) => {
-//   res.sendFile(path.join(__dirname, "../public/index.html"));
-// });
-
-app.get("/", (req, res) => {
-  res.send("Server Railway OK");
-});
 
 app.listen(PORT, async () => {
   console.log(`Server started on port ${PORT}`);
