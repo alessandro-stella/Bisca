@@ -1,7 +1,25 @@
-html {
-  background-color: blue;
+.container {
+  padding: 1em;
+  margin: 1em;
+  background-color: slateblue;
+  color: white;
 }
 
-h1 {
-  background-color: red;
+input[type="text"],
+input[type="password"] {
+  background-color: white;
+  padding: 0.5em 1em;
+}
+
+button {
+  padding: 0.5em 1em;
+  border: 1px solid black;
+  border-radius: 0.5em;
+  background-color: white;
+}
+
+button:hover {
+  background-color: black;
+  color: white;
+  cursor: pointer;
 }

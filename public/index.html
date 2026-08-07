@@ -9,13 +9,20 @@
   </head>
 
   <body>
-    <h1>Create lobby</h1>
-    <input id="lobbyName" type="text" placeholder="Name" />
-    <button onclick="createLobby()">Test</button>
+    <div class="container">
+      <h1>Create lobby</h1>
+      <input id="lobbyName" type="text" placeholder="Name" />
+      <button onclick="createLobby()">Test</button>
+    </div>
 
-    <h1>Existing lobbies</h1>
-    <button onclick="getLobbies()">Update</button>
+    <div class="container">
+      <button onclick="getLobbies()">Get lobbies</button>
+      <ol id="lobbies"></ol>
+    </div>
 
-    <ol id="lobbies"></ol>
+    <div class="container">
+      <button><a href="login.html">Login</a></button>
+      <button><a href="register.html">Register</a></button>
+    </div>
   </body>
 </html>
