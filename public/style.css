@@ -5,18 +5,19 @@
   color: white;
 }
 
+#loginForm,
 #registrationForm {
   display: flex;
   flex-direction: column;
   gap: 1em;
 }
 
-.inputWithError {
-  border: 1px solid green;
-}
-
 .inputError {
   font-size: 0.75em;
+  color: red;
+}
+
+#loginError {
   color: red;
 }
 

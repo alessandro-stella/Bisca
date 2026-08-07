@@ -6,20 +6,34 @@
 
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
-    <script src="scripts/login.js"></script>
   </head>
   <body>
     <div class="container">
-      <div>Email</div>
-      <input type="text" placeholder="Email" />
+      <form id="loginForm">
+        <div class="inputWithError">
+          <div>Email</div>
+          <input id="emailInput" type="email" required placeholder="Email" />
+        </div>
 
-      <div>Password</div>
-      <input type="password" placeholder="Password" />
+        <div class="inputWithError">
+          <div>Password</div>
+          <input
+            id="passwordInput"
+            type="password"
+            required
+            placeholder="Password"
+          />
+        </div>
 
-      <br /><br />
+        <div id="loginError" style="display: none">
+          Invalid username or password
+        </div>
 
-      <button onclick="login()">Login</button>
-      <button><a href="register.html">Go to registration</a></button>
+        <button type="submit">Login</button>
+        <button><a href="register.html">Go to registration</a></button>
+      </form>
     </div>
+
+    <script src="scripts/login.js"></script>
   </body>
 </html>
