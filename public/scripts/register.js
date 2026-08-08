@@ -115,7 +115,8 @@ async function registerUser(username, email, password) {
     if (!res.ok) {
       addErrors(registrationResponse.errors);
     } else {
-      console.log({ registrationResponse });
+      // console.log({ registrationResponse });
+      window.location.replace("lobbies.html");
     }
   } catch (error) {
     console.log("Internal server error: ", error);
