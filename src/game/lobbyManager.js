@@ -40,7 +40,9 @@ function addPlayer(lobbyId, userId) {
     return { success: false, error: "already in a lobby" };
   }
 
-  lobby.players.add(userId);
+  lobby.players.set(userId, {
+    connected: true,
+  });
 
   return { success: true, error: null };
 }
@@ -55,6 +57,36 @@ function removePlayer(lobbyId, userId) {
   lobby.players.delete(userId);
 
   return true;
+}
+
+function setPlayerConnected(lobbyId, userId, connected) {
+  const lobby = lobbies.get(lobbyId);
+
+  if (!lobby) {
+    return false;
+  }
+
+  const player = lobby.players.get(userId);
+
+  if (!player) {
+    return false;
+  }
+
+  player.connected = connected;
+
+  return true;
+}
+
+function isPlayerConnected(lobbyId, userId) {
+  const lobby = lobbies.get(lobbyId);
+
+  if (!lobby) {
+    return false;
+  }
+
+  const player = lobby.players.get(userId);
+
+  return player?.connected ?? false;
 }
 
 function getLobbyByPlayer(userId) {
@@ -74,5 +106,7 @@ module.exports = {
   deleteLobby,
   addPlayer,
   removePlayer,
+  setPlayerConnected,
+  isPlayerConnected,
   getLobbyByPlayer,
 };

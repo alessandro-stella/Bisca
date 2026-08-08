@@ -44,6 +44,10 @@ function setupSocket() {
   socket.on("lobby:join:error", (data) => {
     console.error("Cannot join lobby:", data.message);
   });
+
+  socket.on("game:started", () => {
+    window.location.replace("/game.html");
+  });
 }
 
 function renderLobbies(lobbies) {

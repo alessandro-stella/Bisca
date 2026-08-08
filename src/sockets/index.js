@@ -9,7 +9,19 @@ const {
   getLobbyByPlayer,
   getLobby,
   deleteLobby,
-} = require("../lobbies/manager");
+  setPlayerConnected,
+  isPlayerConnected,
+} = require("../game/lobbyManager");
+
+const {
+  createGame,
+  getGame,
+  deleteGame,
+  getPublicGameState,
+} = require("../game/gameManager");
+
+const reconnectTimers = new Map();
+const RECONNECT_TIMEOUT = 60 * 1000;
 
 function sendLobbies(socket) {
   const lobbies = getLobbies();
@@ -42,10 +54,19 @@ function handleCreateLobby(socket, io) {
     id: uuidv4(),
     ownerId: socket.user.id,
     ownerUsername: socket.user.username,
-    players: new Set([socket.user.id]),
+    players: new Map([
+      [
+        socket.user.id,
+        {
+          connected: true,
+        },
+      ],
+    ]),
   };
 
   createLobby(lobby);
+
+  socket.join(`lobby:${lobby.id}`);
 
   console.log("Lobby created:", lobby);
 
@@ -53,15 +74,20 @@ function handleCreateLobby(socket, io) {
 }
 
 function joinLobby(lobbyId, socket, io) {
-  const response = addPlayer(lobbyId, socket.user.id);
+  const result = addPlayer(lobbyId, socket.user.id);
 
-  if (!response.success) {
+  if (!result.success) {
     socket.emit("lobby:join:error", {
-      message: response.error,
+      message:
+        result.error === "missing lobby"
+          ? "Lobby does not exist"
+          : "You are already in a lobby",
     });
 
     return;
   }
+
+  socket.join(`lobby:${lobbyId}`);
 
   console.log(`${socket.user.username} joined lobby ${lobbyId}`);
 
@@ -75,7 +101,22 @@ function leaveLobby(socket, io) {
     return;
   }
 
+  const timer = reconnectTimers.get(socket.user.id);
+
+  if (timer) {
+    clearTimeout(timer);
+    reconnectTimers.delete(socket.user.id);
+  }
+
   if (lobby.ownerId === socket.user.id) {
+    const room = `lobby:${lobby.id}`;
+
+    deleteGame(lobby.id);
+
+    io.to(room).emit("lobby:deleted");
+
+    io.in(room).socketsLeave(room);
+
     deleteLobby(lobby.id);
 
     console.log(
@@ -88,6 +129,8 @@ function leaveLobby(socket, io) {
   }
 
   removePlayer(lobby.id, socket.user.id);
+
+  socket.leave(`lobby:${lobby.id}`);
 
   console.log(`${socket.user.username} left lobby ${lobby.id}`);
 
@@ -105,9 +148,175 @@ function handleDeleteLobby(lobbyId, socket, io) {
     return;
   }
 
+  const room = `lobby:${lobbyId}`;
+
+  for (const userId of lobby.players.keys()) {
+    const timer = reconnectTimers.get(userId);
+
+    if (timer) {
+      clearTimeout(timer);
+      reconnectTimers.delete(userId);
+    }
+  }
+
+  deleteGame(lobbyId);
+
+  io.to(room).emit("lobby:deleted");
+
+  io.in(room).socketsLeave(room);
+
   deleteLobby(lobbyId);
 
   console.log(`Lobby ${lobbyId} deleted by owner ${socket.user.username}`);
+
+  broadcastLobbies(io);
+}
+
+function startGame(socket, io) {
+  const lobby = getLobbyByPlayer(socket.user.id);
+
+  if (!lobby) {
+    console.log("START GAME: lobby not found");
+    return;
+  }
+
+  if (lobby.ownerId !== socket.user.id) {
+    console.log("START GAME: user is not owner");
+    return;
+  }
+
+  if (getGame(lobby.id)) {
+    console.log("START GAME: game already exists");
+    return;
+  }
+
+  const game = {
+    lobbyId: lobby.id,
+    status: "playing",
+    deck: [],
+    currentPlayer: null,
+  };
+
+  createGame(game);
+
+  console.log("GAME CREATED:", game);
+
+  io.to(`lobby:${lobby.id}`).emit("game:started");
+}
+
+function sendGameState(socket) {
+  const lobby = getLobbyByPlayer(socket.user.id);
+
+  if (!lobby) {
+    console.log("GAME STATE: lobby not found");
+
+    socket.emit("game:not-found");
+
+    return;
+  }
+
+  socket.join(`lobby:${lobby.id}`);
+
+  const game = getGame(lobby.id);
+
+  if (!game) {
+    console.log("GAME STATE: game not found");
+
+    socket.emit("game:not-found");
+
+    return;
+  }
+
+  console.log(`Sending game state to ${socket.user.username}`);
+
+  socket.emit("game:state", getPublicGameState(game));
+}
+
+function handleDisconnect(socket, io) {
+  const userId = socket.user.id;
+
+  const lobby = getLobbyByPlayer(userId);
+
+  if (!lobby) {
+    return;
+  }
+
+  setPlayerConnected(lobby.id, userId, false);
+
+  console.log(`${socket.user.username} disconnected from lobby ${lobby.id}`);
+
+  broadcastLobbies(io);
+
+  const timer = setTimeout(() => {
+    const currentLobby = getLobbyByPlayer(userId);
+
+    if (!currentLobby) {
+      reconnectTimers.delete(userId);
+      return;
+    }
+
+    if (isPlayerConnected(currentLobby.id, userId)) {
+      reconnectTimers.delete(userId);
+      return;
+    }
+
+    if (currentLobby.ownerId === userId) {
+      const room = `lobby:${currentLobby.id}`;
+
+      deleteGame(currentLobby.id);
+
+      io.to(room).emit("lobby:deleted");
+
+      io.in(room).socketsLeave(room);
+
+      deleteLobby(currentLobby.id);
+
+      console.log(
+        `Lobby deleted because owner ${socket.user.username} did not reconnect within 60 seconds: ${currentLobby.id}`,
+      );
+
+      reconnectTimers.delete(userId);
+
+      broadcastLobbies(io);
+
+      return;
+    }
+
+    removePlayer(currentLobby.id, userId);
+
+    reconnectTimers.delete(userId);
+
+    console.log(
+      `${socket.user.username} removed from lobby ${currentLobby.id} after 60 seconds`,
+    );
+
+    broadcastLobbies(io);
+  }, RECONNECT_TIMEOUT);
+
+  reconnectTimers.set(userId, timer);
+}
+
+function handleReconnect(socket, io) {
+  const userId = socket.user.id;
+
+  const lobby = getLobbyByPlayer(userId);
+
+  if (!lobby) {
+    return;
+  }
+
+  setPlayerConnected(lobby.id, userId, true);
+
+  const timer = reconnectTimers.get(userId);
+
+  if (timer) {
+    clearTimeout(timer);
+    reconnectTimers.delete(userId);
+  }
+
+  socket.join(`lobby:${lobby.id}`);
+
+  console.log(`${socket.user.username} reconnected to lobby ${lobby.id}`);
 
   broadcastLobbies(io);
 }
@@ -117,8 +326,9 @@ function setupSockets(io) {
 
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
-
     console.log("Authenticated user:", socket.user);
+
+    handleReconnect(socket, io);
 
     sendLobbies(socket);
 
@@ -138,10 +348,20 @@ function setupSockets(io) {
       handleDeleteLobby(lobbyId, socket, io);
     });
 
+    socket.on("game:start", () => {
+      console.log("GAME START requested by:", socket.user.username);
+
+      startGame(socket, io);
+    });
+
+    socket.on("game:get-state", () => {
+      sendGameState(socket);
+    });
+
     socket.on("disconnect", () => {
       console.log("Socket disconnected:", socket.id);
 
-      leaveLobby(socket, io);
+      handleDisconnect(socket, io);
     });
   });
 }
