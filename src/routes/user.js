@@ -1,12 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const { handleSession } = require("./session");
 
 const db = require("../db");
 
-// Error codes from PostgreSQL
+// Error code from PostgreSQL
 const UNIQUE_CONSTRAINT = "23505";
 
+// Utility for registration (check existing credentials)
 router.post("/checkUser", async (req, res) => {
   const { username, email } = req.body;
 
@@ -55,6 +57,7 @@ router.post("/checkUser", async (req, res) => {
   }
 });
 
+// Registration handler
 router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -98,7 +101,7 @@ router.post("/register", async (req, res) => {
       }
     }
 
-    console.error(error);
+    console.error("Registration error: ", error);
 
     res.status(500).json({
       error: "Internal server error",
@@ -106,6 +109,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// Login handler
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -140,10 +144,25 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    res.json({
-      id: user.id,
-      username: user.username,
-      email: user.email,
+    const session = await handleSession(user.id);
+
+    if (!session) {
+      throw new Error("Couldn't create session");
+    }
+
+    res.cookie("sessionId", session.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      expires: session.expiresAt,
+    });
+
+    return res.status(200).json({
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error) {
     console.error(error);

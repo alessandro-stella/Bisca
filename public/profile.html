@@ -1,0 +1,28 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+
+    <script>
+      async function checkSession() {
+        const response = await fetch("/api/session/checkSession", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          console.log("Session OK");
+        } else {
+          console.log("No session or expired");
+          window.location.href = "/login.html";
+        }
+      }
+
+      checkSession();
+    </script>
+  </head>
+  <body>
+    <h1>Your personal profile</h1>
+  </body>
+</html>

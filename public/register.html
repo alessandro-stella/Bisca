@@ -6,6 +6,24 @@
 
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
+
+    <script>
+      async function checkSession() {
+        const response = await fetch("/api/session/checkSession", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          console.log("Session OK");
+          window.location.replace("/lobbies.html");
+        } else {
+          console.log("No session or expired");
+        }
+      }
+
+      checkSession();
+    </script>
   </head>
   <body>
     <div class="container">

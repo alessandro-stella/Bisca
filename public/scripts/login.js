@@ -23,7 +23,8 @@ form.addEventListener("submit", async (event) => {
   const password = passwordInput.value;
 
   try {
-    const res = await fetch("/api/users/login", {
+    console.log("Entering try");
+    const res = await fetch("/api/user/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,8 +34,10 @@ form.addEventListener("submit", async (event) => {
         password,
       }),
     });
+    console.log("After fetch");
 
     const loginResponse = await res.json();
+    console.log("Login response: ", loginResponse);
 
     if (!res.ok) {
       loginError.style.display = "block";

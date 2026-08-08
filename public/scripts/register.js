@@ -69,7 +69,7 @@ form.addEventListener("submit", async (event) => {
   }
 
   try {
-    const res = await fetch("/api/users/checkUser", {
+    const res = await fetch("/api/user/checkUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -99,7 +99,7 @@ async function registerUser(username, email, password) {
   console.log({ username, email, password });
 
   try {
-    const res = await fetch("/api/users/register", {
+    const res = await fetch("/api/user/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
