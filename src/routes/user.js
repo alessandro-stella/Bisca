@@ -200,13 +200,4 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Logout handler
-// router.get("/logout", async (req, res) => {
-//   const sessionId = req.cookies?.sessionId;
-//
-//   if (!sessionId) {
-//     return res.sendStatus(401);
-//   }
-// });
-
 module.exports = router;
