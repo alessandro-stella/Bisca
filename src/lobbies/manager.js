@@ -15,11 +15,40 @@ function getLobby(lobbyId) {
 }
 
 function getLobbies() {
-  return Array.from(lobbies.values());
+  return Array.from(lobbies.values()).map((lobby) => ({
+    id: lobby.id,
+    ownerId: lobby.ownerId,
+    ownerUsername: lobby.ownerUsername,
+    players: lobby.players.size,
+  }));
 }
 
 function deleteLobby(lobbyId) {
   return lobbies.delete(lobbyId);
+}
+
+function addPlayer(lobbyId, userId) {
+  const lobby = lobbies.get(lobbyId);
+
+  if (!lobby) {
+    return false;
+  }
+
+  lobby.players.add(userId);
+
+  return true;
+}
+
+function removePlayer(lobbyId, userId) {
+  const lobby = lobbies.get(lobbyId);
+
+  if (!lobby) {
+    return false;
+  }
+
+  lobby.players.delete(userId);
+
+  return true;
 }
 
 module.exports = {
@@ -27,4 +56,6 @@ module.exports = {
   getLobby,
   getLobbies,
   deleteLobby,
+  addPlayer,
+  removePlayer,
 };
