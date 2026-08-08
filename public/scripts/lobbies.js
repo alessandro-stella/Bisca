@@ -23,8 +23,10 @@ async function checkSession() {
 function setupSocket() {
   socket = io();
 
-  socket.on("connect", () => {
-    console.log("Socket connected:", socket.id);
+  const createLobbyButton = document.getElementById("createLobby");
+
+  createLobbyButton.addEventListener("click", () => {
+    socket.emit("lobby:create");
   });
 
   socket.on("connect_error", (error) => {

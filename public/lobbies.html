@@ -9,29 +9,6 @@
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
 
-    <script>
-      async function checkSession() {
-        try {
-          const response = await fetch("/api/session/me", {
-            method: "GET",
-            credentials: "include",
-          });
-
-          if (response.ok) {
-            console.log("Session OK");
-          } else {
-            console.log("No session or expired");
-            window.location.replace("/login.html");
-          }
-        } catch (error) {
-          console.error("Session check failed:", error);
-          window.location.replace("/login.html");
-        }
-      }
-
-      checkSession();
-    </script>
-
     <script src="/socket.io/socket.io.js"></script>
     <script src="scripts/lobbies.js"></script>
   </head>
@@ -44,6 +21,7 @@
     </div>
 
     <div class="container">
+      <button id="createLobby">Create lobby</button>
       <a href="profile.html">
         <button type="button">Go to profile</button>
       </a>

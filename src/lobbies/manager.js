@@ -31,18 +31,18 @@ function addPlayer(lobbyId, userId) {
   const lobby = lobbies.get(lobbyId);
 
   if (!lobby) {
-    return false;
+    return { success: false, error: "missing lobby" };
   }
 
   const currentLobby = getLobbyByPlayer(userId);
 
   if (currentLobby) {
-    return false;
+    return { success: false, error: "already in a lobby" };
   }
 
   lobby.players.add(userId);
 
-  return true;
+  return { success: true, error: null };
 }
 
 function removePlayer(lobbyId, userId) {

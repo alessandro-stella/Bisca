@@ -53,11 +53,11 @@ function handleCreateLobby(socket, io) {
 }
 
 function joinLobby(lobbyId, socket, io) {
-  const success = addPlayer(lobbyId, socket.user.id);
+  const response = addPlayer(lobbyId, socket.user.id);
 
-  if (!success) {
+  if (!response.success) {
     socket.emit("lobby:join:error", {
-      message: "Cannot join lobby",
+      message: response.error,
     });
 
     return;
