@@ -11,6 +11,12 @@ const {
 } = require("../lobbies/manager");
 
 function handleCreateLobby(socket, io) {
+  const currentLobby = getLobbyByPlayer(socket.user.id);
+
+  if (currentLobby) {
+    return;
+  }
+
   const lobby = {
     id: uuidv4(),
     ownerId: socket.user.id,

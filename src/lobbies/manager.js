@@ -34,6 +34,12 @@ function addPlayer(lobbyId, userId) {
     return false;
   }
 
+  const currentLobby = getLobbyByPlayer(userId);
+
+  if (currentLobby) {
+    return false;
+  }
+
   lobby.players.add(userId);
 
   return true;
