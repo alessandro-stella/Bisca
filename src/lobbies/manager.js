@@ -51,6 +51,16 @@ function removePlayer(lobbyId, userId) {
   return true;
 }
 
+function getLobbyByPlayer(userId) {
+  for (const lobby of lobbies.values()) {
+    if (lobby.players.has(userId)) {
+      return lobby;
+    }
+  }
+
+  return null;
+}
+
 module.exports = {
   createLobby,
   getLobby,
@@ -58,4 +68,5 @@ module.exports = {
   deleteLobby,
   addPlayer,
   removePlayer,
+  getLobbyByPlayer,
 };
