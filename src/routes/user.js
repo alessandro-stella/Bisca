@@ -67,10 +67,13 @@ router.post("/register", async (req, res) => {
     });
   }
 
+  const dbClient = await db.connect();
+
   try {
+    await dbClient.query("BEGIN");
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const result = await db.query(
+    const result = await dbClient.query(
       `
         INSERT INTO users(username, email, password_hash)
         VALUES ($1, $2, $3)
@@ -79,8 +82,33 @@ router.post("/register", async (req, res) => {
       [username, email, passwordHash],
     );
 
-    res.status(201).json(result.rows[0]);
+    const user = result.rows[0];
+    const session = await handleSession(dbClient, user.id);
+
+    if (!session) {
+      throw new Error("Couldn't create session");
+    }
+
+    await dbClient.query("COMMIT");
+
+    res.cookie("sessionId", session.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      expires: session.expiresAt,
+    });
+
+    return res.status(201).json({
+      authenticated: true,
+      user,
+    });
   } catch (error) {
+    try {
+      await dbClient.query("ROLLBACK");
+    } catch (rollbackError) {
+      console.error("Rollback error:", rollbackError);
+    }
+
     if (error.code === UNIQUE_CONSTRAINT) {
       if (error.constraint === "users_username_key") {
         return res.status(409).json({
@@ -106,6 +134,8 @@ router.post("/register", async (req, res) => {
     res.status(500).json({
       error: "Internal server error",
     });
+  } finally {
+    dbClient.release();
   }
 });
 
@@ -122,7 +152,7 @@ router.post("/login", async (req, res) => {
   try {
     const result = await db.query(
       `
-        SELECT *
+        SELECT id, username, email, password_hash
         FROM users
         WHERE email=$1
       `,
@@ -158,6 +188,7 @@ router.post("/login", async (req, res) => {
     });
 
     return res.status(200).json({
+      authenticated: true,
       user: {
         id: user.id,
         username: user.username,
