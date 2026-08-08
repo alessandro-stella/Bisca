@@ -1,7 +1,9 @@
-<html lang="en">
+<!doctype html>
+<html lang="it">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Lobbies</title>
 
     <link rel="stylesheet" href="reset.css" />
@@ -9,37 +11,42 @@
 
     <script>
       async function checkSession() {
-        const response = await fetch("/api/session/me", {
-          method: "GET",
-          credentials: "include",
-        });
+        try {
+          const response = await fetch("/api/session/me", {
+            method: "GET",
+            credentials: "include",
+          });
 
-        if (response.ok) {
-          console.log("Session OK");
-        } else {
-          console.log("No session or expired");
+          if (response.ok) {
+            console.log("Session OK");
+          } else {
+            console.log("No session or expired");
+            window.location.replace("/login.html");
+          }
+        } catch (error) {
+          console.error("Session check failed:", error);
           window.location.replace("/login.html");
         }
       }
 
       checkSession();
     </script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/sockets/lobbies.js"></script>
   </head>
 
   <body>
     <div class="container">
-      <h1>Create lobby</h1>
-      <input id="lobbyName" type="text" placeholder="Name" />
-      <button onclick="createLobby()">Test</button>
-    </div>
+      <h1>Lobbies</h1>
 
-    <div class="container">
-      <button onclick="getLobbies()">Get lobbies</button>
       <ol id="lobbies"></ol>
     </div>
 
     <div class="container">
-      <a href="profile.html"><button>Go to profile</button></a>
+      <a href="profile.html">
+        <button type="button">Go to profile</button>
+      </a>
     </div>
   </body>
 </html>

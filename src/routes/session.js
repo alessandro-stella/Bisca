@@ -9,7 +9,6 @@ const FUTURE_TIME = 7 * 24 * 60 * 60 * 1000;
 
 async function handleSession(userId, client = db) {
   const sessionId = uuidv4();
-
   const expiresAt = new Date(Date.now() + FUTURE_TIME);
 
   await client.query(
@@ -109,11 +108,7 @@ router.post("/logout", async (req, res) => {
       [sessionId],
     );
 
-    res.clearCookie("sessionId", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
+    res.clearCookie("sessionId");
 
     return res.sendStatus(204);
   } catch (error) {
