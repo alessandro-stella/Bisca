@@ -86,9 +86,8 @@ form.addEventListener("submit", async (event) => {
     } else {
       await registerUser(username, email, password);
     }
-  } catch (e) {
-    console.log("Internal server error");
-    console.log(e);
+  } catch (error) {
+    console.log("Internal server error: ", error);
   }
 
   setReadonly(false);
@@ -116,13 +115,9 @@ async function registerUser(username, email, password) {
     if (!res.ok) {
       addErrors(registrationResponse.errors);
     } else {
-      console.log(registrationResponse);
-
-      // TODO: add way to save user data
-      // window.location.replace("index.html");
+      console.log({ registrationResponse });
     }
-  } catch (e) {
-    console.log("Internal server error");
-    console.log(e);
+  } catch (error) {
+    console.log("Internal server error: ", error);
   }
 }

@@ -83,7 +83,7 @@ router.post("/register", async (req, res) => {
     );
 
     const user = result.rows[0];
-    const session = await handleSession(dbClient, user.id);
+    const session = await handleSession(user.id, dbClient);
 
     if (!session) {
       throw new Error("Couldn't create session");
@@ -176,10 +176,6 @@ router.post("/login", async (req, res) => {
 
     const session = await handleSession(user.id);
 
-    if (!session) {
-      throw new Error("Couldn't create session");
-    }
-
     res.cookie("sessionId", session.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -203,5 +199,14 @@ router.post("/login", async (req, res) => {
     });
   }
 });
+
+// Logout handler
+// router.get("/logout", async (req, res) => {
+//   const sessionId = req.cookies?.sessionId;
+//
+//   if (!sessionId) {
+//     return res.sendStatus(401);
+//   }
+// });
 
 module.exports = router;

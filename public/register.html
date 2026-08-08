@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
 
+    <script src="scripts/register.js" defer></script>
+
     <script>
       async function checkSession() {
-        const response = await fetch("/api/session/checkSession", {
+        const response = await fetch("/api/session/me", {
           method: "GET",
           credentials: "include",
         });
@@ -84,7 +86,5 @@
       <a href="index.html"><button>Home</button></a>
       <a href="login.html"><button>Go to login</button></a>
     </div>
-
-    <script src="scripts/register.js"></script>
   </body>
 </html>

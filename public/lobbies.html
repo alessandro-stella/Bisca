@@ -3,12 +3,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lobbies</title>
+
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
 
     <script>
       async function checkSession() {
-        const response = await fetch("/api/session/checkSession", {
+        const response = await fetch("/api/session/me", {
           method: "GET",
           credentials: "include",
         });
@@ -22,23 +23,7 @@
       }
 
       checkSession();
-
-      async function logout() {
-        const response = await fetch("/api/user/logout", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          console.log("Logout successful");
-          // window.location.replace("/login.html");
-        } else {
-          console.log("Error during logout");
-        }
-      }
     </script>
-
-    <script src="client.js"></script>
   </head>
 
   <body>
@@ -54,7 +39,7 @@
     </div>
 
     <div class="container">
-      <button onclick="logout()">Logout</button>
+      <a href="profile.html"><button>Go to profile</button></a>
     </div>
   </body>
 </html>

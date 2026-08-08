@@ -2,27 +2,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Profile</title>
 
-    <script>
-      async function checkSession() {
-        const response = await fetch("/api/session/checkSession", {
-          method: "GET",
-          credentials: "include",
-        });
+    <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="style.css" />
 
-        if (response.ok) {
-          console.log("Session OK");
-        } else {
-          console.log("No session or expired");
-          window.location.href = "/login.html";
-        }
-      }
-
-      checkSession();
-    </script>
+    <script src="./scripts/profile.js" defer></script>
   </head>
+
   <body>
     <h1>Your personal profile</h1>
+
+    <div class="container">
+      <button onclick="logout()">Logout</button>
+      <a href="lobbies.html"><button>See lobbies</button></a>
+    </div>
   </body>
 </html>

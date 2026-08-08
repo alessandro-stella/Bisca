@@ -42,14 +42,11 @@ form.addEventListener("submit", async (event) => {
     if (!res.ok) {
       loginError.style.display = "block";
     } else {
-      console.log(loginResponse);
-
-      // TODO: add way to save user data
-      // window.location.replace("index.html");
+      // console.log({ loginResponse });
+      window.location.replace("lobbies.html");
     }
-  } catch (e) {
-    console.log("Internal server error");
-    console.log(e);
+  } catch (error) {
+    console.log("Internal server error: ", error);
   }
 
   setReadonly(false);

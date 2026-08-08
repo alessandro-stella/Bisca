@@ -7,24 +7,24 @@ const db = require("../db");
 // 1 week in milliseconds
 const FUTURE_TIME = 7 * 24 * 60 * 60 * 1000;
 
-async function handleSession(dbClient, userId) {
+async function handleSession(userId, client = db) {
   const sessionId = uuidv4();
 
   const expiresAt = new Date(Date.now() + FUTURE_TIME);
 
-  await dbClient.query(
+  await client.query(
     `
-        INSERT INTO sessions (id, user_id, expires_at)
-        VALUES ($1, $2, $3)
-      `,
+      INSERT INTO sessions (id, user_id, expires_at)
+      VALUES ($1, $2, $3)
+    `,
     [sessionId, userId, expiresAt],
   );
 
   return { id: sessionId, expiresAt };
 }
 
-// Check validity of session
-router.get("/checkSession", async (req, res) => {
+// Check validity of session and get user data
+router.get("/me", async (req, res) => {
   const sessionId = req.cookies?.sessionId;
 
   if (!sessionId) {
@@ -83,9 +83,45 @@ router.get("/checkSession", async (req, res) => {
       authenticated: true,
       user,
     });
-  } catch (e) {
-    console.error(e);
-    return res.sendStatus(500);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+});
+
+// Logout user by deleting current session
+router.post("/logout", async (req, res) => {
+  const sessionId = req.cookies?.sessionId;
+
+  if (!sessionId) {
+    return res.sendStatus(204);
+  }
+
+  try {
+    await db.query(
+      `
+        DELETE FROM sessions
+        WHERE id = $1
+      `,
+      [sessionId],
+    );
+
+    res.clearCookie("sessionId", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    return res.sendStatus(204);
+  } catch (error) {
+    console.error("Logout error:", error);
+
+    return res.status(500).json({
+      error: "Internal server error",
+    });
   }
 });
 

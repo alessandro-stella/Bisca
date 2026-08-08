@@ -9,7 +9,7 @@
 
     <script>
       async function checkSession() {
-        const response = await fetch("/api/session/checkSession", {
+        const response = await fetch("/api/session/me", {
           method: "GET",
           credentials: "include",
         });
