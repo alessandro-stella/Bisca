@@ -9,6 +9,7 @@ const {
   getLobbyByPlayer,
   getLobby,
   deleteLobby,
+  setLobbyStarted,
   setPlayerConnected,
   isPlayerConnected,
 } = require("../game/lobbyManager");
@@ -32,6 +33,10 @@ function sendLobbies(socket) {
     ...lobby,
     isMember: currentLobby?.id === lobby.id,
     isOwner: lobby.ownerId === socket.user.id,
+    isConnected:
+      currentLobby?.id === lobby.id
+        ? (currentLobby.players.get(socket.user.id)?.connected ?? false)
+        : false,
   }));
 
   socket.emit("lobbies:update", lobbiesForUser);
@@ -54,6 +59,7 @@ function handleCreateLobby(socket, io) {
     id: uuidv4(),
     ownerId: socket.user.id,
     ownerUsername: socket.user.username,
+    started: false,
     players: new Map([
       [
         socket.user.id,
@@ -78,10 +84,7 @@ function joinLobby(lobbyId, socket, io) {
 
   if (!result.success) {
     socket.emit("lobby:join:error", {
-      message:
-        result.error === "missing lobby"
-          ? "Lobby does not exist"
-          : "You are already in a lobby",
+      message: result.error,
     });
 
     return;
@@ -201,6 +204,7 @@ function startGame(socket, io) {
 
   console.log("GAME CREATED:", game);
 
+  setLobbyStarted(lobby.id, true);
   io.to(`lobby:${lobby.id}`).emit("game:started");
 }
 
@@ -230,6 +234,16 @@ function sendGameState(socket) {
   console.log(`Sending game state to ${socket.user.username}`);
 
   socket.emit("game:state", getPublicGameState(game));
+}
+
+function checkCurrentGame(socket) {
+  const lobby = getLobbyByPlayer(socket.user.id);
+
+  if (!lobby || !lobby.started) {
+    return;
+  }
+
+  socket.emit("game:reconnect");
 }
 
 function handleDisconnect(socket, io) {
@@ -319,6 +333,10 @@ function handleReconnect(socket, io) {
   console.log(`${socket.user.username} reconnected to lobby ${lobby.id}`);
 
   broadcastLobbies(io);
+
+  if (lobby.started) {
+    socket.emit("game:reconnect");
+  }
 }
 
 function setupSockets(io) {
@@ -356,6 +374,10 @@ function setupSockets(io) {
 
     socket.on("game:get-state", () => {
       sendGameState(socket);
+    });
+
+    socket.on("lobbies:check", () => {
+      checkCurrentGame(socket);
     });
 
     socket.on("disconnect", () => {

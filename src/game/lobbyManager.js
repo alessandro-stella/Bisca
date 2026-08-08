@@ -20,6 +20,10 @@ function getLobbies() {
     ownerId: lobby.ownerId,
     ownerUsername: lobby.ownerUsername,
     players: lobby.players.size,
+    started: lobby.started,
+    playersConnected: Array.from(lobby.players.values()).filter(
+      (player) => player.connected,
+    ).length,
   }));
 }
 
@@ -31,20 +35,36 @@ function addPlayer(lobbyId, userId) {
   const lobby = lobbies.get(lobbyId);
 
   if (!lobby) {
-    return { success: false, error: "missing lobby" };
+    return {
+      success: false,
+      error: "missing lobby",
+    };
+  }
+
+  if (lobby.started) {
+    return {
+      success: false,
+      error: "game already started",
+    };
   }
 
   const currentLobby = getLobbyByPlayer(userId);
 
   if (currentLobby) {
-    return { success: false, error: "already in a lobby" };
+    return {
+      success: false,
+      error: "already in a lobby",
+    };
   }
 
   lobby.players.set(userId, {
     connected: true,
   });
 
-  return { success: true, error: null };
+  return {
+    success: true,
+    error: null,
+  };
 }
 
 function removePlayer(lobbyId, userId) {
@@ -55,6 +75,18 @@ function removePlayer(lobbyId, userId) {
   }
 
   lobby.players.delete(userId);
+
+  return true;
+}
+
+function setLobbyStarted(lobbyId, started) {
+  const lobby = lobbies.get(lobbyId);
+
+  if (!lobby) {
+    return false;
+  }
+
+  lobby.started = started;
 
   return true;
 }
@@ -106,6 +138,7 @@ module.exports = {
   deleteLobby,
   addPlayer,
   removePlayer,
+  setLobbyStarted,
   setPlayerConnected,
   isPlayerConnected,
   getLobbyByPlayer,

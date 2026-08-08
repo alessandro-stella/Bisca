@@ -1,6 +1,12 @@
 let currentUser = null;
 let socket = null;
 
+window.addEventListener("pageshow", () => {
+  if (socket?.connected) {
+    socket.emit("lobbies:check");
+  }
+});
+
 async function checkSession() {
   const response = await fetch("/api/session/me", {
     method: "GET",
@@ -9,7 +15,6 @@ async function checkSession() {
 
   if (!response.ok) {
     window.location.replace("/login.html");
-
     return false;
   }
 
@@ -45,8 +50,22 @@ function setupSocket() {
     console.error("Cannot join lobby:", data.message);
   });
 
+  socket.on("lobby:deleted", () => {
+    window.location.replace("/lobbies.html");
+  });
+
   socket.on("game:started", () => {
-    window.location.replace("/game.html");
+    window.location.href = "/game.html";
+  });
+
+  socket.on("game:reconnect", () => {
+    const reconnect = window.confirm(
+      "Do you want to reconnect to your previous game?",
+    );
+
+    if (reconnect) {
+      window.location.href = "/game.html";
+    }
   });
 }
 
@@ -60,11 +79,26 @@ function renderLobbies(lobbies) {
 
     const info = document.createElement("span");
 
-    info.textContent = `${lobby.ownerUsername} - ${lobby.players} giocatori`;
+    info.textContent =
+      `${lobby.ownerUsername} - ` +
+      `${lobby.players} giocatori ` +
+      `(${lobby.playersConnected} connessi)`;
 
     item.appendChild(info);
 
     if (lobby.isOwner) {
+      if (!lobby.started) {
+        const startButton = document.createElement("button");
+
+        startButton.textContent = "Start Game";
+
+        startButton.addEventListener("click", () => {
+          socket.emit("game:start");
+        });
+
+        item.appendChild(startButton);
+      }
+
       const deleteButton = document.createElement("button");
 
       deleteButton.textContent = "Delete";
@@ -84,7 +118,7 @@ function renderLobbies(lobbies) {
       });
 
       item.appendChild(leaveButton);
-    } else {
+    } else if (!lobby.started) {
       const joinButton = document.createElement("button");
 
       joinButton.textContent = "Join";
@@ -94,6 +128,12 @@ function renderLobbies(lobbies) {
       });
 
       item.appendChild(joinButton);
+    } else {
+      const startedText = document.createElement("span");
+
+      startedText.textContent = "Game already started";
+
+      item.appendChild(startedText);
     }
 
     lobbiesList.appendChild(item);
