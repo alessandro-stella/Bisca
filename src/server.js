@@ -26,13 +26,8 @@ app.use("/api/session", sessionRouter);
 
 app.use(express.static(path.join(__dirname, "../public")));
 
-io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("Socket disconnected:", socket.id);
-  });
-});
+const setupSockets = require("./sockets");
+setupSockets(io);
 
 server.listen(PORT, async () => {
   console.log(`Server started on port ${PORT}`);

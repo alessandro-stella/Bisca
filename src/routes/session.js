@@ -19,64 +19,70 @@ async function handleSession(userId, client = db) {
     [sessionId, userId, expiresAt],
   );
 
-  return { id: sessionId, expiresAt };
+  return {
+    id: sessionId,
+    expiresAt,
+  };
 }
 
-// Check validity of session and get user data
-router.get("/me", async (req, res) => {
-  const sessionId = req.cookies?.sessionId;
-
+async function getUserFromSession(sessionId, client = db) {
   if (!sessionId) {
-    return res.sendStatus(401);
+    return null;
   }
 
-  try {
-    const sessionResult = await db.query(
-      `
-        SELECT user_id
-        FROM sessions
-        WHERE id = $1 AND expires_at > NOW()
-      `,
-      [sessionId],
-    );
+  const sessionResult = await client.query(
+    `
+      SELECT user_id
+      FROM sessions
+      WHERE id = $1 AND expires_at > NOW()
+    `,
+    [sessionId],
+  );
 
-    // Missing or expired session
-    if (sessionResult.rows.length === 0) {
-      await db.query(
-        `
-          DELETE FROM sessions
-          WHERE id = $1 AND expires_at <= NOW()
-        `,
-        [sessionId],
-      );
+  if (sessionResult.rows.length === 0) {
+    return null;
+  }
 
-      res.clearCookie("sessionId");
+  const userId = sessionResult.rows[0].user_id;
 
-      return res.sendStatus(401);
-    }
-
-    const userId = sessionResult.rows[0].user_id;
-
-    // Get session's user
-    const userResult = await db.query(
-      `
+  const userResult = await client.query(
+    `
         SELECT id, username, email
         FROM users
         WHERE id = $1
-      `,
-      [userId],
-    );
+        `,
+    [userId],
+  );
 
-    // No user associated with the session
-    if (userResult.rows.length === 0) {
-      await db.query(`DELETE FROM sessions WHERE id = $1`, [sessionId]);
+  if (userResult.rows.length === 0) {
+    return null;
+  }
+
+  return userResult.rows[0];
+}
+
+// Get the currently authenticated user.
+router.get("/me", async (req, res) => {
+  const sessionId = req.cookies?.sessionId;
+
+  try {
+    const user = await getUserFromSession(sessionId);
+
+    if (!user) {
+      if (sessionId) {
+        await db.query(
+          `
+            DELETE FROM sessions
+            WHERE id = $1
+          `,
+          [sessionId],
+        );
+      }
 
       res.clearCookie("sessionId");
 
       return res.sendStatus(401);
     }
-
-    const user = userResult.rows[0];
 
     return res.status(200).json({
       authenticated: true,
@@ -85,13 +91,13 @@ router.get("/me", async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Internal server error",
     });
   }
 });
 
-// Logout user by deleting current session
+// Logout the current user by deleting the current session.
 router.post("/logout", async (req, res) => {
   const sessionId = req.cookies?.sessionId;
 
@@ -120,4 +126,8 @@ router.post("/logout", async (req, res) => {
   }
 });
 
-module.exports = { router, handleSession };
+module.exports = {
+  router,
+  handleSession,
+  getUserFromSession,
+};
