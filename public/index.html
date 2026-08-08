@@ -8,7 +8,109 @@
   </head>
 
   <body>
-    <h1>Welcome to Bisca!</h1>
+    <div class="title">Welcome to Bisca!</div>
+
+    <div id="rules">
+      <div>Regole del gioco</div>
+
+      <ul>
+        <li>
+          <b>Scopo del gioco</b>: ogni giocatore inizia con X vite. Al termine
+          di ogni turno, almeno un giocatore perderà una vita. Vince l'ultimo
+          giocatore con almeno una vita rimanenti.
+        </li>
+        <li>
+          <b>Come è composto un turno di gioco</b>: ad ogni turno verranno
+          distribuite un tot di carte ad ogni giocatore. Cominciando dal
+          giocatore alla destra del mazziere, per poi procedere in senso
+          antiorario, ognuno annuncia in base alle proprie carte quante "mani"
+          vincerà in totale. Dopo aver completato il giro, nello stesso ordine
+          in cui si ha parlato, ogni giocatore dovrà calare una carta. Alla fine
+          del giro il giocatore che ha tirato la carta più alta vincerà la mano.
+          Quest'ultimo sarà poi il primo a tirare la seconda carta e così via,
+          finchè tutti non avranno tirato le carte nella loro mano.
+        </li>
+        <li>
+          <b>Calcolo del punteggio</b>: alla fine di un turno ogni giocatore
+          confronta il numero di prese che aveva previsto con quelle effettuate,
+          perdendo vita in base alla differenza da quanto aveva detto
+          inizialmente. Ad esempio, pronosticare 2 prese e farne 3 non è una
+          cosa positiva, poichè ci farà perdere una vita; occorre quindi
+          prestare attenzione anche al numero di mani da perdere durante un
+          turno, oltre che al numero di prese da vincere.
+        </li>
+        <li>
+          <b>Proseguimento della partita</b>: ad ogni nuovo turno si
+          distribuisce il numero di carte precedente meno uno (partendo
+          generalmente da 6) fin quando non si arriva ad uno. Una volta
+          completato il round con una carta, che si svolge in modo diverso
+          rispetto agli altri, se vi sono ancora giocatori in vita si ricomincia
+          dal numero di carte distribuito inizialmente.
+        </li>
+        <li>
+          <b>Showdown, il round con una carta</b>: quando si resta con una sola
+          carta "in mano" non ci sarà possibile vederla; ogni giocatore mostrerà
+          la propria carta (in vita reale si mette sulla fronte) agli avversari,
+          che dovranno decidere, sempre mantenendo l'ordine definito prima, se
+          vinceranno o perderanno quella mano. Alla fine del giro si mostrano le
+          carte e si determina chi ha sbagliato, facendogli perdere una vita.
+        </li>
+        <li>
+          <b>Come garantire la perdita di vite</b>: come detto precedentemente,
+          ad ogni round almeno un giocatore dovrà perdere una vita; per
+          garantire ciò, la somma del numero di prese dette da ogni giocatore
+          dovrà essere diversa dal numero di carte in mano ad ogni giocatore. Se
+          così non fosse, infatti, sarebbe sempre possibile giocare le carte in
+          modo tale che ogni giocatore prenda quanto ha detto. Ciò penalizza
+          l'ultimo giocatore del giro iniziale, poiché potrebbe ritrovarsi
+          obbligato a dire un certo numero di prese. Nonostante sembri un forte
+          svantaggio, in realtà permette di bilanciare un vantaggio intrinseco:
+          essere l'ultimo del giro permette di farsi un'idea delle carte che
+          hanno in mano gli avversari, potendo scegliere il proprio numero in
+          modo più "sicuro".
+
+          <b>Esempio pratico:</b> 3 giocatori, ognuno con 4 carte in mano.
+          Verranno quindi effettuate esattamente 4 prese.
+
+          <ul>
+            <li><b>Giocatore 1</b>: dice "farò 2 prese"</li>
+            <li><b>Giocatore 2</b>: dice "farò 1 presa"</li>
+            <li>
+              <b>Giocatore 3</b>: non potrà dire "farò 1 presa", in quanto la
+              somma delle prese sarebbe uguale a 4. Dovrà per forza dire 0, 2, 3
+              o 4.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <b>Valore delle carte</b>: una carta può avere più valore di un'altra
+          sia in base al seme che al valore numerico:
+          <ul>
+            <li>
+              <b>Semi diversi</b>: i semi sono disposti, in ordine decrescente,
+              come DENARI > COPPE > SPADE > BASTONI.
+            </li>
+            <li>
+              <b>Parità di seme</b>: tra carte dello stesso seme, il valore è
+              determinato dal valore numerico, ovvero 10 > 9 > ... > 2 > Asso.
+            </li>
+          </ul>
+          Secondo questo ordinamento, il re di denari è la carta più alta,
+          mentre l'asso di bastoni è la più bassa.
+        </li>
+        <li>
+          <b>Attenzione all'asso di denari!</b> L'asso di denari, e solo lui,
+          può comportarsi come un jolly nella mano in cui viene giocato: quando
+          un giocatore lo gioca, può decidere se considerarlo la carta più alta
+          o la carta più bassa della mano, potendo quindi assicurarsi di vincere
+          o perdere la mano. Questo scavalca completamente l'ordinamento
+          definito in precedenza, permettendo all'asso di denari di essere
+          superiore anche al re di denari o inferiore persino all'asso di
+          bastoni.
+        </li>
+      </ul>
+    </div>
+
     <div class="container">
       <a href="login.html"><button>Login</button></a>
       <a href="register.html"><button>Register</button></a>
