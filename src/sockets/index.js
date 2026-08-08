@@ -7,8 +7,29 @@ const {
   addPlayer,
   removePlayer,
   getLobbyByPlayer,
+  getLobby,
   deleteLobby,
 } = require("../lobbies/manager");
+
+function sendLobbies(socket) {
+  const lobbies = getLobbies();
+
+  const currentLobby = getLobbyByPlayer(socket.user.id);
+
+  const lobbiesForUser = lobbies.map((lobby) => ({
+    ...lobby,
+    isMember: currentLobby?.id === lobby.id,
+    isOwner: lobby.ownerId === socket.user.id,
+  }));
+
+  socket.emit("lobbies:update", lobbiesForUser);
+}
+
+function broadcastLobbies(io) {
+  for (const socket of io.sockets.sockets.values()) {
+    sendLobbies(socket);
+  }
+}
 
 function handleCreateLobby(socket, io) {
   const currentLobby = getLobbyByPlayer(socket.user.id);
@@ -28,25 +49,41 @@ function handleCreateLobby(socket, io) {
 
   console.log("Lobby created:", lobby);
 
-  io.emit("lobbies:update", getLobbies());
+  broadcastLobbies(io);
 }
 
-function handleJoinLobby(lobbyId, socket, io) {
+function joinLobby(lobbyId, socket, io) {
   const success = addPlayer(lobbyId, socket.user.id);
 
   if (!success) {
+    socket.emit("lobby:join:error", {
+      message: "Cannot join lobby",
+    });
+
     return;
   }
 
   console.log(`${socket.user.username} joined lobby ${lobbyId}`);
 
-  io.emit("lobbies:update", getLobbies());
+  broadcastLobbies(io);
 }
 
-function handleLeaveLobby(socket, io) {
+function leaveLobby(socket, io) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
+    return;
+  }
+
+  if (lobby.ownerId === socket.user.id) {
+    deleteLobby(lobby.id);
+
+    console.log(
+      `Lobby deleted because owner ${socket.user.username} left: ${lobby.id}`,
+    );
+
+    broadcastLobbies(io);
+
     return;
   }
 
@@ -54,13 +91,25 @@ function handleLeaveLobby(socket, io) {
 
   console.log(`${socket.user.username} left lobby ${lobby.id}`);
 
-  if (lobby.players.size === 0) {
-    deleteLobby(lobby.id);
+  broadcastLobbies(io);
+}
 
-    console.log(`Lobby deleted: ${lobby.id}`);
+function handleDeleteLobby(lobbyId, socket, io) {
+  const lobby = getLobby(lobbyId);
+
+  if (!lobby) {
+    return;
   }
 
-  io.emit("lobbies:update", getLobbies());
+  if (lobby.ownerId !== socket.user.id) {
+    return;
+  }
+
+  deleteLobby(lobbyId);
+
+  console.log(`Lobby ${lobbyId} deleted by owner ${socket.user.username}`);
+
+  broadcastLobbies(io);
 }
 
 function setupSockets(io) {
@@ -68,21 +117,31 @@ function setupSockets(io) {
 
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
+
     console.log("Authenticated user:", socket.user);
 
-    socket.emit("lobbies:update", getLobbies());
+    sendLobbies(socket);
 
-    socket.on("lobby:create", () => handleCreateLobby(socket, io));
+    socket.on("lobby:create", () => {
+      handleCreateLobby(socket, io);
+    });
 
-    socket.on("lobby:join", (lobbyId) => handleJoinLobby(lobbyId, socket, io));
+    socket.on("lobby:join", (lobbyId) => {
+      joinLobby(lobbyId, socket, io);
+    });
 
     socket.on("lobby:leave", () => {
-      handleLeaveLobby(socket, io);
+      leaveLobby(socket, io);
+    });
+
+    socket.on("lobby:delete", (lobbyId) => {
+      handleDeleteLobby(lobbyId, socket, io);
     });
 
     socket.on("disconnect", () => {
       console.log("Socket disconnected:", socket.id);
-      handleLeaveLobby(socket, io);
+
+      leaveLobby(socket, io);
     });
   });
 }
