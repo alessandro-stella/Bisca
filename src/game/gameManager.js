@@ -109,6 +109,10 @@ function placeBid(game, playerId, bid) {
   }
 }
 
+function playCard(game, playerId, card) {
+  console.log(`${playerId} wants to play ${card}`);
+}
+
 module.exports = {
   initGameState,
   createGame,
@@ -116,4 +120,5 @@ module.exports = {
   deleteGame,
   getPlayerGameState,
   placeBid,
+  playCard,
 };

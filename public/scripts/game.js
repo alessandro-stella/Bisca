@@ -96,7 +96,7 @@ function createCards(cards) {
     newCard.classList.add("card");
 
     newCard.addEventListener("click", () => {
-      console.log(`Voglio giocare ${number} di ${suit}`);
+      socket.emit("game:play-card", card);
     });
 
     cardsContainer.appendChild(newCard);
