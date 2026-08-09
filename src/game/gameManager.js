@@ -46,6 +46,7 @@ function initGameState(lobbyId, players, lives, initialCards) {
     turnPhase: "bidding",
     initialCards,
     turn: 1,
+    playedHands: 0,
     players,
     playedCards: new Map(),
     currentPlayer: Array.from(players.keys())[0],
@@ -149,13 +150,16 @@ function getCardValue(card) {
     case "bastoni":
       return number + 100;
 
-    default:
+    case "asso-prende":
+      return 10000;
+
+    case "asso-lascia":
       return -1;
   }
 }
 
 function updateScore(game) {
-  const playedCards = [...game.playedCards.entries()];
+  const playedCards = Array.from(game.playedCards.entries());
 
   let highestCard = playedCards[0];
 
@@ -171,8 +175,54 @@ function updateScore(game) {
   game.currentPlayer = winnerId;
 
   const winnerValues = game.players.get(winnerId);
-  winnerValues.won += 1;
+  winnerValues.won++;
   game.players.set(winnerId, winnerValues);
+
+  game.playedHands++;
+
+  if (game.playedHands == game.initialCards - (game.turn - 1)) {
+    endTurn(game);
+  }
+}
+
+function endTurn(game) {
+  const newLives = new Map();
+
+  for (const [playerId, playerValues] of game.players) {
+    if (playerValues.lives === 0) {
+      newLives.set(playerId, 0);
+      continue;
+    }
+
+    const lives = Math.max(
+      playerValues.lives - Math.abs(playerValues.bid - playerValues.won),
+      0,
+    );
+
+    newLives.set(playerId, lives);
+  }
+
+  const survivors = Array.from(newLives.entries()).filter(
+    ([, lives]) => lives > 0,
+  );
+
+  if (survivors.length === 0) {
+    console.log("PAREGGIO!");
+    return;
+  }
+
+  if (survivors.length === 1) {
+    const [winnerId] = survivors[0];
+
+    console.log("VINCITORE!", winnerId);
+    return;
+  }
+
+  console.log("Più di un vivo, si continua!");
+
+  for (const [playerId, lives] of newLives.entries()) {
+    game.players.get(playerId).lives = lives;
+  }
 }
 
 module.exports = {

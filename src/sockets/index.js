@@ -78,7 +78,7 @@ function setupTestGame(socket, io) {
   let game = getGame(TEST_LOBBY_ID);
 
   if (!game) {
-    game = initGameState(TEST_LOBBY_ID, lobby.players, 3, 6);
+    game = initGameState(TEST_LOBBY_ID, lobby.players, 1, 3);
 
     createGame(game);
 
