@@ -93,7 +93,7 @@ function renderLobbies(lobbies) {
         startButton.textContent = "Start Game";
 
         startButton.addEventListener("click", () => {
-          socket.emit("game:start");
+          socket.emit("game:start", 3, 6);
         });
 
         item.appendChild(startButton);

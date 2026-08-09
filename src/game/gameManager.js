@@ -363,9 +363,10 @@ function endTurn(game) {
     ([, lives]) => lives > 0,
   );
 
-  if (survivors.length === 0) {
-    console.log("PAREGGIO!");
+  game.turn++;
 
+  // Draw, don't lose lives and go to next turn
+  if (survivors.length === 0) {
     game.playedHands = 0;
     game.playedCards.clear();
 
@@ -397,6 +398,7 @@ function endTurn(game) {
     game.players.get(playerId).lives = lives;
   }
 
+  // End game
   if (survivors.length === 1) {
     const [winnerId] = survivors;
 
@@ -411,8 +413,7 @@ function endTurn(game) {
     };
   }
 
-  console.log("Più di un vivo, si continua!");
-
+  // Go to next turn
   for (const [playerId] of survivors) {
     const playerData = game.players.get(playerId);
 
@@ -431,8 +432,6 @@ function endTurn(game) {
   game.turnStarter = nextStarter;
   game.currentPlayer = nextStarter;
   game.lastPlayer = getPreviousAlivePlayer(game, nextStarter);
-
-  game.turn++;
 
   game.turnPhase = "bidding";
   game.totalBids = 0;

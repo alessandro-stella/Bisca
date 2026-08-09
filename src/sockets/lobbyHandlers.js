@@ -54,6 +54,7 @@ function handleCreateLobby(socket, io) {
         socket.user.id,
         {
           connected: true,
+          username: socket.user.username,
         },
       ],
     ]),
