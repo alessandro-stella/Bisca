@@ -31,7 +31,7 @@ function deleteLobby(lobbyId) {
   return lobbies.delete(lobbyId);
 }
 
-function addPlayer(lobbyId, userId) {
+function addPlayer(lobbyId, userId, username) {
   const lobby = lobbies.get(lobbyId);
 
   if (!lobby) {
@@ -59,6 +59,7 @@ function addPlayer(lobbyId, userId) {
 
   lobby.players.set(userId, {
     connected: true,
+    username,
   });
 
   return {

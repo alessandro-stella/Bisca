@@ -15,11 +15,74 @@ const {
 } = require("../game/lobbyManager");
 
 const {
+  initGameState,
   createGame,
   getGame,
   deleteGame,
-  getPublicGameState,
+  getPlayerGameState,
 } = require("../game/gameManager");
+
+const TEST_GAME = process.env.NODE_ENV !== "production";
+const TEST_LOBBY_ID = "TEST-GAME";
+
+function setupTestGame(socket, io) {
+  if (!TEST_GAME) {
+    return;
+  }
+
+  let lobby = getLobby(TEST_LOBBY_ID);
+
+  if (!lobby) {
+    lobby = {
+      id: TEST_LOBBY_ID,
+      ownerId: socket.user.id,
+      ownerUsername: socket.user.username,
+      started: false,
+      players: new Map(),
+    };
+
+    createLobby(lobby);
+  }
+
+  if (!lobby.players.has(socket.user.id)) {
+    if (lobby.players.size >= 2) {
+      console.log("TEST GAME: already has two players");
+      return;
+    }
+
+    lobby.players.set(socket.user.id, {
+      connected: true,
+      username: socket.user.username,
+    });
+  } else {
+    setPlayerConnected(lobby.id, socket.user.id, true);
+  }
+
+  socket.join(`lobby:${lobby.id}`);
+
+  console.log(
+    `TEST GAME: ${socket.user.username} connected ` +
+      `(${lobby.players.size}/2)`,
+  );
+
+  if (lobby.players.size < 2) {
+    return;
+  }
+
+  let game = getGame(TEST_LOBBY_ID);
+
+  if (!game) {
+    game = initGameState(TEST_LOBBY_ID, lobby.players, 3, 6);
+
+    createGame(game);
+
+    setLobbyStarted(TEST_LOBBY_ID, true);
+
+    console.log("TEST GAME CREATED");
+
+    io.to(`lobby:${TEST_LOBBY_ID}`).emit("game:started");
+  }
+}
 
 const reconnectTimers = new Map();
 const RECONNECT_TIMEOUT = 60 * 1000;
@@ -80,7 +143,7 @@ function handleCreateLobby(socket, io) {
 }
 
 function joinLobby(lobbyId, socket, io) {
-  const result = addPlayer(lobbyId, socket.user.id);
+  const result = addPlayer(lobbyId, socket.user.id, socket.user.username);
 
   if (!result.success) {
     socket.emit("lobby:join:error", {
@@ -212,28 +275,20 @@ function sendGameState(socket) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
-    console.log("GAME STATE: lobby not found");
-
     socket.emit("game:not-found");
-
     return;
   }
-
-  socket.join(`lobby:${lobby.id}`);
 
   const game = getGame(lobby.id);
 
   if (!game) {
-    console.log("GAME STATE: game not found");
-
     socket.emit("game:not-found");
-
     return;
   }
 
-  console.log(`Sending game state to ${socket.user.username}`);
+  const playerId = socket.user.id;
 
-  socket.emit("game:state", getPublicGameState(game));
+  socket.emit("game:state", getPlayerGameState(game, playerId));
 }
 
 function checkCurrentGame(socket) {
@@ -347,6 +402,8 @@ function setupSockets(io) {
     console.log("Authenticated user:", socket.user);
 
     handleReconnect(socket, io);
+
+    setupTestGame(socket, io);
 
     sendLobbies(socket);
 
