@@ -46,3 +46,20 @@ button:hover {
   color: white;
   cursor: pointer;
 }
+
+/* ==================== */
+/* game.html */
+/* ==================== */
+
+#cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 1em;
+}
+
+.card {
+  padding: 0.5em;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 0.5em;
+}
