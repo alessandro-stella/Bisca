@@ -36,7 +36,8 @@ function broadcastLobbies(io) {
   }
 }
 
-function handleCreateLobby(socket, io) {
+function handleCreateLobby(socket, io, lives, cards) {
+  console.log({ lives, cards });
   const currentLobby = getLobbyByPlayer(socket.user.id);
 
   if (currentLobby) {
@@ -58,6 +59,9 @@ function handleCreateLobby(socket, io) {
         },
       ],
     ]),
+
+    startingLives: lives,
+    initialCards: cards,
   };
 
   createLobby(lobby);

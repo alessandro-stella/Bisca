@@ -68,7 +68,12 @@ function startGame(socket, io, lives, initialCards) {
 
   const players = lobby.players;
 
-  const game = initGameState(lobby.id, players, lives, initialCards);
+  const game = initGameState(
+    lobby.id,
+    players,
+    lobby.startingLives,
+    lobby.initialCards,
+  );
 
   createGame(game);
 

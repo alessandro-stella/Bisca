@@ -35,8 +35,8 @@ function setupSockets(io) {
     // Lobby
     // -------------------------
 
-    socket.on("lobby:create", () => {
-      handleCreateLobby(socket, io);
+    socket.on("lobby:create", (lives, cards) => {
+      handleCreateLobby(socket, io, lives, cards);
     });
 
     socket.on("lobby:join", (lobbyId) => {
@@ -55,8 +55,8 @@ function setupSockets(io) {
     // Game
     // -------------------------
 
-    socket.on("game:start", (lives, initialCards) => {
-      startGame(socket, io, lives, initialCards);
+    socket.on("game:start", () => {
+      startGame(socket, io);
     });
 
     socket.on("game:get-state", () => {

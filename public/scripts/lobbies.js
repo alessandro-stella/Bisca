@@ -31,7 +31,10 @@ function setupSocket() {
   const createLobbyButton = document.getElementById("createLobby");
 
   createLobbyButton.addEventListener("click", () => {
-    socket.emit("lobby:create");
+    const lives = document.getElementById("livesInput").value;
+    const cards = document.getElementById("cardsInput").value;
+
+    socket.emit("lobby:create", lives, cards);
   });
 
   socket.on("connect_error", (error) => {
@@ -93,7 +96,7 @@ function renderLobbies(lobbies) {
         startButton.textContent = "Start Game";
 
         startButton.addEventListener("click", () => {
-          socket.emit("game:start", 3, 6);
+          socket.emit("game:start");
         });
 
         item.appendChild(startButton);
