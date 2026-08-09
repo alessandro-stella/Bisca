@@ -34,6 +34,8 @@ function initGameState(lobbyId, players, lives, initialCards) {
 
   for (const [player, values] of players.entries()) {
     values.bid = -1;
+    values.lives = lives;
+    values.won = 0;
 
     players.set(player, values);
   }
@@ -45,6 +47,7 @@ function initGameState(lobbyId, players, lives, initialCards) {
     initialCards,
     turn: 1,
     players,
+    playedCards: [],
     currentPlayer: Array.from(players.keys())[0],
     lastPlayer: Array.from(players.keys())[players.size - 1],
     hands: dealCards(deck, players, initialCards),
@@ -86,6 +89,13 @@ function getPlayerGameState(game, playerId) {
   };
 }
 
+function nextPlayer(game, playerId) {
+  const players = Array.from(game.players.keys());
+  const currentIndex = players.indexOf(playerId);
+  const nextPlayer = players[(currentIndex + 1) % players.length];
+  game.currentPlayer = nextPlayer;
+}
+
 function placeBid(game, playerId, bid) {
   const playerState = game.players.get(playerId);
   playerState.bid = bid;
@@ -93,16 +103,7 @@ function placeBid(game, playerId, bid) {
 
   game.players.set(playerId, playerState);
 
-  const players = Array.from(game.players.keys());
-  const currentIndex = players.indexOf(playerId);
-  const nextPlayer = players[(currentIndex + 1) % players.length];
-
-  game.currentPlayer = nextPlayer;
-
-  console.log(
-    "Change phase: ",
-    game.currentPlayer == Array.from(game.players.keys())[0],
-  );
+  nextPlayer(game, playerId);
 
   if (game.currentPlayer == Array.from(game.players.keys())[0]) {
     game.turnPhase = "play";
@@ -110,7 +111,22 @@ function placeBid(game, playerId, bid) {
 }
 
 function playCard(game, playerId, card) {
-  console.log(`${playerId} wants to play ${card}`);
+  const newHand = game.hands
+    .get(playerId)
+    .filter((handCard) => handCard != card);
+
+  game.hands.set(playerId, newHand);
+  game.playedCards.push(card);
+
+  if (game.playedCards.length === game.players.size) {
+    updateScore();
+  } else {
+    nextPlayer(game, playerId);
+  }
+}
+
+function updateScore() {
+  console.log("COUNT POINTS!");
 }
 
 module.exports = {

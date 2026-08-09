@@ -123,6 +123,19 @@ function handlePlayCard(io, socket, card) {
   const playerId = socket.user.id;
 
   if (playerId !== game.currentPlayer) {
+    socket.emit("game:not-your-turn");
+    return;
+  }
+
+  const player = game.players.get(playerId);
+
+  if (!player) {
+    socket.emit("game:player-not-found");
+    return;
+  }
+
+  if (game.hands.get(playerId).indexOf(card) == -1) {
+    socket.emit("game:invalid-card");
     return;
   }
 
