@@ -20,6 +20,7 @@ const {
   getGame,
   deleteGame,
   getPlayerGameState,
+  placeBid,
 } = require("../game/gameManager");
 
 const TEST_GAME = process.env.NODE_ENV !== "production";
@@ -238,6 +239,25 @@ function handleDeleteLobby(lobbyId, socket, io) {
   broadcastLobbies(io);
 }
 
+function broadcastGameState(io, lobbyId) {
+  const lobby = getLobby(lobbyId);
+  const game = getGame(lobbyId);
+
+  if (!lobby || !game) {
+    return;
+  }
+
+  for (const socket of io.sockets.sockets.values()) {
+    if (!socket.rooms.has(`lobby:${lobbyId}`)) {
+      continue;
+    }
+
+    const playerId = socket.user.id;
+
+    socket.emit("game:state", getPlayerGameState(game, playerId));
+  }
+}
+
 function startGame(socket, io) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
@@ -289,6 +309,29 @@ function sendGameState(socket) {
   const playerId = socket.user.id;
 
   socket.emit("game:state", getPlayerGameState(game, playerId));
+}
+
+function handlePlaceBid(io, socket, bid) {
+  const lobby = getLobbyByPlayer(socket.user.id);
+
+  if (!lobby) {
+    socket.emit("game:not-found");
+    return;
+  }
+
+  const game = getGame(lobby.id);
+
+  if (!game) {
+    socket.emit("game:not-found");
+    return;
+  }
+
+  const playerId = socket.user.id;
+
+  if (playerId !== game.currentPlayer) return;
+
+  placeBid(game, playerId, bid);
+  broadcastGameState(io, lobby.id);
 }
 
 function checkCurrentGame(socket) {
@@ -431,6 +474,10 @@ function setupSockets(io) {
 
     socket.on("game:get-state", () => {
       sendGameState(socket);
+    });
+
+    socket.on("game:place-bid", (bid) => {
+      handlePlaceBid(io, socket, bid);
     });
 
     socket.on("lobbies:check", () => {

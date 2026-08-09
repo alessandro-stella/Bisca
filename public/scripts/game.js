@@ -19,21 +19,49 @@ socket.on("game:not-found", () => {
 socket.on("game:state", (game) => {
   console.log("Game state:", game);
 
-  document.getElementById("game-status").textContent =
-    `Partita: ${game.status}`;
+  document.getElementById("gameStatus").textContent =
+    `Stato corrente: ${game.turnPhase}`;
 
-  document.getElementById("lobby-id").textContent = `Lobby: ${game.lobbyId}`;
-
-  if (game.currentPlayer) {
-    document.getElementById("current-player").textContent =
-      `Turno: ${game.currentPlayer}`;
-  } else {
-    document.getElementById("current-player").textContent =
-      "Turno: non ancora assegnato";
-  }
+  document.getElementById("currentPlayer").textContent =
+    `Current player: ${game.currentPlayer}`;
 
   createCards(game.hand);
+
+  const bidButtonsContainer = document.getElementById("bidButtonsContainer");
+
+  if (game.turnPhase == "bidding" && game.isMyTurn) {
+    createBidButtons(game, bidButtonsContainer);
+  }
+
+  if (!game.isMyTurn) {
+    return;
+  }
 });
+
+function createBidButtons(game, container) {
+  let possibleBids = Array.from({ length: game.hand.length + 1 }).map(
+    (_, i) => i,
+  );
+
+  if (game.lastPlayer) {
+    const deniedBid = game.hand.length - game.totalBids;
+    possibleBids.splice(deniedBid, 1);
+  }
+
+  for (const bid of possibleBids) {
+    const bidButton = document.createElement("button");
+
+    bidButton.innerHTML = bid;
+    bidButton.classList.add("bidButton");
+
+    bidButton.addEventListener("click", () => {
+      socket.emit("game:place-bid", bid);
+      document.getElementById("bidButtonsContainer").innerHTML = "";
+    });
+
+    container.appendChild(bidButton);
+  }
+}
 
 function parseCard(card) {
   const match = card.match(/^([a-z]+)(\d+)$/);
@@ -55,6 +83,7 @@ function supportsWebP() {
 
 function createCards(cards) {
   const cardsContainer = document.getElementById("cardsContainer");
+  cardsContainer.innerHTML = "";
   const format = supportsWebP() ? "webp" : "jpg";
 
   for (const card of cards) {
@@ -65,6 +94,11 @@ function createCards(cards) {
     newCard.setAttribute("alt", `${number} di ${suit}`);
     newCard.setAttribute("title", `${number} di ${suit}`);
     newCard.classList.add("card");
+
+    newCard.addEventListener("click", () => {
+      console.log(`Voglio giocare ${number} di ${suit}`);
+    });
+
     cardsContainer.appendChild(newCard);
   }
 }

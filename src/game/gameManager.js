@@ -32,7 +32,11 @@ function initGameState(lobbyId, players, lives, initialCards) {
     }
   }
 
-  console.log(players);
+  for (const [player, values] of players.entries()) {
+    values.bid = -1;
+
+    players.set(player, values);
+  }
 
   const game = {
     lobbyId,
@@ -42,10 +46,10 @@ function initGameState(lobbyId, players, lives, initialCards) {
     turn: 1,
     players,
     currentPlayer: Array.from(players.keys())[0],
+    lastPlayer: Array.from(players.keys())[players.size - 1],
     hands: dealCards(deck, players, initialCards),
+    totalBids: 0,
   };
-
-  console.log(game);
 
   return game;
 }
@@ -69,16 +73,40 @@ function deleteGame(lobbyId) {
 }
 
 function getPlayerGameState(game, playerId) {
-  console.log({ game, playerId });
-
   return {
     lobbyId: game.lobbyId,
-    status: game.status,
-    players: game.players,
-    currentPlayer: game.currentPlayer,
+    turnPhase: game.turnPhase,
+    totalBids: game.totalBids,
+    players: Array.from(game.players.values()),
+    currentPlayer: game.players.get(game.currentPlayer).username,
     hand: game.hands.get(playerId),
+    myUsername: game.players.get(playerId).username,
     isMyTurn: game.currentPlayer == playerId,
+    lastPlayer: game.lastPlayer == playerId,
   };
+}
+
+function placeBid(game, playerId, bid) {
+  const playerState = game.players.get(playerId);
+  playerState.bid = bid;
+  game.totalBids += bid;
+
+  game.players.set(playerId, playerState);
+
+  const players = Array.from(game.players.keys());
+  const currentIndex = players.indexOf(playerId);
+  const nextPlayer = players[(currentIndex + 1) % players.length];
+
+  game.currentPlayer = nextPlayer;
+
+  console.log(
+    "Change phase: ",
+    game.currentPlayer == Array.from(game.players.keys())[0],
+  );
+
+  if (game.currentPlayer == Array.from(game.players.keys())[0]) {
+    game.turnPhase = "play";
+  }
 }
 
 module.exports = {
@@ -87,4 +115,5 @@ module.exports = {
   getGame,
   deleteGame,
   getPlayerGameState,
+  placeBid,
 };
