@@ -48,7 +48,7 @@ function sendGameState(socket) {
   socket.emit("game:state", getPlayerGameState(game, playerId));
 }
 
-function startGame(socket, io) {
+function startGame(socket, io, lives, initialCards) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
@@ -68,7 +68,7 @@ function startGame(socket, io) {
 
   const players = lobby.players;
 
-  const game = initGameState(lobby.id, players, 1, 3);
+  const game = initGameState(lobby.id, players, lives, initialCards);
 
   createGame(game);
 
@@ -120,6 +120,10 @@ function handlePlayCard(io, socket, card) {
     return;
   }
 
+  if (game.turnPhase !== "play") {
+    return;
+  }
+
   const playerId = socket.user.id;
 
   if (playerId !== game.currentPlayer) {
@@ -134,12 +138,37 @@ function handlePlayCard(io, socket, card) {
     return;
   }
 
-  if (game.hands.get(playerId).indexOf(card) == -1) {
+  const hand = game.hands.get(playerId);
+
+  if (!hand || !hand.includes(card)) {
     socket.emit("game:invalid-card");
     return;
   }
 
-  playCard(game, playerId, card);
+  const result = playCard(game, playerId, card);
+
+  if (result?.finished) {
+    broadcastGameState(io, lobby.id);
+
+    const winner = game.players.get(result.winnerId);
+
+    for (const socket of io.sockets.sockets.values()) {
+      if (!socket.rooms.has(`lobby:${lobby.id}`)) {
+        continue;
+      }
+
+      const playerId = socket.user.id;
+      const isWinner = playerId === result.winnerId;
+
+      socket.emit("game:finished", {
+        winnerId: result.winnerId,
+        winnerUsername: winner?.username,
+        isWinner,
+      });
+    }
+
+    return;
+  }
 
   broadcastGameState(io, lobby.id);
 }

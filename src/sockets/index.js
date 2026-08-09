@@ -78,7 +78,7 @@ function setupTestGame(socket, io) {
   let game = getGame(TEST_LOBBY_ID);
 
   if (!game) {
-    game = initGameState(TEST_LOBBY_ID, lobby.players, 1, 3);
+    game = initGameState(TEST_LOBBY_ID, lobby.players, 3, 5);
 
     createGame(game);
 
@@ -127,8 +127,8 @@ function setupSockets(io) {
     // Game
     // -------------------------
 
-    socket.on("game:start", () => {
-      startGame(socket, io);
+    socket.on("game:start", (lives, initialCards) => {
+      startGame(socket, io, lives, initialCards);
     });
 
     socket.on("game:get-state", () => {

@@ -42,6 +42,10 @@ socket.on("game:state", (game) => {
   }
 });
 
+socket.on("game:finished", ({ winnerId }) => {
+  console.log("Partita terminata. Vincitore:", winnerId);
+});
+
 function createBidButtons(game, container) {
   let possibleBids = Array.from({ length: game.hand.length + 1 }).map(
     (_, i) => i,
