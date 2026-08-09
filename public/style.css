@@ -51,7 +51,7 @@ button:hover {
 /* game.html */
 /* ==================== */
 
-#cardsContainer {
+.cardsContainer {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 1em;

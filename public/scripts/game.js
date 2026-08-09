@@ -25,7 +25,11 @@ socket.on("game:state", (game) => {
   document.getElementById("currentPlayer").textContent =
     `Current player: ${game.currentPlayer}`;
 
-  createCards(game.hand);
+  createCards(game.hand, "myCardsContainer", true);
+  createCards(
+    game.playedCards.map((cardValues) => cardValues.card),
+    "playedCardsContainer",
+  );
 
   const bidButtonsContainer = document.getElementById("bidButtonsContainer");
 
@@ -51,7 +55,7 @@ function createBidButtons(game, container) {
   for (const bid of possibleBids) {
     const bidButton = document.createElement("button");
 
-    bidButton.innerHTML = bid;
+    bidButton.innerHTML = `${bid}`;
     bidButton.classList.add("bidButton");
 
     bidButton.addEventListener("click", () => {
@@ -81,8 +85,9 @@ function supportsWebP() {
   return canvas.toDataURL("image/webp").startsWith("data:image/webp");
 }
 
-function createCards(cards) {
-  const cardsContainer = document.getElementById("cardsContainer");
+function createCards(cards, containerId, eventListener = false) {
+  console.log({ cards });
+  const cardsContainer = document.getElementById(containerId);
   cardsContainer.innerHTML = "";
   const format = supportsWebP() ? "webp" : "jpg";
 
@@ -95,9 +100,10 @@ function createCards(cards) {
     newCard.setAttribute("title", `${number} di ${suit}`);
     newCard.classList.add("card");
 
-    newCard.addEventListener("click", () => {
-      socket.emit("game:play-card", card);
-    });
+    if (eventListener)
+      newCard.addEventListener("click", () => {
+        socket.emit("game:play-card", card);
+      });
 
     cardsContainer.appendChild(newCard);
   }

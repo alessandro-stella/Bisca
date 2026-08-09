@@ -47,7 +47,7 @@ function initGameState(lobbyId, players, lives, initialCards) {
     initialCards,
     turn: 1,
     players,
-    playedCards: [],
+    playedCards: new Map(),
     currentPlayer: Array.from(players.keys())[0],
     lastPlayer: Array.from(players.keys())[players.size - 1],
     hands: dealCards(deck, players, initialCards),
@@ -81,6 +81,7 @@ function getPlayerGameState(game, playerId) {
     turnPhase: game.turnPhase,
     totalBids: game.totalBids,
     players: Array.from(game.players.values()),
+    playedCards: Array.from(game.playedCards.values()),
     currentPlayer: game.players.get(game.currentPlayer).username,
     hand: game.hands.get(playerId),
     myUsername: game.players.get(playerId).username,
@@ -116,17 +117,62 @@ function playCard(game, playerId, card) {
     .filter((handCard) => handCard != card);
 
   game.hands.set(playerId, newHand);
-  game.playedCards.push(card);
+  game.playedCards.set(playerId, { card, value: getCardValue(card) });
 
-  if (game.playedCards.length === game.players.size) {
-    updateScore();
+  if (game.playedCards.size === game.players.size) {
+    updateScore(game);
   } else {
     nextPlayer(game, playerId);
   }
 }
 
-function updateScore() {
-  console.log("COUNT POINTS!");
+function getCardValue(card) {
+  const match = card.match(/^([a-z]+)(\d+)$/);
+
+  if (!match) {
+    throw new Error(`Invalid card: ${card}`);
+  }
+
+  const suit = match[1];
+  const number = Number(match[2]);
+
+  switch (suit) {
+    case "denari":
+      return number + 400;
+
+    case "coppe":
+      return number + 300;
+
+    case "spade":
+      return number + 200;
+
+    case "bastoni":
+      return number + 100;
+
+    default:
+      return -1;
+  }
+}
+
+function updateScore(game) {
+  const playedCards = [...game.playedCards.entries()];
+
+  let highestCard = playedCards[0];
+
+  for (let i = 1; i < playedCards.length; i++) {
+    if (playedCards[i][1].value > highestCard[1].value) {
+      highestCard = playedCards[i];
+    }
+  }
+
+  const winnerId = highestCard[0];
+
+  game.playedCards = new Map();
+  game.currentPlayer = winnerId;
+
+  const winnerValues = game.players.get(winnerId);
+  winnerValues.won += 1;
+  game.players.set(winnerId, winnerValues);
 }
 
 module.exports = {
