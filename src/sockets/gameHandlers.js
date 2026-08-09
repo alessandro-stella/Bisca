@@ -100,7 +100,11 @@ function handlePlaceBid(io, socket, bid) {
     return;
   }
 
-  placeBid(game, playerId, bid);
+  const accepted = placeBid(game, playerId, bid);
+
+  if (!accepted) {
+    return;
+  }
 
   broadcastGameState(io, lobby.id);
 }

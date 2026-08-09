@@ -56,12 +56,14 @@ function initGameState(lobbyId, players, lives, initialCards) {
     turnStarter: firstPlayer,
     currentPlayer: firstPlayer,
 
-    lastPlayer: Array.from(players.keys())[players.size - 1],
+    lastPlayer: null,
 
     hands: dealCards(players, initialCards),
 
     totalBids: 0,
   };
+
+  game.lastPlayer = getLastBidder(game);
 
   return game;
 }
@@ -139,6 +141,34 @@ function nextPlayer(game, playerId) {
   }
 }
 
+function getPreviousAlivePlayer(game, playerId) {
+  const players = Array.from(game.players.keys());
+
+  if (players.length === 0) {
+    return null;
+  }
+
+  const currentIndex = players.indexOf(playerId);
+
+  if (currentIndex === -1) {
+    return null;
+  }
+
+  let prevIndex = currentIndex;
+
+  do {
+    prevIndex = (prevIndex - 1 + players.length) % players.length;
+  } while (game.players.get(players[prevIndex]).lives === 0);
+
+  return players[prevIndex];
+}
+
+// The last player to bid in a round is whoever comes right before
+// turnStarter in the (alive-player) speaking order.
+function getLastBidder(game) {
+  return getPreviousAlivePlayer(game, game.turnStarter);
+}
+
 function getNextTurnStarter(game) {
   const players = Array.from(game.players.keys());
 
@@ -161,15 +191,30 @@ function placeBid(game, playerId, bid) {
   const playerState = game.players.get(playerId);
 
   if (!playerState || playerState.lives === 0) {
-    return;
+    return false;
   }
 
   if (game.turnPhase !== "bidding") {
-    return;
+    return false;
   }
 
   if (playerState.bid !== -1) {
-    return;
+    return false;
+  }
+
+  const hand = game.hands.get(playerId);
+  const handSize = hand ? hand.length : 0;
+
+  if (!Number.isInteger(bid) || bid < 0 || bid > handSize) {
+    return false;
+  }
+
+  if (playerId === game.lastPlayer) {
+    const forbiddenBid = handSize - game.totalBids;
+
+    if (bid === forbiddenBid) {
+      return false;
+    }
   }
 
   playerState.bid = bid;
@@ -186,10 +231,12 @@ function placeBid(game, playerId, bid) {
 
     game.currentPlayer = game.turnStarter;
 
-    return;
+    return true;
   }
 
   nextPlayer(game, playerId);
+
+  return true;
 }
 
 function playCard(game, playerId, card) {
@@ -333,6 +380,12 @@ function endTurn(game) {
     game.totalBids = 0;
 
     game.currentPlayer = game.turnStarter;
+    game.lastPlayer = getLastBidder(game);
+
+    const cardsToReplay =
+      game.initialCards - ((game.turn - 1) % game.initialCards);
+
+    game.hands = dealCards(game.players, cardsToReplay);
 
     return {
       finished: false,
@@ -377,6 +430,7 @@ function endTurn(game) {
 
   game.turnStarter = nextStarter;
   game.currentPlayer = nextStarter;
+  game.lastPlayer = getPreviousAlivePlayer(game, nextStarter);
 
   game.turn++;
 
