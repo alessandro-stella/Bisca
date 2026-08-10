@@ -1,3 +1,4 @@
+const db = require("../db");
 const games = new Map();
 
 function getRandomizedDeck() {
@@ -71,10 +72,11 @@ function initGameState(lobbyId, players, lives, initialCards) {
     totalBids: 0,
   };
 
-  game.lastPlayer = getLastBidder(game);
+  game.lastPlayer = getPreviousAlivePlayer(game, game.turnStarter);
 
   return game;
 }
+
 function createGame(game) {
   if (games.has(game.lobbyId)) {
     throw new Error("Game already exists for this lobby");
@@ -197,12 +199,6 @@ function getPreviousAlivePlayer(game, playerId) {
   } while (game.players.get(players[prevIndex]).lives === 0);
 
   return players[prevIndex];
-}
-
-// The last player to bid in a round is whoever comes right before
-// turnStarter in the (alive-player) speaking order.
-function getLastBidder(game) {
-  return getPreviousAlivePlayer(game, game.turnStarter);
 }
 
 function getNextTurnStarter(game) {
@@ -500,7 +496,6 @@ function assignPlayersPosition(game, playerIds) {
   game.nextPosition -= players.length;
 }
 
-// Play all cards at once
 function resolveShowdown(game) {
   if (!game.showdown || game.turnPhase !== "play") {
     return null;
@@ -561,8 +556,6 @@ function restartCurrentTurn(game) {
 }
 
 function removePlayerFromGame(game, playerId) {
-  console.log("Calling removePlayerFromGame");
-
   const playerState = game.players.get(playerId);
 
   if (!playerState) {
@@ -572,13 +565,15 @@ function removePlayerFromGame(game, playerId) {
   const wasAlive = playerState.lives > 0;
   playerState.lives = 0;
 
+  if (wasAlive) {
+    playerState.leftEarly = true;
+  }
+
   assignPlayersPosition(game, [playerId]);
 
   const alivePlayers = Array.from(game.players.entries()).filter(
     ([, p]) => p.lives > 0,
   );
-
-  console.log(alivePlayers);
 
   if (alivePlayers.length < 2) {
     if (alivePlayers.length === 1) {
@@ -601,6 +596,41 @@ function removePlayerFromGame(game, playerId) {
   return { action: "none" };
 }
 
+async function saveGameData(game) {
+  const dbClient = await db.connect();
+
+  try {
+    await dbClient.query("BEGIN");
+
+    const gameResult = await dbClient.query(
+      `
+        INSERT INTO games (winner_id, duration)
+        VALUES ($1, $2)
+        RETURNING id;
+      `,
+      [game.winner || null, game.duration],
+    );
+    const gameId = gameResult.rows[0].id;
+
+    for (const player of game.players) {
+      await dbClient.query(
+        `
+          INSERT INTO game_players (game_id, user_id, position, left_early)
+          VALUES ($1, $2, $3, $4);
+        `,
+        [gameId, player.userId, player.position, player.leftEarly || false],
+      );
+    }
+
+    await dbClient.query("COMMIT");
+  } catch (error) {
+    await dbClient.query("ROLLBACK");
+    throw error;
+  } finally {
+    dbClient.release();
+  }
+}
+
 module.exports = {
   initGameState,
   createGame,
@@ -612,4 +642,5 @@ module.exports = {
   resolveShowdown,
   assignPlayersPosition,
   removePlayerFromGame,
+  saveGameData,
 };

@@ -232,10 +232,7 @@ function handlePlayCard(io, socket, card) {
 }
 
 function checkCurrentGame(socket) {
-  console.log("Inside checkCurrentGame");
-
   const lobby = getLobbyByPlayer(socket.user.id);
-  console.log({ lobby });
 
   if (!lobby || !lobby.started) {
     return;

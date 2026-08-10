@@ -8,6 +8,7 @@ async function init() {
 
     DROP TABLE IF EXISTS users CASCADE;
     DROP TABLE IF EXISTS sessions CASCADE;
+    DROP TABLE IF EXISTS games CASCADE;
 
     CREATE TABLE users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -25,6 +26,21 @@ async function init() {
       FOREIGN KEY (user_id)
         REFERENCES users(id)
         ON DELETE CASCADE
+    );
+
+    CREATE TABLE games (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      winner_id UUID REFERENCES users(id) ON DELETE SET NULL,
+      duration INT NOT NULL,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE game_players (
+      game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+      user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+      position INT NOT NULL,
+      left_early BOOLEAN DEFAULT FALSE,
+      PRIMARY KEY (game_id, user_id)
     );
   `);
 

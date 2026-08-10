@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const { handleSession } = require("./session");
+const { handleSession } = require("./sessionRouter");
 
 const db = require("../db");
 
@@ -195,6 +195,67 @@ router.post("/login", async (req, res) => {
     console.error(error);
 
     res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+});
+
+// Utility function
+async function checkIfUserExists(userId) {
+  const result = await db.query(
+    `
+      SELECT EXISTS (
+        SELECT 1 FROM users WHERE id = $1
+      );
+    `,
+    [userId],
+  );
+
+  return result.rows[0].exists;
+}
+
+// Fetch user games
+router.get("/:userId/games", async (req, res) => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    return res.status(400).json({
+      error: "Missing userId parameter",
+    });
+  }
+
+  try {
+    const userExists = await checkIfUserExists(userId);
+
+    if (!userExists) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    const query = `
+      SELECT 
+        g.id AS game_id, 
+        g.winner_id, 
+        g.duration, 
+        g.created_at, 
+        gp.position, 
+        gp.left_early
+      FROM games g
+      JOIN game_players gp ON g.id = gp.game_id
+      WHERE gp.user_id = $1
+      ORDER BY g.created_at DESC;
+    `;
+
+    const result = await db.query(query, [userId]);
+
+    return res.status(200).json({
+      games: result.rows,
+    });
+  } catch (error) {
+    console.error("Error fetching user games:", error);
+
+    return res.status(500).json({
       error: "Internal server error",
     });
   }

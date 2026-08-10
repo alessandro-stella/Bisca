@@ -1,4 +1,4 @@
-const { getGame } = require("./gameManager");
+const { getGame, saveGameData } = require("./gameManager");
 
 const lobbies = new Map();
 
@@ -31,26 +31,35 @@ function getLobbies() {
 
 async function deleteLobby(lobbyId) {
   console.log("Deleting lobby...");
-  console.log("Lobby data: ");
-  console.log(lobbies.get(lobbyId));
+  const lobbyData = lobbies.get(lobbyId);
+  console.log("Lobby data: ", lobbyData);
 
   const game = getGame(lobbyId);
-  await saveGameData(game);
+
+  if (game) {
+    const playersArray = Array.from(game.players.entries()).map(
+      ([userId, player]) => ({
+        userId: userId,
+        position: player.position,
+        leftEarly: player.leftEarly || false,
+      }),
+    );
+
+    const dataToSave = {
+      duration: game.turn,
+      players: playersArray,
+      winner: game.winnerId || null,
+    };
+
+    try {
+      await saveGameData(dataToSave);
+      console.log("Game data saved successfully");
+    } catch (e) {
+      console.log("Error while saving game data: ", e);
+    }
+  }
 
   return lobbies.delete(lobbyId);
-}
-
-async function saveGameData(game) {
-  const res = await fetch("/api/game/save", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(game),
-  });
-
-  console.log("Response inside saveGameData");
-  console.log({ res });
 }
 
 function addPlayer(lobbyId, userId, username) {

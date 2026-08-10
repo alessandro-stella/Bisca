@@ -1,4 +1,4 @@
-const { getUserFromSession } = require("../routes/session");
+const { getUserFromSession } = require("../routes/sessionRouter");
 
 function parseCookies(cookieHeader) {
   const cookies = {};
