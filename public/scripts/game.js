@@ -19,13 +19,24 @@ socket.on("game:not-found", () => {
 socket.on("game:state", (game) => {
   console.log("Game state:", game);
 
-  document.getElementById("gameStatus").textContent =
-    `Stato corrente: ${game.turnPhase}`;
+  if (game.turnPhase === "finished") {
+    console.log("Finished!");
+    return;
+  }
 
-  document.getElementById("currentPlayer").textContent =
-    `Current player: ${game.currentPlayer}`;
+  document.getElementById("gameStatus").textContent = game.showdown
+    ? `Stato corrente: ${game.turnPhase} (showdown - guarda le carte degli avversari)`
+    : `Stato corrente: ${game.turnPhase}`;
 
-  createCards(game.hand, "myCardsContainer", true);
+  document.getElementById("myUsername").textContent = `Tu: ${game.myUsername}`;
+
+  document.getElementById("currentPlayer").textContent = game.isMyTurn
+    ? `Current player: ${game.currentPlayer} (tu)`
+    : `Current player: ${game.currentPlayer}`;
+
+  createLivesCounter(game);
+
+  createCards(game.hand, "myCardsContainer", !game.showdown);
   createCards(
     game.playedCards.map((cardValues) => cardValues.card),
     "playedCardsContainer",
@@ -46,7 +57,36 @@ socket.on("game:finished", ({ winnerId }) => {
   console.log("Partita terminata. Vincitore:", winnerId);
 });
 
+function createLivesCounter(game) {
+  const container = document.getElementById("livesContainer");
+  container.innerHTML = "";
+
+  for (const player of game.players) {
+    const row = document.createElement("div");
+    row.classList.add("livesRow");
+
+    const isMe = player.username === game.myUsername;
+
+    if (isMe) {
+      row.classList.add("own-player");
+    }
+
+    row.textContent = isMe
+      ? `${player.username} (tu): ${player.lives} vite`
+      : `${player.username}: ${player.lives} vite`;
+
+    container.appendChild(row);
+  }
+}
+
 function createBidButtons(game, container) {
+  container.innerHTML = "";
+
+  if (game.showdown) {
+    createShowdownButtons(container);
+    return;
+  }
+
   let possibleBids = Array.from({ length: game.hand.length + 1 }).map(
     (_, i) => i,
   );
@@ -60,6 +100,27 @@ function createBidButtons(game, container) {
     const bidButton = document.createElement("button");
 
     bidButton.innerHTML = `${bid}`;
+    bidButton.classList.add("bidButton");
+
+    bidButton.addEventListener("click", () => {
+      socket.emit("game:place-bid", bid);
+      document.getElementById("bidButtonsContainer").innerHTML = "";
+    });
+
+    container.appendChild(bidButton);
+  }
+}
+
+function createShowdownButtons(container) {
+  const options = [
+    { label: "Vincerò", bid: 1 },
+    { label: "Perderò", bid: 0 },
+  ];
+
+  for (const { label, bid } of options) {
+    const bidButton = document.createElement("button");
+
+    bidButton.innerHTML = label;
     bidButton.classList.add("bidButton");
 
     bidButton.addEventListener("click", () => {

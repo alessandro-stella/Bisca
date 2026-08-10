@@ -45,6 +45,7 @@ function initGameState(lobbyId, players, lives, initialCards) {
     lobbyId,
     status: "playing",
     turnPhase: "bidding",
+    showdown: initialCards === 1,
 
     initialCards,
     turn: 1,
@@ -87,17 +88,50 @@ function deleteGame(lobbyId) {
 }
 
 function getPlayerGameState(game, playerId) {
+  console.log({ playerId, hands: game.hands });
+
+  if (!game.showdown) {
+    return {
+      lobbyId: game.lobbyId,
+      turnPhase: game.turnPhase,
+      totalBids: game.totalBids,
+      showdown: game.showdown,
+
+      players: Array.from(game.players.values()),
+      playedCards: Array.from(game.playedCards.values()),
+
+      currentPlayer: game.players.get(game.currentPlayer).username,
+
+      hand: game.hands.get(playerId),
+
+      myUsername: game.players.get(playerId).username,
+      isMyTurn: game.currentPlayer === playerId,
+      lastPlayer: game.lastPlayer === playerId,
+    };
+  }
+
+  const hand = [];
+
+  for (const [opponentId, opponentHand] of game.hands.entries()) {
+    if (opponentId === playerId) continue;
+
+    hand.push(opponentHand[0]);
+  }
+
+  console.log({ playerId, hand });
+
   return {
     lobbyId: game.lobbyId,
     turnPhase: game.turnPhase,
     totalBids: game.totalBids,
+    showdown: game.showdown,
 
     players: Array.from(game.players.values()),
     playedCards: Array.from(game.playedCards.values()),
 
     currentPlayer: game.players.get(game.currentPlayer).username,
 
-    hand: game.hands.get(playerId),
+    hand,
 
     myUsername: game.players.get(playerId).username,
     isMyTurn: game.currentPlayer === playerId,
@@ -209,7 +243,8 @@ function placeBid(game, playerId, bid) {
     return false;
   }
 
-  if (playerId === game.lastPlayer) {
+  // Skip denied bidding rule when in showdown
+  if (!game.showdown && playerId === game.lastPlayer) {
     const forbiddenBid = handSize - game.totalBids;
 
     if (bid === forbiddenBid) {
@@ -348,6 +383,7 @@ function updateScore(game) {
 
 function endTurn(game) {
   const newLives = new Map();
+  const deadThisTurn = [];
 
   for (const [playerId, playerValues] of game.players) {
     if (playerValues.lives === 0) {
@@ -361,6 +397,10 @@ function endTurn(game) {
     );
 
     newLives.set(playerId, lives);
+
+    if (lives === 0) {
+      deadThisTurn.push(playerId);
+    }
   }
 
   const survivors = Array.from(newLives.entries()).filter(
@@ -369,29 +409,9 @@ function endTurn(game) {
 
   game.turn++;
 
-  // Draw, don't lose lives and go to next turn
-  if (survivors.length === 0) {
-    game.playedHands = 0;
-    game.playedCards.clear();
+  const isDraw = survivors.length === 0;
 
-    for (const [playerId, playerValues] of game.players) {
-      playerValues.bid = -1;
-      playerValues.won = 0;
-
-      game.players.set(playerId, playerValues);
-    }
-
-    game.turnPhase = "bidding";
-    game.totalBids = 0;
-
-    game.currentPlayer = game.turnStarter;
-    game.lastPlayer = getLastBidder(game);
-
-    const cardsToReplay =
-      game.initialCards - ((game.turn - 1) % game.initialCards);
-
-    game.hands = dealCards(game.players, cardsToReplay);
-
+  if (isDraw) {
     return {
       finished: false,
       draw: true,
@@ -402,7 +422,18 @@ function endTurn(game) {
     game.players.get(playerId).lives = lives;
   }
 
-  // End game
+  if (deadThisTurn.length > 0) {
+    const aliveCount = survivors.length;
+
+    for (const playerId of deadThisTurn) {
+      const player = game.players.get(playerId);
+
+      if (player.position == null) {
+        player.position = aliveCount + 1;
+      }
+    }
+  }
+
   if (survivors.length === 1) {
     const [winnerId] = survivors;
 
@@ -411,21 +442,27 @@ function endTurn(game) {
     game.status = "finished";
     game.winnerId = winnerId;
 
+    game.players.get(winnerId).position = 1;
+
     return {
       finished: true,
       winnerId,
     };
   }
 
-  // Go to next turn
-  for (const [playerId] of survivors) {
-    const playerData = game.players.get(playerId);
+  const alivePlayers = new Map(
+    survivors.map(([playerId]) => [playerId, game.players.get(playerId)]),
+  );
 
+  for (const [, playerData] of alivePlayers) {
     playerData.bid = -1;
     playerData.won = 0;
-
-    game.players.set(playerId, playerData);
   }
+
+  game.turnPhase = "bidding";
+  game.totalBids = 0;
+  game.playedHands = 0;
+  game.playedCards.clear();
 
   const nextStarter = getNextTurnStarter(game);
 
@@ -437,23 +474,42 @@ function endTurn(game) {
   game.currentPlayer = nextStarter;
   game.lastPlayer = getPreviousAlivePlayer(game, nextStarter);
 
-  game.turnPhase = "bidding";
-  game.totalBids = 0;
-  game.playedHands = 0;
-  game.playedCards.clear();
-
-  const alivePlayers = new Map(
-    survivors.map(([playerId]) => [playerId, game.players.get(playerId)]),
-  );
-
   const cardsToDeal = game.initialCards - ((game.turn - 1) % game.initialCards);
 
   game.hands = dealCards(alivePlayers, cardsToDeal);
+  game.showdown = cardsToDeal === 1;
 
   return {
     finished: false,
     draw: false,
   };
+}
+
+// Play all cards at once
+function resolveShowdown(game) {
+  if (!game.showdown || game.turnPhase !== "play") {
+    return null;
+  }
+
+  const alivePlayers = getAlivePlayers(game);
+  let result = { finished: false };
+
+  for (const [playerId] of alivePlayers) {
+    const hand = game.hands.get(playerId);
+
+    if (!hand || hand.length === 0) {
+      continue;
+    }
+
+    const card = hand[0];
+    const stepResult = playCard(game, playerId, card);
+
+    if (stepResult) {
+      result = stepResult;
+    }
+  }
+
+  return result;
 }
 
 module.exports = {
@@ -464,4 +520,5 @@ module.exports = {
   getPlayerGameState,
   placeBid,
   playCard,
+  resolveShowdown,
 };
