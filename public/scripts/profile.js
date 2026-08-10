@@ -1,7 +1,13 @@
-function getStats(user) {
+async function getStats(user) {
   console.log("Getting user stats...");
 
   console.log({ user });
+
+  const games = await fetch(`/api/user/${user.id}/games`).then(
+    async (res) => await res.json(),
+  );
+
+  console.log(games);
 }
 
 async function logout() {

@@ -236,7 +236,6 @@ router.get("/:userId/games", async (req, res) => {
     const query = `
       SELECT 
         g.id AS game_id, 
-        g.winner_id, 
         g.duration, 
         g.created_at, 
         gp.position, 
