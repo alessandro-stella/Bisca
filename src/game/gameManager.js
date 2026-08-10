@@ -252,11 +252,18 @@ function playCard(game, playerId, card) {
 
   const hand = game.hands.get(playerId);
 
-  if (!hand || !hand.includes(card)) {
+  if (!hand) {
     return;
   }
 
-  const newHand = hand.filter((handCard) => handCard !== card);
+  const isAce = card === "asso-prende" || card === "asso-lascia";
+  const physicalCard = isAce ? "denari1" : card;
+
+  if (!hand.includes(physicalCard)) {
+    return;
+  }
+
+  const newHand = hand.filter((handCard) => handCard !== physicalCard);
 
   game.hands.set(playerId, newHand);
 
@@ -275,6 +282,9 @@ function playCard(game, playerId, card) {
 }
 
 function getCardValue(card) {
+  if (card === "asso-prende") return 10000;
+  if (card === "asso-lascia") return -10000;
+
   const match = card.match(/^([a-z]+)(\d+)$/);
 
   if (!match) {
@@ -296,12 +306,6 @@ function getCardValue(card) {
 
     case "bastoni":
       return number + 100;
-
-    case "asso-prende":
-      return 10000;
-
-    case "asso-lascia":
-      return -1;
 
     default:
       throw new Error(`Unknown card suit: ${suit}`);

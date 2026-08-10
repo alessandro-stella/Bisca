@@ -149,9 +149,23 @@ function handlePlayCard(io, socket, card) {
 
   const hand = game.hands.get(playerId);
 
-  if (!hand || !hand.includes(card)) {
+  if (!hand) {
     socket.emit("game:invalid-card");
     return;
+  }
+
+  const isAce = card === "asso-prende" || card === "asso-lascia";
+
+  if (isAce) {
+    if (!hand.includes("denari1")) {
+      socket.emit("game:invalid-card");
+      return;
+    }
+  } else {
+    if (!hand.includes(card)) {
+      socket.emit("game:invalid-card");
+      return;
+    }
   }
 
   const result = playCard(game, playerId, card);

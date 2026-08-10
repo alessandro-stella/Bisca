@@ -72,6 +72,9 @@ function createBidButtons(game, container) {
 }
 
 function parseCard(card) {
+  if (card === "asso-prende" || card === "asso-lascia")
+    return { suit: "denari", number: "1" };
+
   const match = card.match(/^([a-z]+)(\d+)$/);
 
   if (!match) {
@@ -90,7 +93,6 @@ function supportsWebP() {
 }
 
 function createCards(cards, containerId, eventListener = false) {
-  console.log({ cards });
   const cardsContainer = document.getElementById(containerId);
   cardsContainer.innerHTML = "";
   const format = supportsWebP() ? "webp" : "jpg";
@@ -104,10 +106,43 @@ function createCards(cards, containerId, eventListener = false) {
     newCard.setAttribute("title", `${number} di ${suit}`);
     newCard.classList.add("card");
 
-    if (eventListener)
-      newCard.addEventListener("click", () => {
-        socket.emit("game:play-card", card);
-      });
+    if (eventListener) {
+      if (card !== "denari1") {
+        newCard.addEventListener("click", () => {
+          socket.emit("game:play-card", card);
+        });
+      } else {
+        newCard.addEventListener("click", () => {
+          const popup = document.createElement("div");
+          popup.id = "acePopup";
+
+          const title = document.createElement("div");
+          title.innerHTML =
+            "Scegli se sarà la carta più alta o più bassa della mano:";
+
+          const higher = document.createElement("button");
+          higher.innerHTML = "Più alta";
+
+          higher.addEventListener("click", () => {
+            socket.emit("game:play-card", "asso-prende");
+            document.getElementById("acePopup").remove();
+          });
+
+          const lower = document.createElement("button");
+          lower.innerHTML = "Più bassa";
+
+          lower.addEventListener("click", () => {
+            socket.emit("game:play-card", "asso-lascia");
+            document.getElementById("acePopup").remove();
+          });
+
+          popup.appendChild(higher);
+          popup.appendChild(lower);
+
+          document.body.appendChild(popup);
+        });
+      }
+    }
 
     cardsContainer.appendChild(newCard);
   }
