@@ -10,6 +10,7 @@ const { Server } = require("socket.io");
 const db = require("./db");
 const userRouter = require("./routes/user");
 const { router: sessionRouter } = require("./routes/session");
+const gameRouter = require("./routes/game");
 
 const app = express();
 const server = http.createServer(app);
@@ -23,6 +24,7 @@ app.use(cookieParser());
 
 app.use("/api/user", userRouter);
 app.use("/api/session", sessionRouter);
+app.use("/api/game", gameRouter);
 
 app.use(express.static(path.join(__dirname, "../public")));
 

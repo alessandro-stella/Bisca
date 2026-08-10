@@ -24,9 +24,6 @@ function setupSockets(io) {
   io.use(authenticateSocket);
 
   io.on("connection", (socket) => {
-    console.log("Socket connected:", socket.id);
-    console.log("Authenticated user:", socket.user);
-
     reconnect.handleReconnect(socket, io, broadcastLobbies);
 
     sendLobbies(socket);
@@ -80,8 +77,6 @@ function setupSockets(io) {
     // -------------------------
 
     socket.on("disconnect", () => {
-      console.log("Socket disconnected:", socket.id);
-
       reconnect.handleDisconnect(socket, io, broadcastLobbies);
     });
   });

@@ -1,3 +1,5 @@
+const { getGame } = require("./gameManager");
+
 const lobbies = new Map();
 
 function createLobby(lobby) {
@@ -27,8 +29,28 @@ function getLobbies() {
   }));
 }
 
-function deleteLobby(lobbyId) {
+async function deleteLobby(lobbyId) {
+  console.log("Deleting lobby...");
+  console.log("Lobby data: ");
+  console.log(lobbies.get(lobbyId));
+
+  const game = getGame(lobbyId);
+  await saveGameData(game);
+
   return lobbies.delete(lobbyId);
+}
+
+async function saveGameData(game) {
+  const res = await fetch("/api/game/save", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(game),
+  });
+
+  console.log("Response inside saveGameData");
+  console.log({ res });
 }
 
 function addPlayer(lobbyId, userId, username) {

@@ -42,7 +42,6 @@ function broadcastLobbies(io) {
 }
 
 function handleCreateLobby(socket, io, lives, cards) {
-  console.log({ lives, cards });
   const currentLobby = getLobbyByPlayer(socket.user.id);
 
   if (currentLobby) {
@@ -73,8 +72,6 @@ function handleCreateLobby(socket, io, lives, cards) {
 
   socket.join(`lobby:${lobby.id}`);
 
-  console.log("Lobby created:", lobby);
-
   broadcastLobbies(io);
 }
 
@@ -91,13 +88,10 @@ function joinLobby(lobbyId, socket, io) {
 
   socket.join(`lobby:${lobbyId}`);
 
-  console.log(`${socket.user.username} joined lobby ${lobbyId}`);
-
   broadcastLobbies(io);
 }
 
 function leaveLobby(socket, io, reconnectTimers) {
-  console.log("ENTERING LOBBY LEAVE");
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
@@ -110,14 +104,12 @@ function leaveLobby(socket, io, reconnectTimers) {
 
   removePlayer(lobby.id, socket.user.id);
   socket.leave(`lobby:${lobby.id}`);
-  console.log(`${socket.user.username} left lobby ${lobby.id}`);
 
   if (game) {
     const result = removePlayerFromGame(game, socket.user.id);
 
     if (result.action === "finished") {
       game.turnPhase = "finished";
-      console.log("CALL X");
       broadcastGameState(io, lobby.id);
 
       const winner = game.players.get(result.winnerId);
@@ -132,14 +124,14 @@ function leaveLobby(socket, io, reconnectTimers) {
 
   if (lobby.players.size === 0) {
     const room = `lobby:${lobby.id}`;
-    deleteGame(lobby.id);
 
     io.to(room).emit("lobby:deleted");
     io.in(room).socketsLeave(room);
 
     deleteLobby(lobby.id);
+    deleteGame(lobby.id);
 
-    console.log(`Lobby ${lobby.id} deleted because it is empty`);
+    console.log(`Lobby ${lobby.id} deleted because it's empty`);
   }
 
   broadcastLobbies(io);
@@ -156,20 +148,21 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
     return;
   }
 
+  if (lobby.started) {
+    return;
+  }
+
   const room = `lobby:${lobbyId}`;
 
   for (const userId of lobby.players.keys()) {
     clearReconnectTimer(userId, reconnectTimers);
   }
 
-  deleteGame(lobbyId);
-
   io.to(room).emit("lobby:deleted");
   io.in(room).socketsLeave(room);
 
   deleteLobby(lobbyId);
-
-  console.log(`Lobby ${lobbyId} deleted by owner ` + `${socket.user.username}`);
+  deleteGame(lobbyId);
 
   broadcastLobbies(io);
 }

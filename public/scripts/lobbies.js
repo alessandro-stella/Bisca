@@ -72,87 +72,58 @@ function setupSocket() {
 
 function renderLobbies(lobbies) {
   const lobbiesList = document.getElementById("lobbies");
-
   lobbiesList.innerHTML = "";
 
   for (const lobby of lobbies) {
     const item = document.createElement("li");
 
-    if (lobby.started) {
-      item.style.opacity = "0.6";
-      item.classList.add("lobby-closed");
-    }
-
     const info = document.createElement("span");
-
-    info.textContent =
-      `${lobby.ownerUsername} - ` +
-      `${lobby.players} giocatori ` +
-      `(${lobby.playersConnected} connessi)`;
+    info.textContent = `${lobby.ownerUsername} - ${lobby.players} giocatori (${lobby.playersConnected} connessi)`;
 
     if (lobby.started) {
       info.textContent += " [IN CORSO]";
       info.style.fontWeight = "bold";
+      item.style.opacity = "0.6";
+      item.classList.add("lobby-closed");
     }
 
     item.appendChild(info);
 
-    if (lobby.isOwner) {
-      if (!lobby.started) {
+    if (!lobby.started) {
+      if (lobby.isOwner) {
         const startButton = document.createElement("button");
-
         startButton.textContent = "Start Game";
-
         startButton.addEventListener("click", () => {
           socket.emit("game:start");
         });
-
         item.appendChild(startButton);
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", () => {
+          socket.emit("lobby:delete", lobby.id);
+        });
+        item.appendChild(deleteButton);
+      } else if (!lobby.isMember) {
+        const joinButton = document.createElement("button");
+        joinButton.textContent = "Join";
+        joinButton.addEventListener("click", () => {
+          socket.emit("lobby:join", lobby.id);
+        });
+        item.appendChild(joinButton);
+      } else {
+        const leaveButton = document.createElement("button");
+        leaveButton.textContent = "Leave";
+        leaveButton.addEventListener("click", () => {
+          socket.emit("lobby:leave");
+        });
+        item.appendChild(leaveButton);
       }
-
-      const deleteButton = document.createElement("button");
-
-      deleteButton.textContent = "Delete";
-
-      deleteButton.addEventListener("click", () => {
-        socket.emit("lobby:delete", lobby.id);
-      });
-
-      item.appendChild(deleteButton);
-    } else if (lobby.isMember) {
-      const leaveButton = document.createElement("button");
-
-      leaveButton.textContent = "Leave";
-
-      leaveButton.addEventListener("click", () => {
-        socket.emit("lobby:leave");
-      });
-
-      item.appendChild(leaveButton);
-    } else if (!lobby.started) {
-      const joinButton = document.createElement("button");
-
-      joinButton.textContent = "Join";
-
-      joinButton.addEventListener("click", () => {
-        socket.emit("lobby:join", lobby.id);
-      });
-
-      item.appendChild(joinButton);
-    } else {
-      const startedText = document.createElement("span");
-
-      startedText.textContent = " Chiusa (Partita già iniziata)";
-      startedText.style.fontStyle = "italic";
-      startedText.style.marginLeft = "10px";
-
-      item.appendChild(startedText);
     }
 
     lobbiesList.appendChild(item);
   }
 }
-
 async function init() {
   const authenticated = await checkSession();
 

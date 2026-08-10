@@ -24,8 +24,6 @@ function parseCookies(cookieHeader) {
 }
 
 async function authenticateSocket(socket, next) {
-  console.log(socket.handshake.headers.cookie);
-
   try {
     const cookies = parseCookies(socket.handshake.headers.cookie);
 

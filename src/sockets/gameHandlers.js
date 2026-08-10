@@ -30,7 +30,6 @@ function broadcastGameState(io, lobbyId) {
 
     const playerId = socket.user.id;
 
-    console.log("CALL 1");
     socket.emit("game:state", getPlayerGameState(game, playerId));
   }
 }
@@ -58,7 +57,6 @@ function sendGameState(socket, io) {
   if (io) {
     broadcastGameState(io, lobby.id);
   } else {
-    console.log("CALL 2");
     socket.emit("game:state", getPlayerGameState(game, playerId));
   }
 }
@@ -97,8 +95,6 @@ function startGame(socket, io) {
 
   setLobbyStarted(lobby.id, true);
 
-  console.log("GAME CREATED:", game);
-
   const room = `lobby:${lobby.id}`;
 
   io.to(room).emit("game:started");
@@ -130,8 +126,6 @@ function emitGameResult(io, lobbyId, game, result) {
       isWinner,
     });
   }
-
-  deleteGame(lobbyId);
 
   setLobbyStarted(lobbyId, false);
 }
@@ -238,7 +232,10 @@ function handlePlayCard(io, socket, card) {
 }
 
 function checkCurrentGame(socket) {
+  console.log("Inside checkCurrentGame");
+
   const lobby = getLobbyByPlayer(socket.user.id);
+  console.log({ lobby });
 
   if (!lobby || !lobby.started) {
     return;

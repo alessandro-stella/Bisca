@@ -39,18 +39,39 @@ function createConnectionHandlers() {
       return;
     }
 
+    const activeGame = getGame(lobby.id);
+
+    if (activeGame && activeGame.status === "finished") {
+      removePlayer(lobby.id, userId);
+      console.log(
+        `${socket.user.username} disconnected from finished lobby ${lobby.id} and was removed.`,
+      );
+
+      if (lobby.players.size === 0) {
+        const room = `lobby:${lobby.id}`;
+
+        io.to(room).emit("lobby:deleted");
+        io.in(room).socketsLeave(room);
+
+        deleteLobby(lobby.id);
+        deleteGame(lobby.id);
+
+        console.log(
+          `Lobby ${lobby.id} deleted because it is empty (game finished)`,
+        );
+      }
+
+      broadcastLobbies(io);
+      return;
+    }
+
     setPlayerConnected(lobby.id, userId, false);
 
-    console.log(
-      `${socket.user.username} disconnected ` + `from lobby ${lobby.id}`,
-    );
+    console.log(`${socket.user.username} disconnected from lobby ${lobby.id}`);
 
     broadcastLobbies(io);
 
-    const activeGame = getGame(lobby.id);
-
     if (activeGame) {
-      console.log("CALL 3");
       broadcastGameState(io, lobby.id);
     }
 
@@ -96,12 +117,12 @@ function createConnectionHandlers() {
 
       if (currentLobby.players.size === 0) {
         const room = `lobby:${currentLobby.id}`;
-        deleteGame(currentLobby.id);
 
         io.to(room).emit("lobby:deleted");
         io.in(room).socketsLeave(room);
 
         deleteLobby(currentLobby.id);
+        deleteGame(currentLobby.id);
 
         console.log(`Lobby ${currentLobby.id} deleted because it is empty`);
       }

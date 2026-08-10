@@ -31,14 +31,21 @@ function dealCards(players, cardsToDeal) {
 }
 
 function initGameState(lobbyId, players, lives, initialCards) {
-  for (const [_, playerValues] of players.entries()) {
-    playerValues.bid = -1;
-    playerValues.lives = lives;
-    playerValues.won = 0;
-    playerValues.position = null;
+  const gamePlayers = new Map();
+
+  for (const [playerId, playerValues] of players.entries()) {
+    const newPlayerState = {
+      ...playerValues,
+      bid: -1,
+      lives: lives,
+      won: 0,
+      position: null,
+    };
+
+    gamePlayers.set(playerId, newPlayerState);
   }
 
-  const firstPlayer = Array.from(players.keys())[0];
+  const firstPlayer = Array.from(gamePlayers.keys())[0];
 
   const game = {
     lobbyId,
@@ -50,16 +57,16 @@ function initGameState(lobbyId, players, lives, initialCards) {
     turn: 1,
     playedHands: 0,
 
-    players,
+    players: gamePlayers,
     playedCards: new Map(),
-    nextPosition: players.size,
+    nextPosition: gamePlayers.size,
 
     turnStarter: firstPlayer,
     currentPlayer: firstPlayer,
 
     lastPlayer: null,
 
-    hands: dealCards(players, initialCards),
+    hands: dealCards(gamePlayers, initialCards),
 
     totalBids: 0,
   };
@@ -68,7 +75,6 @@ function initGameState(lobbyId, players, lives, initialCards) {
 
   return game;
 }
-
 function createGame(game) {
   if (games.has(game.lobbyId)) {
     throw new Error("Game already exists for this lobby");
@@ -522,6 +528,8 @@ function resolveShowdown(game) {
 }
 
 function restartCurrentTurn(game) {
+  console.log("Calling restartCurrentTurn");
+
   const alivePlayers = new Map(
     Array.from(game.players.entries()).filter(([, player]) => player.lives > 0),
   );
@@ -553,20 +561,24 @@ function restartCurrentTurn(game) {
 }
 
 function removePlayerFromGame(game, playerId) {
+  console.log("Calling removePlayerFromGame");
+
   const playerState = game.players.get(playerId);
-  if (!playerState) return { action: "none" };
+
+  if (!playerState) {
+    return { action: "none" };
+  }
 
   const wasAlive = playerState.lives > 0;
+  playerState.lives = 0;
 
   assignPlayersPosition(game, [playerId]);
-
-  game.players.delete(playerId);
-  game.hands.delete(playerId);
-  game.playedCards.delete(playerId);
 
   const alivePlayers = Array.from(game.players.entries()).filter(
     ([, p]) => p.lives > 0,
   );
+
+  console.log(alivePlayers);
 
   if (alivePlayers.length < 2) {
     if (alivePlayers.length === 1) {

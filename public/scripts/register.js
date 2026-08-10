@@ -52,7 +52,6 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   resetErrors();
 
-  console.log("Trying to register...");
   setReadonly(true);
 
   const username = usernameInput.value.trim();
@@ -94,9 +93,6 @@ form.addEventListener("submit", async (event) => {
 });
 
 async function registerUser(username, email, password) {
-  console.log("User does not exists, proceding to registration...");
-  console.log({ username, email, password });
-
   try {
     const res = await fetch("/api/user/register", {
       method: "POST",
