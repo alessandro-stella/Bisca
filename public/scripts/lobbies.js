@@ -53,10 +53,6 @@ function setupSocket() {
     console.error("Cannot join lobby:", data.message);
   });
 
-  socket.on("lobby:deleted", () => {
-    window.location.replace("/lobbies.html");
-  });
-
   socket.on("game:started", () => {
     window.location.href = "/game.html";
   });

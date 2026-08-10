@@ -20,7 +20,8 @@ socket.on("game:state", (game) => {
   console.log("Game state:", game);
 
   if (game.turnPhase === "finished") {
-    console.log("Finished!");
+    document.getElementById("gameStatus").textContent =
+      "La partita è conclusa!";
     return;
   }
 
@@ -53,10 +54,15 @@ socket.on("game:state", (game) => {
   }
 });
 
-socket.on("game:finished", ({ winnerId }) => {
+socket.on("game:finished", ({ winnerId, winnerUsername }) => {
   console.log("Partita terminata. Vincitore:", winnerId);
-});
 
+  document.getElementById("gameStatus").textContent =
+    `🎉 Partita terminata! Il vincitore è ${winnerUsername}! 🎉`;
+
+  document.getElementById("bidButtonsContainer").innerHTML = "";
+  document.getElementById("myCardsContainer").innerHTML = "";
+});
 function createLivesCounter(game) {
   const container = document.getElementById("livesContainer");
   container.innerHTML = "";
@@ -208,3 +214,7 @@ function createCards(cards, containerId, eventListener = false) {
     cardsContainer.appendChild(newCard);
   }
 }
+
+socket.on("lobby:deleted", () => {
+  window.location.replace("/lobbies.html");
+});

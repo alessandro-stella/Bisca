@@ -3,12 +3,14 @@ const {
   setPlayerConnected,
   isPlayerConnected,
   removePlayer,
-  getLobby,
   deleteLobby,
 } = require("../game/lobbyManager");
 
-const { deleteGame } = require("../game/gameManager");
-
+const {
+  deleteGame,
+  getGame,
+  assignPlayersPosition,
+} = require("../game/gameManager");
 const RECONNECT_TIMEOUT = 60 * 1000;
 
 function createConnectionHandlers() {
@@ -76,6 +78,12 @@ function createConnectionHandlers() {
         broadcastLobbies(io);
 
         return;
+      }
+
+      const game = getGame(currentLobby.id);
+
+      if (game) {
+        assignPlayersPosition(game, [userId]);
       }
 
       removePlayer(currentLobby.id, userId);

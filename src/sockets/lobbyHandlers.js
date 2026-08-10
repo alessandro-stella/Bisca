@@ -8,7 +8,6 @@ const {
   getLobbyByPlayer,
   getLobby,
   deleteLobby,
-  setLobbyStarted,
 } = require("../game/lobbyManager");
 
 const { deleteGame } = require("../game/gameManager");
