@@ -58,7 +58,7 @@ socket.on("game:finished", ({ winnerId, winnerUsername }) => {
   console.log("Partita terminata. Vincitore:", winnerId);
 
   document.getElementById("gameStatus").textContent =
-    `🎉 Partita terminata! Il vincitore è ${winnerUsername}! 🎉`;
+    `Partita terminata! Il vincitore è ${winnerUsername}!`;
 
   document.getElementById("bidButtonsContainer").innerHTML = "";
   document.getElementById("myCardsContainer").innerHTML = "";

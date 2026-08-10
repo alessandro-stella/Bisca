@@ -30,6 +30,7 @@ function broadcastGameState(io, lobbyId) {
 
     const playerId = socket.user.id;
 
+    console.log("CALL 1");
     socket.emit("game:state", getPlayerGameState(game, playerId));
   }
 }
@@ -57,6 +58,7 @@ function sendGameState(socket, io) {
   if (io) {
     broadcastGameState(io, lobby.id);
   } else {
+    console.log("CALL 2");
     socket.emit("game:state", getPlayerGameState(game, playerId));
   }
 }
@@ -79,11 +81,14 @@ function startGame(socket, io) {
     return;
   }
 
-  const players = lobby.players;
+  if (lobby.players.size < 2) {
+    console.log("Too few players!");
+    return;
+  }
 
   const game = initGameState(
     lobby.id,
-    players,
+    lobby.players,
     lobby.startingLives,
     lobby.initialCards,
   );

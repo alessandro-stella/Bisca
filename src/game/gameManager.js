@@ -98,7 +98,7 @@ function getPlayerGameState(game, playerId) {
       players: Array.from(game.players.values()),
       playedCards: Array.from(game.playedCards.values()),
 
-      currentPlayer: game.players.get(game.currentPlayer).username,
+      currentPlayer: game.players.get(game.currentPlayer)?.username || "",
 
       hand: game.hands.get(playerId),
 
@@ -125,7 +125,7 @@ function getPlayerGameState(game, playerId) {
     players: Array.from(game.players.values()),
     playedCards: Array.from(game.playedCards.values()),
 
-    currentPlayer: game.players.get(game.currentPlayer).username,
+    currentPlayer: game.players.get(game.currentPlayer)?.username || "",
 
     hand,
 
@@ -568,7 +568,7 @@ function removePlayerFromGame(game, playerId) {
     ([, p]) => p.lives > 0,
   );
 
-  if (alivePlayers.length <= 1) {
+  if (alivePlayers.length < 2) {
     if (alivePlayers.length === 1) {
       const winnerId = alivePlayers[0][0];
       game.status = "finished";

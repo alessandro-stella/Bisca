@@ -97,6 +97,7 @@ function joinLobby(lobbyId, socket, io) {
 }
 
 function leaveLobby(socket, io, reconnectTimers) {
+  console.log("ENTERING LOBBY LEAVE");
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
@@ -105,33 +106,18 @@ function leaveLobby(socket, io, reconnectTimers) {
 
   clearReconnectTimer(socket.user.id, reconnectTimers);
 
-  if (lobby.ownerId === socket.user.id) {
-    const room = `lobby:${lobby.id}`;
-
-    deleteGame(lobby.id);
-
-    io.to(room).emit("lobby:deleted");
-    io.in(room).socketsLeave(room);
-
-    deleteLobby(lobby.id);
-
-    console.log(
-      `Lobby deleted because owner ` +
-        `${socket.user.username} left: ${lobby.id}`,
-    );
-
-    broadcastLobbies(io);
-
-    return;
-  }
-
   const game = getGame(lobby.id);
+
+  removePlayer(lobby.id, socket.user.id);
+  socket.leave(`lobby:${lobby.id}`);
+  console.log(`${socket.user.username} left lobby ${lobby.id}`);
 
   if (game) {
     const result = removePlayerFromGame(game, socket.user.id);
 
     if (result.action === "finished") {
       game.turnPhase = "finished";
+      console.log("CALL X");
       broadcastGameState(io, lobby.id);
 
       const winner = game.players.get(result.winnerId);
@@ -144,11 +130,17 @@ function leaveLobby(socket, io, reconnectTimers) {
     }
   }
 
-  removePlayer(lobby.id, socket.user.id);
+  if (lobby.players.size === 0) {
+    const room = `lobby:${lobby.id}`;
+    deleteGame(lobby.id);
 
-  socket.leave(`lobby:${lobby.id}`);
+    io.to(room).emit("lobby:deleted");
+    io.in(room).socketsLeave(room);
 
-  console.log(`${socket.user.username} left lobby ${lobby.id}`);
+    deleteLobby(lobby.id);
+
+    console.log(`Lobby ${lobby.id} deleted because it is empty`);
+  }
 
   broadcastLobbies(io);
 }

@@ -31,8 +31,8 @@ function setupSocket() {
   const createLobbyButton = document.getElementById("createLobby");
 
   createLobbyButton.addEventListener("click", () => {
-    const lives = document.getElementById("livesInput").value;
-    const cards = document.getElementById("cardsInput").value;
+    const lives = parseInt(document.getElementById("livesInput").value, 10);
+    const cards = parseInt(document.getElementById("cardsInput").value, 10);
 
     socket.emit("lobby:create", lives, cards);
   });
@@ -78,12 +78,22 @@ function renderLobbies(lobbies) {
   for (const lobby of lobbies) {
     const item = document.createElement("li");
 
+    if (lobby.started) {
+      item.style.opacity = "0.6";
+      item.classList.add("lobby-closed");
+    }
+
     const info = document.createElement("span");
 
     info.textContent =
       `${lobby.ownerUsername} - ` +
       `${lobby.players} giocatori ` +
       `(${lobby.playersConnected} connessi)`;
+
+    if (lobby.started) {
+      info.textContent += " [IN CORSO]";
+      info.style.fontWeight = "bold";
+    }
 
     item.appendChild(info);
 
@@ -132,7 +142,9 @@ function renderLobbies(lobbies) {
     } else {
       const startedText = document.createElement("span");
 
-      startedText.textContent = "Game already started";
+      startedText.textContent = " Chiusa (Partita già iniziata)";
+      startedText.style.fontStyle = "italic";
+      startedText.style.marginLeft = "10px";
 
       item.appendChild(startedText);
     }

@@ -48,7 +48,9 @@ function createConnectionHandlers() {
     broadcastLobbies(io);
 
     const activeGame = getGame(lobby.id);
+
     if (activeGame) {
+      console.log("CALL 3");
       broadcastGameState(io, lobby.id);
     }
 
@@ -62,29 +64,6 @@ function createConnectionHandlers() {
 
       if (isPlayerConnected(currentLobby.id, userId)) {
         reconnectTimers.delete(userId);
-        return;
-      }
-
-      if (currentLobby.ownerId === userId) {
-        const room = `lobby:${currentLobby.id}`;
-
-        deleteGame(currentLobby.id);
-
-        io.to(room).emit("lobby:deleted");
-        io.in(room).socketsLeave(room);
-
-        deleteLobby(currentLobby.id);
-
-        console.log(
-          `Lobby deleted because owner ` +
-            `${socket.user.username} did not reconnect ` +
-            `within 60 seconds: ${currentLobby.id}`,
-        );
-
-        reconnectTimers.delete(userId);
-
-        broadcastLobbies(io);
-
         return;
       }
 
@@ -108,13 +87,24 @@ function createConnectionHandlers() {
       }
 
       removePlayer(currentLobby.id, userId);
-
       reconnectTimers.delete(userId);
 
       console.log(
         `${socket.user.username} removed from lobby ` +
           `${currentLobby.id} after 60 seconds`,
       );
+
+      if (currentLobby.players.size === 0) {
+        const room = `lobby:${currentLobby.id}`;
+        deleteGame(currentLobby.id);
+
+        io.to(room).emit("lobby:deleted");
+        io.in(room).socketsLeave(room);
+
+        deleteLobby(currentLobby.id);
+
+        console.log(`Lobby ${currentLobby.id} deleted because it is empty`);
+      }
 
       broadcastLobbies(io);
     }, RECONNECT_TIMEOUT);
