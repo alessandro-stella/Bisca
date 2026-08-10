@@ -1,4 +1,8 @@
-const { getLobbyByPlayer, getLobby } = require("../game/lobbyManager");
+const {
+  getLobbyByPlayer,
+  getLobby,
+  setLobbyStarted,
+} = require("../game/lobbyManager");
 
 const {
   initGameState,
@@ -8,6 +12,7 @@ const {
   placeBid,
   playCard,
   resolveShowdown,
+  deleteGame,
 } = require("../game/gameManager");
 
 function broadcastGameState(io, lobbyId) {
@@ -29,7 +34,8 @@ function broadcastGameState(io, lobbyId) {
   }
 }
 
-function sendGameState(socket) {
+function sendGameState(socket, io) {
+  const { setPlayerConnected } = require("../game/lobbyManager");
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
@@ -46,7 +52,13 @@ function sendGameState(socket) {
 
   const playerId = socket.user.id;
 
-  socket.emit("game:state", getPlayerGameState(game, playerId));
+  setPlayerConnected(lobby.id, playerId, true);
+
+  if (io) {
+    broadcastGameState(io, lobby.id);
+  } else {
+    socket.emit("game:state", getPlayerGameState(game, playerId));
+  }
 }
 
 function startGame(socket, io) {
@@ -77,6 +89,8 @@ function startGame(socket, io) {
   );
 
   createGame(game);
+
+  setLobbyStarted(lobby.id, true);
 
   console.log("GAME CREATED:", game);
 
@@ -111,6 +125,10 @@ function emitGameResult(io, lobbyId, game, result) {
       isWinner,
     });
   }
+
+  deleteGame(lobbyId);
+
+  setLobbyStarted(lobbyId, false);
 }
 
 function handlePlaceBid(io, socket, bid) {

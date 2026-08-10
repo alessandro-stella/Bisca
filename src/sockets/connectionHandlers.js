@@ -124,25 +124,23 @@ function createConnectionHandlers() {
 
   function handleReconnect(socket, io, broadcastLobbies) {
     const userId = socket.user.id;
-
     const lobby = getLobbyByPlayer(userId);
 
     if (!lobby) {
       return;
     }
 
-    setPlayerConnected(lobby.id, userId, true);
-
     clearReconnectTimer(userId);
-
     socket.join(`lobby:${lobby.id}`);
 
-    console.log(`${socket.user.username} reconnected to lobby ${lobby.id}`);
-
-    broadcastLobbies(io);
-
     if (lobby.started) {
+      console.log(`${socket.user.username} online, waiting to join...`);
       socket.emit("game:reconnect");
+      broadcastLobbies(io);
+    } else {
+      setPlayerConnected(lobby.id, userId, true);
+      console.log(`${socket.user.username} reconnected to lobby ${lobby.id}`);
+      broadcastLobbies(io);
     }
   }
 

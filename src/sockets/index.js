@@ -60,7 +60,7 @@ function setupSockets(io) {
     });
 
     socket.on("game:get-state", () => {
-      sendGameState(socket);
+      sendGameState(socket, io);
     });
 
     socket.on("game:place-bid", (bid) => {

@@ -59,11 +59,13 @@ function setupSocket() {
 
   socket.on("game:reconnect", () => {
     const reconnect = window.confirm(
-      "Do you want to reconnect to your previous game?",
+      "Hai una partita in corso! Vuoi rientrare nel gioco?",
     );
 
     if (reconnect) {
       window.location.href = "/game.html";
+    } else {
+      socket.emit("lobby:leave");
     }
   });
 }
