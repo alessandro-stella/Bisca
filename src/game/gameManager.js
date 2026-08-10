@@ -521,6 +521,74 @@ function resolveShowdown(game) {
   return result;
 }
 
+function restartCurrentTurn(game) {
+  const alivePlayers = new Map(
+    Array.from(game.players.entries()).filter(([, player]) => player.lives > 0),
+  );
+
+  for (const [, playerData] of alivePlayers) {
+    playerData.bid = -1;
+    playerData.won = 0;
+  }
+
+  game.turnPhase = "bidding";
+  game.totalBids = 0;
+  game.playedHands = 0;
+  game.playedCards.clear();
+
+  if (
+    !game.players.has(game.turnStarter) ||
+    game.players.get(game.turnStarter).lives === 0
+  ) {
+    game.turnStarter = Array.from(alivePlayers.keys())[0];
+  }
+
+  game.currentPlayer = game.turnStarter;
+  game.lastPlayer = getPreviousAlivePlayer(game, game.turnStarter);
+
+  const cardsToDeal = game.initialCards - ((game.turn - 1) % game.initialCards);
+
+  game.hands = dealCards(alivePlayers, cardsToDeal);
+  game.showdown = cardsToDeal === 1;
+}
+
+function removePlayerFromGame(game, playerId) {
+  const playerState = game.players.get(playerId);
+  if (!playerState) return { action: "none" };
+
+  const wasAlive = playerState.lives > 0;
+
+  assignPlayersPosition(game, [playerId]);
+
+  game.players.delete(playerId);
+  game.hands.delete(playerId);
+  game.playedCards.delete(playerId);
+
+  const alivePlayers = Array.from(game.players.entries()).filter(
+    ([, p]) => p.lives > 0,
+  );
+
+  if (alivePlayers.length <= 1) {
+    if (alivePlayers.length === 1) {
+      const winnerId = alivePlayers[0][0];
+      game.status = "finished";
+      game.winnerId = winnerId;
+      game.players.get(winnerId).position = 1;
+      return { action: "finished", winnerId };
+    } else {
+      game.status = "finished";
+      return { action: "finished", winnerId: null };
+    }
+  }
+
+  if (wasAlive) {
+    restartCurrentTurn(game);
+    return { action: "restarted" };
+  }
+
+  return { action: "none" };
+}
+
 module.exports = {
   initGameState,
   createGame,
@@ -531,4 +599,5 @@ module.exports = {
   playCard,
   resolveShowdown,
   assignPlayersPosition,
+  removePlayerFromGame,
 };

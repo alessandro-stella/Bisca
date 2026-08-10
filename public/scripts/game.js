@@ -63,6 +63,7 @@ socket.on("game:finished", ({ winnerId, winnerUsername }) => {
   document.getElementById("bidButtonsContainer").innerHTML = "";
   document.getElementById("myCardsContainer").innerHTML = "";
 });
+
 function createLivesCounter(game) {
   const container = document.getElementById("livesContainer");
   container.innerHTML = "";
@@ -77,10 +78,17 @@ function createLivesCounter(game) {
       row.classList.add("own-player");
     }
 
-    row.textContent = isMe
+    let text = isMe
       ? `${player.username} (tu): ${player.lives} vite`
       : `${player.username}: ${player.lives} vite`;
 
+    if (!player.connected) {
+      text += " [Disconnesso in attesa...]";
+      row.style.opacity = "0.5";
+      row.style.fontStyle = "italic";
+    }
+
+    row.textContent = text;
     container.appendChild(row);
   }
 }

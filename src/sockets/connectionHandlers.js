@@ -7,10 +7,13 @@ const {
 } = require("../game/lobbyManager");
 
 const {
-  deleteGame,
   getGame,
-  assignPlayersPosition,
+  deleteGame,
+  removePlayerFromGame,
 } = require("../game/gameManager");
+
+const { broadcastGameState } = require("./gameHandlers");
+
 const RECONNECT_TIMEOUT = 60 * 1000;
 
 function createConnectionHandlers() {
@@ -43,6 +46,11 @@ function createConnectionHandlers() {
     );
 
     broadcastLobbies(io);
+
+    const activeGame = getGame(lobby.id);
+    if (activeGame) {
+      broadcastGameState(io, lobby.id);
+    }
 
     const timer = setTimeout(() => {
       const currentLobby = getLobbyByPlayer(userId);
@@ -83,7 +91,20 @@ function createConnectionHandlers() {
       const game = getGame(currentLobby.id);
 
       if (game) {
-        assignPlayersPosition(game, [userId]);
+        const result = removePlayerFromGame(game, userId);
+
+        if (result.action === "finished") {
+          game.turnPhase = "finished";
+          broadcastGameState(io, currentLobby.id);
+
+          const winner = game.players.get(result.winnerId);
+          io.to(`lobby:${currentLobby.id}`).emit("game:finished", {
+            winnerId: result.winnerId,
+            winnerUsername: winner?.username,
+          });
+        } else {
+          broadcastGameState(io, currentLobby.id);
+        }
       }
 
       removePlayer(currentLobby.id, userId);

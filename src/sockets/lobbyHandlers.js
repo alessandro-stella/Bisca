@@ -10,7 +10,13 @@ const {
   deleteLobby,
 } = require("../game/lobbyManager");
 
-const { deleteGame } = require("../game/gameManager");
+const {
+  deleteGame,
+  getGame,
+  removePlayerFromGame,
+} = require("../game/gameManager");
+
+const { broadcastGameState } = require("./gameHandlers");
 
 function sendLobbies(socket) {
   const lobbies = getLobbies();
@@ -117,6 +123,25 @@ function leaveLobby(socket, io, reconnectTimers) {
     broadcastLobbies(io);
 
     return;
+  }
+
+  const game = getGame(lobby.id);
+
+  if (game) {
+    const result = removePlayerFromGame(game, socket.user.id);
+
+    if (result.action === "finished") {
+      game.turnPhase = "finished";
+      broadcastGameState(io, lobby.id);
+
+      const winner = game.players.get(result.winnerId);
+      io.to(`lobby:${lobby.id}`).emit("game:finished", {
+        winnerId: result.winnerId,
+        winnerUsername: winner?.username,
+      });
+    } else {
+      broadcastGameState(io, lobby.id);
+    }
   }
 
   removePlayer(lobby.id, socket.user.id);
