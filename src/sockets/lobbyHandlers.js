@@ -22,15 +22,17 @@ function sendLobbies(socket) {
   const lobbies = getLobbies();
   const currentLobby = getLobbyByPlayer(socket.user.id);
 
-  const lobbiesForUser = lobbies.map((lobby) => ({
-    ...lobby,
-    isMember: currentLobby?.id === lobby.id,
-    isOwner: lobby.ownerId === socket.user.id,
-    isConnected:
-      currentLobby?.id === lobby.id
-        ? (currentLobby.players.get(socket.user.id)?.connected ?? false)
-        : false,
-  }));
+  const lobbiesForUser = lobbies
+    .map((lobby) => ({
+      ...lobby,
+      isMember: currentLobby?.id === lobby.id,
+      isOwner: lobby.ownerId === socket.user.id,
+      isConnected:
+        currentLobby?.id === lobby.id
+          ? (currentLobby.players.get(socket.user.id)?.connected ?? false)
+          : false,
+    }))
+    .filter((lobby) => lobby.players > 0 && !lobby.closed);
 
   socket.emit("lobbies:update", lobbiesForUser);
 }
@@ -55,6 +57,7 @@ function handleCreateLobby(socket, io, lives, cards) {
     ownerId: socket.user.id,
     ownerUsername: socket.user.username,
     started: false,
+    closed: false,
 
     players: new Map([
       [

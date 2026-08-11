@@ -2,6 +2,7 @@ const {
   getLobbyByPlayer,
   getLobby,
   setLobbyStarted,
+  setLobbyClosed,
 } = require("../game/lobbyManager");
 
 const {
@@ -167,6 +168,7 @@ function emitGameResult(io, lobbyId, game, result) {
   }
 
   setLobbyStarted(lobbyId, false);
+  setLobbyClosed(lobbyId, true);
 }
 
 function handlePlaceBid(io, socket, bid) {

@@ -23,6 +23,7 @@ function getLobbies() {
     ownerUsername: lobby.ownerUsername,
     players: lobby.players.size,
     started: lobby.started,
+    closed: lobby.closed,
     playersConnected: Array.from(lobby.players.values()).filter(
       (player) => player.connected,
     ).length,
@@ -122,6 +123,18 @@ function setLobbyStarted(lobbyId, started) {
   return true;
 }
 
+function setLobbyClosed(lobbyId, closed) {
+  const lobby = lobbies.get(lobbyId);
+
+  if (!lobby) {
+    return false;
+  }
+
+  lobby.closed = closed;
+
+  return true;
+}
+
 function setPlayerConnected(lobbyId, userId, connected) {
   const lobby = lobbies.get(lobbyId);
 
@@ -173,6 +186,7 @@ module.exports = {
   getLobby,
   getLobbies,
   deleteLobby,
+  setLobbyClosed,
   addPlayer,
   removePlayer,
   setLobbyStarted,

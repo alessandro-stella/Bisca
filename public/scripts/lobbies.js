@@ -53,6 +53,7 @@ function setupSocket() {
   });
 
   socket.on("lobbies:update", (lobbies) => {
+    console.log("Receiving lobbies:update");
     renderLobbies(lobbies);
   });
 

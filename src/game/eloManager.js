@@ -168,13 +168,10 @@ async function calculateAndUpdateElo(gameId, players) {
     await client.query("BEGIN");
 
     const playerIds = players.map((player) => player.id);
-    console.log({ playerIds });
 
     const eloData = await getPlayersEloData(client, playerIds);
-    console.log({ eloData });
 
     const evaluatedPlayers = calculateEloChanges(players, eloData);
-    console.log({ evaluatedPlayers });
 
     for (const player of evaluatedPlayers) {
       await client.query(
