@@ -15,6 +15,8 @@ const {
   deleteGame,
 } = require("../game/gameManager");
 
+const db = require("../db");
+
 function broadcastGameState(io, lobbyId) {
   const lobby = getLobby(lobbyId);
   const game = getGame(lobbyId);
@@ -61,7 +63,7 @@ function sendGameState(socket, io) {
   }
 }
 
-function startGame(socket, io) {
+async function startGame(socket, io) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
@@ -94,6 +96,43 @@ function startGame(socket, io) {
   createGame(game);
 
   setLobbyStarted(lobby.id, true);
+
+  const client = await db.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    await client.query(
+      `INSERT INTO games (id, duration) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING`,
+      [lobby.id, 0],
+    );
+
+    let positionTracker = 1;
+    for (const playerId of lobby.players.keys()) {
+      await client.query(
+        `
+          INSERT INTO game_players (game_id, user_id, position, left_early) 
+          VALUES ($1, $2, $3, FALSE)
+          ON CONFLICT (game_id, user_id) DO NOTHING
+        `,
+        [lobby.id, playerId, positionTracker],
+      );
+      positionTracker++;
+    }
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    console.error(
+      "START GAME: Error saving game players to DB, rolled back",
+      error,
+    );
+
+    return;
+  } finally {
+    client.release();
+  }
 
   const room = `lobby:${lobby.id}`;
 

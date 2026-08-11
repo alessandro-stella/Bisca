@@ -47,7 +47,7 @@ async function getUserFromSession(sessionId, client = db) {
 
   const userResult = await client.query(
     `
-        SELECT id, username, email
+        SELECT id, username, email, elo
         FROM users
         WHERE id = $1
         `,

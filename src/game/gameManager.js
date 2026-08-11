@@ -1,4 +1,7 @@
+const { v4: uuidv4 } = require("uuid");
 const db = require("../db");
+const { calculateAndUpdateElo } = require("./eloManager");
+
 const games = new Map();
 
 function getRandomizedDeck() {
@@ -96,36 +99,19 @@ function deleteGame(lobbyId) {
 }
 
 function getPlayerGameState(game, playerId) {
-  if (!game.showdown) {
-    return {
-      lobbyId: game.lobbyId,
-      turnPhase: game.turnPhase,
-      totalBids: game.totalBids,
-      showdown: game.showdown,
+  let hand = game.hands.get(playerId);
 
-      players: Array.from(game.players.values()),
-      playedCards: Array.from(game.playedCards.values()),
+  if (game.showdown) {
+    hand = [];
 
-      currentPlayer: game.players.get(game.currentPlayer)?.username || "",
+    for (const [opponentId, opponentHand] of game.hands.entries()) {
+      if (opponentId === playerId) continue;
 
-      hand: game.hands.get(playerId),
-
-      myUsername: game.players.get(playerId).username,
-      isMyTurn: game.currentPlayer === playerId,
-      lastPlayer: game.lastPlayer === playerId,
-    };
-  }
-
-  const hand = [];
-
-  for (const [opponentId, opponentHand] of game.hands.entries()) {
-    if (opponentId === playerId) continue;
-
-    hand.push(opponentHand[0]);
+      hand.push(opponentHand[0]);
+    }
   }
 
   return {
-    lobbyId: game.lobbyId,
     turnPhase: game.turnPhase,
     totalBids: game.totalBids,
     showdown: game.showdown,
@@ -135,9 +121,9 @@ function getPlayerGameState(game, playerId) {
 
     currentPlayer: game.players.get(game.currentPlayer)?.username || "",
 
+    myUsername: game.players.get(playerId).username,
     hand,
 
-    myUsername: game.players.get(playerId).username,
     isMyTurn: game.currentPlayer === playerId,
     lastPlayer: game.lastPlayer === playerId,
   };
@@ -598,34 +584,49 @@ function removePlayerFromGame(game, playerId) {
 }
 
 async function saveGameData(game) {
+  console.log("Saving data of this game:", game);
+  const gameId = game.id;
+
   const dbClient = await db.connect();
 
   try {
     await dbClient.query("BEGIN");
 
-    const gameResult = await dbClient.query(
+    await dbClient.query(
       `
-        INSERT INTO games (winner_id, duration)
-        VALUES ($1, $2)
-        RETURNING id;
+        UPDATE games 
+        SET winner_id = $1, duration = $2
+        WHERE id = $3
       `,
-      [game.winner || null, game.duration],
+      [game.winner || null, game.duration || 0, gameId],
     );
-    const gameId = gameResult.rows[0].id;
 
-    for (const player of game.players) {
+    for (const p of game.players) {
       await dbClient.query(
         `
-          INSERT INTO game_players (game_id, user_id, position, left_early)
-          VALUES ($1, $2, $3, $4);
+          UPDATE game_players 
+          SET position = $1, left_early = $2
+          WHERE game_id = $3 AND user_id = $4
         `,
-        [gameId, player.userId, player.position, player.leftEarly || false],
+        [p.position, p.leftEarly || false, gameId, p.userId],
       );
     }
 
     await dbClient.query("COMMIT");
+
+    const playersForElo = game.players.map((p) => ({
+      id: p.userId,
+      position: p.position,
+    }));
+
+    await calculateAndUpdateElo(gameId, playersForElo);
+
+    console.log("ELO updated successfully for game:", gameId);
   } catch (error) {
     await dbClient.query("ROLLBACK");
+
+    console.error("Error in saveGameData & ELO calculation:", error);
+
     throw error;
   } finally {
     dbClient.release();

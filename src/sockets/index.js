@@ -115,7 +115,7 @@ function setupSockets(io) {
           return;
         }
 
-        const maxBid = Array.from(game.hands.values()).length;
+        const maxBid = Array.from(game.hands.values()).length + 1; // Include 0 as bid
         const validation = validators.validateBid(bid, maxBid);
         if (!validation.valid) {
           socket.emit("error", { message: validation.message });

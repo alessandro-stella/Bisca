@@ -7,7 +7,7 @@ async function getStats(user) {
     async (res) => await res.json(),
   );
 
-  console.log(games);
+  console.log({ games });
 }
 
 async function logout() {

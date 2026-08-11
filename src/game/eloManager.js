@@ -64,7 +64,7 @@ async function getPlayersEloData(client, playerIds) {
       SELECT
         u.id,
         u.elo,
-        COUNT(gp.id)::integer AS matches_played
+        COUNT(gp.user_id)::integer AS matches_played
       FROM users u
       LEFT JOIN game_players gp
         ON gp.user_id = u.id
@@ -168,10 +168,13 @@ async function calculateAndUpdateElo(gameId, players) {
     await client.query("BEGIN");
 
     const playerIds = players.map((player) => player.id);
+    console.log({ playerIds });
 
     const eloData = await getPlayersEloData(client, playerIds);
+    console.log({ eloData });
 
     const evaluatedPlayers = calculateEloChanges(players, eloData);
+    console.log({ evaluatedPlayers });
 
     for (const player of evaluatedPlayers) {
       await client.query(
@@ -191,14 +194,10 @@ async function calculateAndUpdateElo(gameId, players) {
             old_elo,
             elo_change,
             new_elo,
-            position,
-            k_factor,
-            expected_score,
-            actual_score
+            position
           )
           VALUES (
-            $1, $2, $3, $4, $5,
-            $6, $7, $8, $9
+            $1, $2, $3, $4, $5, $6
           )
         `,
         [
@@ -208,9 +207,6 @@ async function calculateAndUpdateElo(gameId, players) {
           player.change,
           player.newElo,
           player.position,
-          player.kFactor,
-          player.expectedScore,
-          player.actualScore,
         ],
       );
     }

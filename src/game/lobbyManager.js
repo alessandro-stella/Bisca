@@ -44,6 +44,7 @@ async function deleteLobby(lobbyId) {
     );
 
     const dataToSave = {
+      id: game.lobbyId,
       duration: game.turn,
       players: playersArray,
       winner: game.winnerId || null,

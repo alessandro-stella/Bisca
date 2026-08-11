@@ -107,11 +107,11 @@ async function registerUser(username, email, password) {
     });
 
     const registrationResponse = await res.json();
+    console.log({ registrationResponse });
 
     if (!res.ok) {
       addErrors(registrationResponse.errors);
     } else {
-      // console.log({ registrationResponse });
       window.location.replace("lobbies.html");
     }
   } catch (error) {

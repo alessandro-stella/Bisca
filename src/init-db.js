@@ -9,12 +9,15 @@ async function init() {
     DROP TABLE IF EXISTS users CASCADE;
     DROP TABLE IF EXISTS sessions CASCADE;
     DROP TABLE IF EXISTS games CASCADE;
+    DROP TABLE IF EXISTS game_players CASCADE;
+    DROP TABLE IF EXISTS elo_history CASCADE;
 
     CREATE TABLE users (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       username VARCHAR(30) UNIQUE NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
+      elo INT NOT NULL DEFAULT 1000,
       created_at TIMESTAMP DEFAULT NOW()
     );
 

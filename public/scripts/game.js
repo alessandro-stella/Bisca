@@ -15,6 +15,8 @@ socket.on("connect", () => {
 
 socket.on("connect_error", (error) => {
   console.error("Socket connection error:", error.message);
+
+  window.location.replace("login.html");
 });
 
 socket.on("game:reconnect", () => {
