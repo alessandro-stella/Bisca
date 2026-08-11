@@ -67,6 +67,25 @@ router.post("/register", async (req, res) => {
     });
   }
 
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
+
+  if (username.length < 3 || username.length > 30) {
+    return res.status(400).json({ error: "Username must be 3-30 characters" });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+
+  if (password.length < 8) {
+    return res
+      .status(400)
+      .json({ error: "Password must be at least 8 characters" });
+  }
+
   const dbClient = await db.connect();
 
   try {

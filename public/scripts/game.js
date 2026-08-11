@@ -1,4 +1,11 @@
-const socket = io();
+const socket = io({
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: 5,
+
+  transports: ["websocket", "polling"],
+});
 
 socket.on("connect", () => {
   console.log("Connected to game:", socket.id);
@@ -8,6 +15,12 @@ socket.on("connect", () => {
 
 socket.on("connect_error", (error) => {
   console.error("Socket connection error:", error.message);
+});
+
+socket.on("game:reconnect", () => {
+  console.log("Game reconnect signal received");
+
+  socket.emit("game:get-state");
 });
 
 socket.on("game:not-found", () => {

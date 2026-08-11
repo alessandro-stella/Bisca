@@ -36,6 +36,8 @@ function sendLobbies(socket) {
 }
 
 function broadcastLobbies(io) {
+  console.log("Broadcasting lobbies");
+
   for (const socket of io.sockets.sockets.values()) {
     sendLobbies(socket);
   }
@@ -92,13 +94,13 @@ function joinLobby(lobbyId, socket, io) {
 }
 
 function leaveLobby(socket, io, reconnectTimers) {
+  clearReconnectTimer(socket.user.id, reconnectTimers);
+
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
     return;
   }
-
-  clearReconnectTimer(socket.user.id, reconnectTimers);
 
   const game = getGame(lobby.id);
 

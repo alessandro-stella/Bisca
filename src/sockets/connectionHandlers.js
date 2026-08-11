@@ -146,6 +146,7 @@ function createConnectionHandlers() {
 
     if (lobby.started) {
       console.log(`${socket.user.username} online, waiting to join...`);
+      setPlayerConnected(lobby.id, userId, true);
       socket.emit("game:reconnect");
       broadcastLobbies(io);
     } else {

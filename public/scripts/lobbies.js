@@ -26,7 +26,14 @@ async function checkSession() {
 }
 
 function setupSocket() {
-  socket = io();
+  socket = io({
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    reconnectionAttempts: 5,
+
+    transports: ["websocket", "polling"],
+  });
 
   const createLobbyButton = document.getElementById("createLobby");
 

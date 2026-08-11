@@ -567,6 +567,7 @@ function removePlayerFromGame(game, playerId) {
 
   if (wasAlive) {
     playerState.leftEarly = true;
+    playerState.connected = false;
   }
 
   assignPlayersPosition(game, [playerId]);

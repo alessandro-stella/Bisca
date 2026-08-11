@@ -31,8 +31,6 @@ function getLobbies() {
 
 async function deleteLobby(lobbyId) {
   console.log("Deleting lobby...");
-  const lobbyData = lobbies.get(lobbyId);
-  console.log("Lobby data: ", lobbyData);
 
   const game = getGame(lobbyId);
 
@@ -130,7 +128,13 @@ function setPlayerConnected(lobbyId, userId, connected) {
     return false;
   }
 
-  const player = lobby.players.get(userId);
+  const game = getGame(lobbyId);
+
+  if (!game) {
+    return false;
+  }
+
+  const player = game.players.get(userId);
 
   if (!player) {
     return false;

@@ -3,7 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const cookieParser = require("cookie-parser");
-// const cors = require("cors");
+const cors = require("cors");
 const path = require("path");
 const { Server } = require("socket.io");
 
@@ -13,13 +13,23 @@ const { router: sessionRouter } = require("./routes/sessionRouter");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  pingInterval: 25000,
+  pingTimeout: 60000,
+  transports: ["websocket", "polling"],
+
+  cors: {
+    origin: process.env.CLIENT_URL || "*",
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
 const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(cookieParser());
-// app.use(cors());
+app.use(cors());
 
 app.use("/api/user", userRouter);
 app.use("/api/session", sessionRouter);
@@ -41,7 +51,7 @@ server.listen(PORT, async () => {
   }
 });
 
-app.use((err, req, res, next) => {
+app.use((err, _, res, __) => {
   console.error("ERROR:", err);
   res.status(500).send(err.message);
 });
