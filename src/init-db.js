@@ -42,6 +42,21 @@ async function init() {
       left_early BOOLEAN DEFAULT FALSE,
       PRIMARY KEY (game_id, user_id)
     );
+
+    CREATE TABLE elo_history (
+      id BIGSERIAL PRIMARY KEY,
+      game_id UUID NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+      old_elo INTEGER NOT NULL,
+      elo_change INTEGER NOT NULL,
+      new_elo INTEGER NOT NULL,
+      position INTEGER NOT NULL,
+
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+      UNIQUE (game_id, user_id)
+    );
   `);
 
   console.log("Database initialized");

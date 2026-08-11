@@ -38,6 +38,10 @@ socket.on("game:state", (game) => {
     return;
   }
 
+  document.getElementById("cardsTitle").textContent = game.showdown
+    ? "Carte degli avversari"
+    : "Le mie carte";
+
   document.getElementById("gameStatus").textContent = game.showdown
     ? `Stato corrente: ${game.turnPhase} (showdown - guarda le carte degli avversari)`
     : `Stato corrente: ${game.turnPhase}`;
@@ -48,7 +52,7 @@ socket.on("game:state", (game) => {
     ? `Current player: ${game.currentPlayer} (tu)`
     : `Current player: ${game.currentPlayer}`;
 
-  createLivesCounter(game);
+  createPlayerInfo(game);
 
   createCards(game.hand, "myCardsContainer", !game.showdown);
   createCards(
@@ -75,28 +79,51 @@ socket.on("game:finished", ({ winnerId, winnerUsername }) => {
 
   document.getElementById("bidButtonsContainer").innerHTML = "";
   document.getElementById("myCardsContainer").innerHTML = "";
+  document.getElementById("livesContainer").innerHTML = "";
 });
 
-function createLivesCounter(game) {
+function createPlayerInfo(game) {
   const container = document.getElementById("livesContainer");
   container.innerHTML = "";
 
   for (const player of game.players) {
     const row = document.createElement("div");
-    row.classList.add("livesRow");
+    row.classList.add("playerInfo");
 
     const isMe = player.username === game.myUsername;
 
     if (isMe) {
-      row.classList.add("own-player");
+      row.classList.add("myInfo");
     }
 
-    let text = isMe
-      ? `${player.username} (tu): ${player.lives} vite`
-      : `${player.username}: ${player.lives} vite`;
+    let text = `${isMe ? "* " : ""}${player.username}: ${player.lives} vite`;
+
+    if (player.bid === -1) {
+      if (isMe) {
+        text +=
+          game.currentPlayer === player.username
+            ? " - Scegli quanto scommettere"
+            : " - Attendi il tuo turno";
+      } else {
+        text +=
+          game.currentPlayer === player.username
+            ? " - Sta decidendo quanto scommettere"
+            : " - Attende il suo turno";
+      }
+    } else {
+      text += ` - ${isMe ? "hai scommesso" : "scommette"} ${player.bid} prese`;
+    }
+
+    if (game.turnPhase === "play") {
+      text += ` - vinte ${player.won} mani finora`;
+    }
 
     if (!player.connected) {
-      text += " [Disconnesso in attesa...]";
+      if (player.lives > 0) {
+        text += " [Disconnesso in attesa...]";
+      } else {
+        text += " [Disconnesso]";
+      }
       row.style.opacity = "0.5";
       row.style.fontStyle = "italic";
     }
