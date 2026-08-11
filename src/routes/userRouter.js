@@ -254,22 +254,29 @@ router.get("/:userId/games", async (req, res) => {
 
     const query = `
       SELECT 
-        g.id AS game_id, 
+        g.id, 
         g.duration, 
         g.created_at, 
         gp.position, 
-        gp.left_early
+        gp.left_early,
+        eh.old_elo,
+        eh.elo_change,
+        eh.new_elo,
+        (
+          SELECT COUNT(*) 
+          FROM game_players gp_opponents 
+          WHERE gp_opponents.game_id = g.id AND gp_opponents.user_id != $1
+        )::integer AS opponents_count
       FROM games g
       JOIN game_players gp ON g.id = gp.game_id
+      LEFT JOIN elo_history eh ON g.id = eh.game_id AND gp.user_id = eh.user_id
       WHERE gp.user_id = $1
       ORDER BY g.created_at DESC;
     `;
 
     const result = await db.query(query, [userId]);
 
-    return res.status(200).json({
-      games: result.rows,
-    });
+    return res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching user games:", error);
 

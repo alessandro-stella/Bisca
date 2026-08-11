@@ -1,3 +1,8 @@
+.title {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
 .container {
   padding: 1em;
   margin: 1em;
@@ -75,4 +80,35 @@ button:hover {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+/* ==================== */
+/* profile.html */
+/* ==================== */
+
+#gameHistoryContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.gameContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-gap: 0.125em;
+}
+
+.gameContainer * {
+  border: 1px solid blue;
+  padding: 0.5em;
+  background-color: papayawhip;
+  color: black;
+}
+
+.eloChangeContainer.positive {
+  color: green;
+}
+
+.eloChangeContainer.negative {
+  color: red;
 }

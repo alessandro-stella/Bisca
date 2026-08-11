@@ -43,11 +43,11 @@ async function init() {
       user_id UUID REFERENCES users(id) ON DELETE CASCADE,
       position INT NOT NULL,
       left_early BOOLEAN DEFAULT FALSE,
+
       PRIMARY KEY (game_id, user_id)
     );
 
     CREATE TABLE elo_history (
-      id BIGSERIAL PRIMARY KEY,
       game_id UUID NOT NULL REFERENCES games(id) ON DELETE CASCADE,
       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
@@ -58,7 +58,7 @@ async function init() {
 
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-      UNIQUE (game_id, user_id)
+      PRIMARY KEY (game_id, user_id)
     );
   `);
 

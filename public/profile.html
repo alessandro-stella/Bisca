@@ -12,11 +12,23 @@
   </head>
 
   <body>
-    <h1>Your personal profile</h1>
-
     <div class="container">
+      <div class="title">Your personal profile</div>
+      <br />
       <button onclick="logout()">Logout</button>
       <a href="lobbies.html"><button>See lobbies</button></a>
+    </div>
+
+    <div class="container">
+      <div class="title">User info</div>
+      <div id="usernameInfo"></div>
+      <div id="emailInfo"></div>
+      <div id="eloInfo"></div>
+    </div>
+
+    <div class="container">
+      <div class="title">Match history</div>
+      <div id="gameHistoryContainer"></div>
     </div>
   </body>
 </html>
