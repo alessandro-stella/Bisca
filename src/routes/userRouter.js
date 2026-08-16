@@ -253,23 +253,21 @@ router.get("/:userId/games", async (req, res) => {
     }
 
     const query = `
-      SELECT 
-        g.id, 
-        g.duration, 
-        g.created_at, 
-        gp.position, 
+      SELECT
+        g.id,
+        g.duration,
+        g.created_at,
+        gp.position,
         gp.left_early,
         eh.old_elo,
         eh.elo_change,
         eh.new_elo,
-        (
-          SELECT COUNT(*) 
-          FROM game_players gp_opponents 
-          WHERE gp_opponents.game_id = g.id AND gp_opponents.user_id != $1
-        )::integer AS opponents_count
-      FROM games g
-      JOIN game_players gp ON g.id = gp.game_id
-      LEFT JOIN elo_history eh ON g.id = eh.game_id AND gp.user_id = eh.user_id
+        g.player_count - 1 AS opponents_count
+      FROM game_players gp
+      JOIN games g ON g.id = gp.game_id
+      LEFT JOIN elo_history eh
+        ON eh.game_id = gp.game_id
+       AND eh.user_id = gp.user_id
       WHERE gp.user_id = $1
       ORDER BY g.created_at DESC;
     `;

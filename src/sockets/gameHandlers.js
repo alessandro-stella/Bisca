@@ -13,7 +13,6 @@ const {
   placeBid,
   playCard,
   resolveShowdown,
-  deleteGame,
 } = require("../game/gameManager");
 
 const db = require("../db");
@@ -104,8 +103,8 @@ async function startGame(socket, io) {
     await client.query("BEGIN");
 
     await client.query(
-      `INSERT INTO games (id, duration) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING`,
-      [lobby.id, 0],
+      `INSERT INTO games (id, player_count, duration) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING`,
+      [lobby.id, lobby.players.size, 0],
     );
 
     let positionTracker = 1;

@@ -34,6 +34,7 @@ async function init() {
     CREATE TABLE games (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       winner_id UUID REFERENCES users(id) ON DELETE SET NULL,
+      player_count INT NOT NULL, 
       duration INT NOT NULL,
       created_at TIMESTAMP DEFAULT NOW()
     );
