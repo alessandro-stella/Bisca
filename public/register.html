@@ -5,9 +5,11 @@
     <title>Registration</title>
 
     <link rel="stylesheet" href="reset.css" />
-    <link rel="stylesheet" href="style.css" />
-
-    <script src="scripts/register.js" defer></script>
+    <link rel="stylesheet" href="styles/login_register.css" />
+    <script
+      src="https://kit.fontawesome.com/df57a58519.js"
+      crossorigin="anonymous"
+    ></script>
 
     <script>
       async function checkSession() {
@@ -28,63 +30,91 @@
     </script>
   </head>
   <body>
-    <div class="container">
-      <form id="registrationForm">
-        <div class="inputWithError">
-          <div>Username</div>
-          <input
-            id="usernameInput"
-            type="text"
-            required
-            minlength="3"
-            maxlength="30"
-            ="Username"
-          />
-          <div id="usernameInputError" class="inputError" style="display: none">
-            Username already taken
+    <div id="baseContainer">
+      <div id="registerTitle">Bisca.it</div>
+
+      <div id="registerContainer">
+        <form id="registrationForm">
+          <div class="inputWithError">
+            <div class="inputWithIcon">
+              <i class="icon fa-solid fa-user"></i>
+              <input
+                id="usernameInput"
+                type="text"
+                required
+                minlength="3"
+                maxlength="30"
+                placeholder="Username"
+              />
+            </div>
+            <div
+              id="usernameInputError"
+              class="inputError"
+              style="display: none"
+            >
+              Username already taken
+            </div>
           </div>
-        </div>
 
-        <div class="inputWithError">
-          <div>Email</div>
-          <input id="emailInput" type="email" required placeholder="Email" />
-          <div id="emailInputError" class="inputError" style="display: none">
-            Email already in use
+          <div class="inputWithError">
+            <div class="inputWithIcon">
+              <i class="icon fa-solid fa-envelope"></i>
+              <input
+                id="emailInput"
+                type="email"
+                required
+                placeholder="Email"
+              />
+            </div>
+            <div id="emailInputError" class="inputError" style="display: none">
+              Email already in use
+            </div>
           </div>
-        </div>
 
-        <div class="inputWithError">
-          <div>Password</div>
-          <input
-            id="passwordInput"
-            type="password"
-            required
-            placeholder="Password"
-          />
-        </div>
-
-        <div class="inputWithError">
-          <div>Repeat password</div>
-          <input
-            id="repeatedPasswordInput"
-            type="password"
-            required
-            placeholder="Password"
-          />
-          <div
-            id="repeatedPasswordInputError"
-            class="inputError"
-            style="display: none"
-          >
-            The passwords do not match
+          <div class="inputWithError">
+            <div class="inputWithIcon inputPassword">
+              <i class="icon fa-solid fa-lock"></i>
+              <input
+                id="passwordInput"
+                type="password"
+                required
+                placeholder="Password"
+              />
+              <div id="showPassword" class="iconContainer">
+                <i class="icon fa-solid fa-eye-slash"></i>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <button type="submit">Register</button>
-      </form>
+          <div class="inputWithError">
+            <div class="inputWithIcon inputPassword">
+              <i class="icon fa-solid fa-lock"></i>
+              <input
+                id="repeatedPasswordInput"
+                type="password"
+                required
+                placeholder="Repeat password"
+              />
+              <div id="showPasswordRepeat" class="iconContainer">
+                <i class="icon fa-solid fa-eye-slash"></i>
+              </div>
+            </div>
+            <div
+              id="repeatedPasswordInputError"
+              class="inputError"
+              style="display: none"
+            >
+              The passwords do not match
+            </div>
+          </div>
 
-      <a href="index.html"><button>Home</button></a>
-      <a href="login.html"><button>Go to login</button></a>
+          <button id="registerButton" type="submit">Register</button>
+        </form>
+      </div>
+
+      <a id="loginLink" href="login.html">Hai già un account? Accedi ora!</a>
     </div>
+
+    <script src="scripts/register.js"></script>
   </body>
 </html>

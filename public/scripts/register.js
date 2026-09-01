@@ -13,6 +13,42 @@ const repeatedPasswordInputError = document.getElementById(
   "repeatedPasswordInputError",
 );
 
+const inputs = document.getElementsByClassName("inputWithIcon");
+
+for (const input of inputs) {
+  const inputField = input.getElementsByTagName("input")[0];
+
+  input.addEventListener("click", () => inputField.focus());
+}
+
+const showPassword = document.getElementById("showPassword");
+const showPasswordRepeat = document.getElementById("showPasswordRepeat");
+
+showPassword.addEventListener("click", () => {
+  const icon = showPassword.getElementsByTagName("svg")[0];
+  icon.classList.toggle("fa-eye-slash");
+  icon.classList.toggle("fa-eye");
+
+  passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+});
+
+showPasswordRepeat.addEventListener("click", () => {
+  const icon = showPasswordRepeat.getElementsByTagName("svg")[0];
+  icon.classList.toggle("fa-eye-slash");
+  icon.classList.toggle("fa-eye");
+
+  repeatedPasswordInput.type =
+    repeatedPasswordInput.type === "password" ? "text" : "password";
+});
+
+function setReadonly(blockInput) {
+  const inputs = [emailInput, passwordInput];
+
+  inputs.forEach((input) => {
+    input.readOnly = blockInput;
+  });
+}
+
 function setReadonly(blockInput) {
   const inputs = [
     usernameInput,

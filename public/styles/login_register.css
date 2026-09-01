@@ -1,0 +1,140 @@
+body {
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+#baseContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1em;
+  min-height: 100dvh;
+}
+
+#loginTitle,
+#registerTitle {
+  font-size: 2em;
+  font-weight: bold;
+  color: var(--text-primary);
+  padding-bottom: 0.5em;
+}
+
+#loginContainer,
+#registerLink,
+#registerContainer,
+#loginLink {
+  width: min(24em, 50%);
+  background-color: var(--bg-card);
+  border-radius: 0.5em;
+
+  display: flex;
+  flex-direction: column;
+}
+
+#loginContainer,
+#registerContainer {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: 2em;
+}
+
+#loginForm,
+#registrationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.inputWithIcon {
+  border-radius: 0.25em;
+  border: 1px solid var(--border-inactive);
+
+  padding: 0.5em;
+
+  transition: all ease-in-out 100ms;
+
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.inputWithIcon:hover,
+.inputWithIcon:focus-within {
+  cursor: text;
+  border: 1px solid var(--border-active);
+}
+
+.inputWithIcon input {
+  color: var(--text-active);
+  font-size: 0.9em;
+  flex: 1;
+}
+
+.inputWithIcon input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.icon {
+  padding: 0 0.25em;
+  color: var(--icon-inactive);
+}
+
+#showPassword,
+#showPasswordRepeat {
+  width: 1.5em;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+#showPassword:hover .icon,
+#showPasswordRepeat:hover .icon {
+  color: var(--icon-active);
+}
+
+#loginButton,
+#registerButton {
+  padding: 0.75em;
+  color: var(--text-primary);
+  font-weight: bolder;
+  font-size: 1.25em;
+  background-color: var(--brand-green);
+  border-radius: 0.5em;
+
+  background: linear-gradient(
+    180deg,
+    var(--brand-green) 0%,
+    var(--brand-green-shadow) 100%
+  );
+}
+
+#loginButton:hover,
+#registerButton:hover {
+  background: linear-gradient(
+    180deg,
+    var(--brand-green-hover) 0%,
+    var(--brand-green-shadow) 100%
+  );
+  cursor: pointer;
+}
+
+#registerLink,
+#loginLink {
+  background-color: var(--bg-footer);
+  color: var(--text-link);
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  text-align: center;
+  padding: 0.5em;
+  transition: all ease-in-out 100ms;
+}
+
+#registerLink:hover,
+#loginLink:hover {
+  color: var(--text-link-hover);
+}

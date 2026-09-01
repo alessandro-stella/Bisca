@@ -1,0 +1,209 @@
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+strong {
+  color: var(--text-heading);
+}
+
+/* Top Bar */
+.topbar {
+  background-color: var(--bg-header);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.topbar .logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--brand-green);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: var(--brand-green);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--brand-green-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-dark);
+  color: #ffffff;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  margin-bottom: 15px;
+  color: var(--text-heading);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto 30px auto;
+}
+
+.hero .btn-primary {
+  font-size: 1.5rem;
+  padding: 15px 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 0px rgba(0, 0, 0, 0.2);
+}
+
+.hero .btn-primary:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* Layout Principale */
+.container {
+  display: flex;
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Contenuto delle Regole */
+.rule-card {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.rule-card h2 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rule-card ul {
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
+
+.rule-card li {
+  margin-bottom: 10px;
+}
+
+/* Box Informativi */
+.highlight-box {
+  background-color: #3b4335; /* Verde scuro desaturato */
+  border-left: 5px solid var(--brand-green);
+  padding: 15px 20px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+  color: #e2e2e2;
+}
+
+.warning-box {
+  background-color: #422929; /* Rosso scuro desaturato */
+  border-left: 5px solid var(--accent-red);
+  padding: 15px 20px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+  color: #e2e2e2;
+}
+
+/* Tabella Valore Carte */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background-color: var(--bg-main);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  background-color: var(--btn-dark);
+  color: var(--text-heading);
+  font-weight: 600;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: var(--border-color);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .auth-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  .btn {
+    flex: 1;
+  }
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+  .rule-card {
+    padding: 20px;
+  }
+}
