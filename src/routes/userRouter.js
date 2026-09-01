@@ -10,7 +10,8 @@ const UNIQUE_CONSTRAINT = "23505";
 
 // Utility for registration (check existing credentials)
 router.post("/checkUser", async (req, res) => {
-  const { username, email } = req.body;
+  const username = req.body.username?.trim();
+  const email = req.body.email?.trim().toLowerCase();
 
   if (!username || !email) {
     return res.status(400).json({
@@ -41,8 +42,8 @@ router.post("/checkUser", async (req, res) => {
     if (username_exists || email_exists) {
       return res.status(409).json({
         errors: {
-          username: username_exists,
-          email: email_exists,
+          ...(username_exists && { username: { msg: "Username già in uso" } }),
+          ...(email_exists && { email: { msg: "Email già in uso" } }),
         },
       });
     }
@@ -59,31 +60,37 @@ router.post("/checkUser", async (req, res) => {
 
 // Registration handler
 router.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
+  const username = req.body.username?.trim();
+  const email = req.body.email?.trim().toLowerCase();
+  const password = req.body.password;
 
   if (!username || !email || !password) {
-    return res.status(400).json({
-      error: "Missing fields",
-    });
-  }
-
-  if (!username || !email || !password) {
-    return res.status(400).json({ error: "Missing fields" });
+    return res
+      .status(400)
+      .json({ errors: { missingData: { msg: "Compilare l'intero form" } } });
   }
 
   if (username.length < 3 || username.length > 30) {
-    return res.status(400).json({ error: "Username must be 3-30 characters" });
+    return res.status(400).json({
+      errors: {
+        username: { msg: "Lo username deve essere lungo tra 3 e 30 caratteri" },
+      },
+    });
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return res.status(400).json({ error: "Invalid email format" });
+    return res
+      .status(400)
+      .json({ errors: { email: { msg: "Formato email non valido" } } });
   }
 
   if (password.length < 8) {
-    return res
-      .status(400)
-      .json({ error: "Password must be at least 8 characters" });
+    return res.status(400).json({
+      errors: {
+        password: { msg: "La password deve essere lunga almeno 8 caratteri" },
+      },
+    });
   }
 
   const dbClient = await db.connect();
@@ -132,8 +139,7 @@ router.post("/register", async (req, res) => {
       if (error.constraint === "users_username_key") {
         return res.status(409).json({
           errors: {
-            username: true,
-            email: false,
+            username: { msg: "Username già in uso" },
           },
         });
       }
@@ -141,8 +147,7 @@ router.post("/register", async (req, res) => {
       if (error.constraint === "users_email_key") {
         return res.status(409).json({
           errors: {
-            username: false,
-            email: true,
+            email: { msg: "Email già in uso" },
           },
         });
       }
@@ -151,7 +156,9 @@ router.post("/register", async (req, res) => {
     console.error("Registration error: ", error);
 
     res.status(500).json({
-      error: "Internal server error",
+      errors: {
+        general: { msg: "Errore interno del server. Riprova più tardi." },
+      },
     });
   } finally {
     dbClient.release();
@@ -160,7 +167,8 @@ router.post("/register", async (req, res) => {
 
 // Login handler
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const email = req.body.email?.trim().toLowerCase();
+  const password = req.body.password;
 
   if (!email || !password) {
     return res.status(400).json({
@@ -180,7 +188,7 @@ router.post("/login", async (req, res) => {
 
     if (result.rows.length === 0) {
       return res.status(401).json({
-        error: "Invalid email or password",
+        error: "Email o password non valida",
       });
     }
     const user = result.rows[0];
@@ -189,7 +197,7 @@ router.post("/login", async (req, res) => {
 
     if (!passwordCorrect) {
       return res.status(401).json({
-        error: "Invalid email or password",
+        error: "Email o password non valida",
       });
     }
 

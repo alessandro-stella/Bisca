@@ -72,11 +72,6 @@ body {
   justify-content: space-between;
 
   padding: 1em;
-  padding-bottom: 0;
-}
-
-#navbar.tall {
-  padding-bottom: 1em;
 }
 
 #logo {
@@ -108,11 +103,24 @@ body {
 }
 
 .primaryButton {
-  background-color: var(--brand-green);
+  background: linear-gradient(
+    180deg,
+    var(--brand-green) 0%,
+    var(--brand-green-shadow) 100%
+  );
+}
+
+.primaryButton * {
+  color: var(--text-primary);
 }
 
 .primaryButton:hover {
-  background-color: var(--brand-green-hover);
+  background: linear-gradient(
+    180deg,
+    var(--brand-green-hover) 0%,
+    var(--brand-green-shadow) 100%
+  );
+  cursor: pointer;
 }
 
 .secondaryButton {
@@ -122,6 +130,7 @@ body {
 
 .secondaryButton:hover {
   background-color: var(--btn-secondary-hover);
+  cursor: pointer;
 }
 
 /* =========== */

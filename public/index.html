@@ -16,7 +16,7 @@
   </head>
 
   <body>
-    <div id="navbar" class="tall">
+    <div id="navbar">
       <div id="logo">BISCA.IT</div>
 
       <div class="buttons">
@@ -43,137 +43,133 @@
     </section>
 
     <div class="container">
-      <main class="content">
-        <div class="ruleCard">
-          <h2>Il Turno di Gioco</h2>
-          <p>
-            Ad ogni turno verranno distribuite un tot di carte ad ogni
-            giocatore.
-          </p>
+      <div class="ruleCard">
+        <h2>Il Turno di Gioco</h2>
+        <p>
+          Ad ogni turno verranno distribuite un tot di carte ad ogni giocatore.
+        </p>
+        <ul>
+          <li>
+            Cominciando dal giocatore alla destra del mazziere (in senso
+            antiorario), ognuno annuncia quante "mani" vincerà in totale.
+          </li>
+          <li>
+            Completato il giro delle dichiarazioni, ogni giocatore dovrà calare
+            una carta nello stesso ordine.
+          </li>
+          <li>
+            Alla fine del giro, il giocatore che ha tirato la carta più alta
+            vincerà la mano.
+          </li>
+          <li>
+            Chi vince la mano è il primo a tirare la carta successiva, finché
+            tutti non terminano le carte.
+          </li>
+        </ul>
+        <div class="highlightBox">
+          <strong>Calcolo del punteggio:</strong> Alla fine di un turno ogni
+          giocatore confronta le prese previste con quelle effettuate. Perde
+          vite in base alla differenza. Pronosticare 2 prese e farne 3 farà
+          perdere una vita; occorre prestare attenzione anche a quante mani
+          perdere!
+        </div>
+      </div>
+
+      <div class="ruleCard">
+        <h2>Proseguimento e Showdown</h2>
+        <p>
+          Ad ogni nuovo turno si distribuisce una carta in meno (partendo
+          generalmente da 6) fino ad arrivare a uno. Terminata la mano con una
+          carta, se ci sono ancora giocatori in vita, si ricomincia dal numero
+          di carte iniziale.
+        </p>
+        <div class="highlightBox">
+          <strong>Showdown (Il round con una carta):</strong><br />
+          Quando si resta con una sola carta, non si può guardarla. Ogni
+          giocatore se la mette sulla fronte mostrandola agli avversari.
+          Mantenendo il proprio turno, ognuno decide se vincerà o perderà la
+          mano. Alla fine si svelano le carte: chi ha sbagliato la previsione
+          perde una vita.
+        </div>
+      </div>
+
+      <div class="ruleCard">
+        <h2>Valore delle Carte</h2>
+        <p>
+          Tra carte dello stesso seme, vince il valore numerico (10 > 9 > ... >
+          2 > Asso). Tra semi diversi, ecco la gerarchia:
+        </p>
+        <table id="cardValue">
+          <thead>
+            <tr>
+              <th>Seme</th>
+              <th>Potere</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Denari</strong></td>
+              <td>Più forte</td>
+              <td>Il Re di Denari è la carta fissa più alta.</td>
+            </tr>
+            <tr>
+              <td><strong>Coppe</strong></td>
+              <td>Forte</td>
+              <td>Batte Spade e Bastoni.</td>
+            </tr>
+            <tr>
+              <td><strong>Spade</strong></td>
+              <td>Medio</td>
+              <td>Batte solo Bastoni.</td>
+            </tr>
+            <tr>
+              <td><strong>Bastoni</strong></td>
+              <td>Più debole</td>
+              <td>L'Asso di Bastoni è la carta fissa più bassa.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="warningBox">
+          <strong>Attenzione all'Asso di Denari! (Jolly)</strong><br />
+          L'asso di denari è speciale. Quando un giocatore lo gioca, può
+          decidere al momento se considerarlo la carta <em>più alta</em> o
+          <em>più bassa</em> della mano. Scavalca qualsiasi ordinamento, potendo
+          battere il Re di Denari o farsi battere dall'Asso di Bastoni!
+        </div>
+      </div>
+
+      <div class="ruleCard">
+        <h2>Come garantire la perdita di vite (Regola Aurea)</h2>
+        <p>
+          Per assicurare che qualcuno perda sempre,
+          <strong
+            >la somma delle prese dichiarate da tutti i giocatori deve essere
+            diversa dal totale delle carte in mano.</strong
+          >
+        </p>
+        <p>
+          Questo impedisce che tutti possano indovinare la propria previsione.
+          Penalizza l'ultimo giocatore a parlare, ma bilancia il suo vantaggio
+          di poter vedere le scelte degli altri.
+        </p>
+
+        <div class="highlightBox">
+          <strong
+            >Esempio pratico (3 giocatori, 4 carte a testa = 4 prese
+            totali):</strong
+          >
           <ul>
+            <li>Giocatore 1: dice "farò 2 prese"</li>
+            <li>Giocatore 2: dice "farò 1 presa"</li>
             <li>
-              Cominciando dal giocatore alla destra del mazziere (in senso
-              antiorario), ognuno annuncia quante "mani" vincerà in totale.
-            </li>
-            <li>
-              Completato il giro delle dichiarazioni, ogni giocatore dovrà
-              calare una carta nello stesso ordine.
-            </li>
-            <li>
-              Alla fine del giro, il giocatore che ha tirato la carta più alta
-              vincerà la mano.
-            </li>
-            <li>
-              Chi vince la mano è il primo a tirare la carta successiva, finché
-              tutti non terminano le carte.
+              <strong>Giocatore 3:</strong> la somma provvisoria è 3. Non potrà
+              dire "1", altrimenti la somma totale farebbe 4. Dovrà per forza
+              dichiarare 0, 2, 3 o 4.
             </li>
           </ul>
-          <div class="highlightBox">
-            <strong>Calcolo del punteggio:</strong> Alla fine di un turno ogni
-            giocatore confronta le prese previste con quelle effettuate. Perde
-            vite in base alla differenza. Pronosticare 2 prese e farne 3 farà
-            perdere una vita; occorre prestare attenzione anche a quante mani
-            perdere!
-          </div>
         </div>
-
-        <div class="ruleCard">
-          <h2>Proseguimento e Showdown</h2>
-          <p>
-            Ad ogni nuovo turno si distribuisce una carta in meno (partendo
-            generalmente da 6) fino ad arrivare a uno. Terminata la mano con una
-            carta, se ci sono ancora giocatori in vita, si ricomincia dal numero
-            di carte iniziale.
-          </p>
-          <div class="highlightBox">
-            <strong>Showdown (Il round con una carta):</strong><br />
-            Quando si resta con una sola carta, non si può guardarla. Ogni
-            giocatore se la mette sulla fronte mostrandola agli avversari.
-            Mantenendo il proprio turno, ognuno decide se vincerà o perderà la
-            mano. Alla fine si svelano le carte: chi ha sbagliato la previsione
-            perde una vita.
-          </div>
-        </div>
-
-        <div class="ruleCard">
-          <h2>Valore delle Carte</h2>
-          <p>
-            Tra carte dello stesso seme, vince il valore numerico (10 > 9 > ...
-            > 2 > Asso). Tra semi diversi, ecco la gerarchia:
-          </p>
-          <table id="cardValue">
-            <thead>
-              <tr>
-                <th>Seme</th>
-                <th>Potere</th>
-                <th>Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Denari</strong></td>
-                <td>Più forte</td>
-                <td>Il Re di Denari è la carta fissa più alta.</td>
-              </tr>
-              <tr>
-                <td><strong>Coppe</strong></td>
-                <td>Forte</td>
-                <td>Batte Spade e Bastoni.</td>
-              </tr>
-              <tr>
-                <td><strong>Spade</strong></td>
-                <td>Medio</td>
-                <td>Batte solo Bastoni.</td>
-              </tr>
-              <tr>
-                <td><strong>Bastoni</strong></td>
-                <td>Più debole</td>
-                <td>L'Asso di Bastoni è la carta fissa più bassa.</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="warningBox">
-            <strong>Attenzione all'Asso di Denari! (Jolly)</strong><br />
-            L'asso di denari è speciale. Quando un giocatore lo gioca, può
-            decidere al momento se considerarlo la carta <em>più alta</em> o
-            <em>più bassa</em> della mano. Scavalca qualsiasi ordinamento,
-            potendo battere il Re di Denari o farsi battere dall'Asso di
-            Bastoni!
-          </div>
-        </div>
-
-        <div class="ruleCard">
-          <h2>Come garantire la perdita di vite (Regola Aurea)</h2>
-          <p>
-            Per assicurare che qualcuno perda sempre,
-            <strong
-              >la somma delle prese dichiarate da tutti i giocatori deve essere
-              diversa dal totale delle carte in mano.</strong
-            >
-          </p>
-          <p>
-            Questo impedisce che tutti possano indovinare la propria previsione.
-            Penalizza l'ultimo giocatore a parlare, ma bilancia il suo vantaggio
-            di poter vedere le scelte degli altri.
-          </p>
-
-          <div class="highlightBox">
-            <strong
-              >Esempio pratico (3 giocatori, 4 carte a testa = 4 prese
-              totali):</strong
-            >
-            <ul>
-              <li>Giocatore 1: dice "farò 2 prese"</li>
-              <li>Giocatore 2: dice "farò 1 presa"</li>
-              <li>
-                <strong>Giocatore 3:</strong> la somma provvisoria è 3. Non
-                potrà dire "1", altrimenti la somma totale farebbe 4. Dovrà per
-                forza dichiarare 0, 2, 3 o 4.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
 
     <script>

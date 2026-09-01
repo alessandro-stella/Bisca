@@ -26,15 +26,13 @@ ul {
 }
 
 .container {
-  display: flex;
-  max-width: 1000px;
-  margin: 40px auto;
-  padding: 0 20px;
-  flex-direction: column;
-  gap: 30px;
-}
+  width: 65em;
+  max-width: 90%;
+  min-height: 100dvh;
 
-.content {
+  padding: 1em;
+  margin: 1em auto;
+
   display: flex;
   flex-direction: column;
   gap: 1em;
@@ -93,7 +91,9 @@ ul {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .ruleCard {
-    padding: 2em;
+  .container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
   }
 }

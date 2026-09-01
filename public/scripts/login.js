@@ -6,7 +6,12 @@ const emailInput = /** @type {HTMLInputElement} */ (
 const passwordInput = /** @type {HTMLInputElement} */ (
   document.getElementById("passwordInput")
 );
+const inputPasswordContainer =
+  document.getElementsByClassName("inputPassword")[0];
+
 const loginError = document.getElementById("loginError");
+
+const loginButton = document.getElementById("loginButton");
 
 const inputs = document.getElementsByClassName("inputWithIcon");
 
@@ -34,11 +39,34 @@ showPassword.addEventListener("click", () => {
   passwordInput.type = passwordInput.type === "password" ? "text" : "password";
 });
 
+function showError(show, message, highlightPasswordField = true) {
+  loginError.hidden = !show;
+
+  if (show) {
+    loginError.textContent = message || "Email o password non valida";
+  }
+
+  if (show && highlightPasswordField) {
+    inputPasswordContainer.classList.add("error");
+  } else {
+    inputPasswordContainer.classList.remove("error");
+  }
+}
+
+function setLoading(loading) {
+  if (loading) {
+    loginButton.innerHTML = '<i class="fa-solid fa-spinner"></i>';
+  } else {
+    loginButton.innerHTML = "Accedi";
+  }
+}
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   setReadonly(true);
-  loginError.style.display = "none";
+  showError(false);
+  setLoading(true);
 
   const email = emailInput.value.trim();
   const password = passwordInput.value;
@@ -55,17 +83,28 @@ form.addEventListener("submit", async (event) => {
       }),
     });
 
-    const loginResponse = await res.json();
+    let loginResponse = null;
+    try {
+      loginResponse = await res.json();
+    } catch (parseError) {
+      loginResponse = null;
+    }
 
     if (!res.ok) {
-      loginError.style.display = "block";
+      showError(
+        true,
+        loginResponse?.error || "Invalid email or password",
+        res.status === 401,
+      );
     } else {
       // console.log({ loginResponse });
       window.location.replace("lobbies.html");
     }
   } catch (error) {
     console.log("Internal server error: ", error);
+    showError(true, "Errore di connessione. Riprova più tardi.", false);
   }
 
   setReadonly(false);
+  setLoading(false);
 });

@@ -2,7 +2,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Accesso</title>
 
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
@@ -21,7 +21,6 @@
         });
 
         if (response.ok) {
-          console.log("Session OK");
           window.location.replace("/lobbies.html");
         } else {
           console.log("No session or expired");
@@ -33,7 +32,7 @@
   </head>
   <body>
     <div id="baseContainer">
-      <div id="loginTitle">BISCA.IT</div>
+      <a id="loginTitle" href="index.html">BISCA.IT</a>
 
       <div id="loginContainer">
         <form id="loginForm">
@@ -56,12 +55,14 @@
               </div>
             </div>
 
-            <div id="loginError" style="display: none">
-              Invalid email or password
+            <div id="loginError" class="inputError" hidden>
+              Email o password non valida
             </div>
           </div>
 
-          <button id="loginButton" type="submit">Login</button>
+          <button id="loginButton" class="primaryButton" type="submit">
+            Accedi
+          </button>
         </form>
       </div>
 

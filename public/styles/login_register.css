@@ -71,6 +71,18 @@
   color: var(--text-placeholder);
 }
 
+.inputWithError:has(#loginError:not([hidden])) {
+  border-color: var(--accent-red);
+}
+
+.inputWithIcon.error {
+  border-color: var(--accent-red);
+}
+
+.inputError {
+  color: var(--accent-red);
+}
+
 .icon {
   padding: 0 0.25em;
   color: var(--icon-inactive);
@@ -98,24 +110,7 @@
   color: var(--text-primary);
   font-weight: bolder;
   font-size: 1.25em;
-  background-color: var(--brand-green);
   border-radius: 0.5em;
-
-  background: linear-gradient(
-    180deg,
-    var(--brand-green) 0%,
-    var(--brand-green-shadow) 100%
-  );
-}
-
-#loginButton:hover,
-#registerButton:hover {
-  background: linear-gradient(
-    180deg,
-    var(--brand-green-hover) 0%,
-    var(--brand-green-shadow) 100%
-  );
-  cursor: pointer;
 }
 
 #registerLink,

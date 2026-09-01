@@ -2,7 +2,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registration</title>
+    <title>Registrazione</title>
 
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
@@ -21,7 +21,6 @@
         });
 
         if (response.ok) {
-          console.log("Session OK");
           window.location.replace("/lobbies.html");
         } else {
           console.log("No session or expired");
@@ -33,12 +32,12 @@
   </head>
   <body>
     <div id="baseContainer">
-      <div id="registerTitle">BISCA.IT</div>
+      <a id="registerTitle" href="index.html">BISCA.IT</a>
 
       <div id="registerContainer">
         <form id="registrationForm">
           <div class="inputWithError">
-            <div class="inputWithIcon">
+            <div id="usernameInputContainer" class="inputWithIcon">
               <i class="icon fa-solid fa-user"></i>
               <input
                 id="usernameInput"
@@ -49,17 +48,11 @@
                 placeholder="Username"
               />
             </div>
-            <div
-              id="usernameInputError"
-              class="inputError"
-              style="display: none"
-            >
-              Username already taken
-            </div>
+            <div id="usernameInputError" class="inputError" hidden></div>
           </div>
 
           <div class="inputWithError">
-            <div class="inputWithIcon">
+            <div id="emailInputContainer" class="inputWithIcon">
               <i class="icon fa-solid fa-envelope"></i>
               <input
                 id="emailInput"
@@ -68,13 +61,14 @@
                 placeholder="Email"
               />
             </div>
-            <div id="emailInputError" class="inputError" style="display: none">
-              Email already in use
-            </div>
+            <div id="emailInputError" class="inputError" hidden></div>
           </div>
 
           <div class="inputWithError">
-            <div class="inputWithIcon inputPassword">
+            <div
+              id="passwordInputContainer"
+              class="inputWithIcon inputPassword"
+            >
               <i class="icon fa-solid fa-lock"></i>
               <input
                 id="passwordInput"
@@ -86,10 +80,14 @@
                 <i class="icon fa-solid fa-eye-slash"></i>
               </div>
             </div>
+            <div id="passwordInputError" class="inputError" hidden></div>
           </div>
 
           <div class="inputWithError">
-            <div class="inputWithIcon inputPassword">
+            <div
+              id="repeatedPasswordInputContainer"
+              class="inputWithIcon inputPassword"
+            >
               <i class="icon fa-solid fa-lock"></i>
               <input
                 id="repeatedPasswordInput"
@@ -104,13 +102,19 @@
             <div
               id="repeatedPasswordInputError"
               class="inputError"
-              style="display: none"
-            >
-              The passwords do not match
-            </div>
+              hidden
+            ></div>
           </div>
 
-          <button id="registerButton" type="submit">Register</button>
+          <button id="registerButton" class="primaryButton" type="submit">
+            Registrati
+          </button>
+
+          <div id="missingData" class="inputError" hidden>
+            Compilare l'intero questionario
+          </div>
+
+          <div id="registerGeneralError" class="inputError" hidden></div>
         </form>
       </div>
 
