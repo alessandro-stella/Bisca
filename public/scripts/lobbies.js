@@ -38,8 +38,16 @@ function setupSocket() {
   const createLobbyButton = document.getElementById("createLobby");
 
   createLobbyButton.addEventListener("click", () => {
-    const lives = parseInt(document.getElementById("livesInput").value, 10);
-    const cards = parseInt(document.getElementById("cardsInput").value, 10);
+    const lives = parseInt(
+      /** @type {HTMLInputElement} */ (document.getElementById("livesInput"))
+        .value,
+      10,
+    );
+    const cards = parseInt(
+      /** @type {HTMLInputElement} */ (document.getElementById("cardsInput"))
+        .value,
+      10,
+    );
 
     socket.emit("lobby:create", lives, cards);
   });

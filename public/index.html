@@ -6,35 +6,32 @@
     <title>Regole di Bisca</title>
 
     <link rel="stylesheet" href="reset.css" />
-    <link rel="stylesheet" href="./styles/home.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles/home.css" />
+
+    <script
+      src="https://kit.fontawesome.com/df57a58519.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
+
   <body>
-    <header class="topbar">
-      <div class="logo">BISCA.IT</div>
-      <form
-        class="login-section"
-        action="#"
-        method="POST"
-        onsubmit="
-          event.preventDefault();
-          alert('Funzione di login da implementare nel backend!');
-        "
-      >
-        <input
-          type="text"
-          placeholder="Username"
-          class="login-input"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          class="login-input"
-          required
-        />
-        <button type="submit" class="login-btn">Accedi</button>
-      </form>
-    </header>
+    <div id="navbar" class="tall">
+      <div id="logo">BISCA.IT</div>
+
+      <div class="buttons">
+        <a class="primaryButton iconButton" href="lobbies.html">
+          <p id="spinner"><i class="fa-solid fa-spinner"></i></p>
+          <p id="lobbies" style="display: none">
+            <i class="fa-solid fa-door-closed"></i>
+          </p>
+          <p id="login" style="display: none">
+            <i class="fa-solid fa-user"></i>
+          </p>
+          <p id="buttonText">Caricamento...</p>
+        </a>
+      </div>
+    </div>
 
     <section class="hero">
       <h1>Benvenuto a Bisca!</h1>
@@ -47,7 +44,7 @@
 
     <div class="container">
       <main class="content">
-        <div class="rule-card">
+        <div class="ruleCard">
           <h2>Il Turno di Gioco</h2>
           <p>
             Ad ogni turno verranno distribuite un tot di carte ad ogni
@@ -71,7 +68,7 @@
               tutti non terminano le carte.
             </li>
           </ul>
-          <div class="highlight-box">
+          <div class="highlightBox">
             <strong>Calcolo del punteggio:</strong> Alla fine di un turno ogni
             giocatore confronta le prese previste con quelle effettuate. Perde
             vite in base alla differenza. Pronosticare 2 prese e farne 3 farà
@@ -80,7 +77,7 @@
           </div>
         </div>
 
-        <div class="rule-card">
+        <div class="ruleCard">
           <h2>Proseguimento e Showdown</h2>
           <p>
             Ad ogni nuovo turno si distribuisce una carta in meno (partendo
@@ -88,7 +85,7 @@
             carta, se ci sono ancora giocatori in vita, si ricomincia dal numero
             di carte iniziale.
           </p>
-          <div class="highlight-box">
+          <div class="highlightBox">
             <strong>Showdown (Il round con una carta):</strong><br />
             Quando si resta con una sola carta, non si può guardarla. Ogni
             giocatore se la mette sulla fronte mostrandola agli avversari.
@@ -98,13 +95,13 @@
           </div>
         </div>
 
-        <div class="rule-card">
+        <div class="ruleCard">
           <h2>Valore delle Carte</h2>
           <p>
             Tra carte dello stesso seme, vince il valore numerico (10 > 9 > ...
             > 2 > Asso). Tra semi diversi, ecco la gerarchia:
           </p>
-          <table>
+          <table id="cardValue">
             <thead>
               <tr>
                 <th>Seme</th>
@@ -135,7 +132,7 @@
               </tr>
             </tbody>
           </table>
-          <div class="warning-box">
+          <div class="warningBox">
             <strong>Attenzione all'Asso di Denari! (Jolly)</strong><br />
             L'asso di denari è speciale. Quando un giocatore lo gioca, può
             decidere al momento se considerarlo la carta <em>più alta</em> o
@@ -145,7 +142,7 @@
           </div>
         </div>
 
-        <div class="rule-card">
+        <div class="ruleCard">
           <h2>Come garantire la perdita di vite (Regola Aurea)</h2>
           <p>
             Per assicurare che qualcuno perda sempre,
@@ -160,7 +157,7 @@
             di poter vedere le scelte degli altri.
           </p>
 
-          <div class="highlight-box">
+          <div class="highlightBox">
             <strong
               >Esempio pratico (3 giocatori, 4 carte a testa = 4 prese
               totali):</strong
@@ -178,5 +175,34 @@
         </div>
       </main>
     </div>
+
+    <script>
+      const spinnerContainer = document.getElementById("spinner");
+      const lobbiesContainer = document.getElementById("lobbies");
+      const loginContainer = document.getElementById("login");
+
+      async function checkSession() {
+        const buttonText = document.getElementById("buttonText");
+
+        const response = await fetch("/api/session/me", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        spinnerContainer.style.display = "none";
+
+        if (response.ok) {
+          buttonText.innerHTML = "Vai ai tavoli";
+          lobbiesContainer.style.display = "block";
+          console.log(lobbiesContainer);
+        } else {
+          buttonText.innerHTML = "Accedi";
+          loginContainer.style.display = "block";
+          console.log(loginContainer);
+        }
+      }
+
+      checkSession();
+    </script>
   </body>
 </html>

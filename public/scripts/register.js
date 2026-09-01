@@ -1,14 +1,23 @@
 const form = document.getElementById("registrationForm");
 
-const usernameInput = document.getElementById("usernameInput");
+const usernameInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("usernameInput")
+);
 const usernameInputError = document.getElementById("usernameInputError");
 
-const emailInput = document.getElementById("emailInput");
+const emailInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("emailInput")
+);
 const emailInputError = document.getElementById("emailInputError");
 
-const passwordInput = document.getElementById("passwordInput");
+const passwordInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("passwordInput")
+);
 
-const repeatedPasswordInput = document.getElementById("repeatedPasswordInput");
+const repeatedPasswordInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("repeatedPasswordInput")
+);
+
 const repeatedPasswordInputError = document.getElementById(
   "repeatedPasswordInputError",
 );

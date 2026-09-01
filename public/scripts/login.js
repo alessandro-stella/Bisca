@@ -1,7 +1,11 @@
 const form = document.getElementById("loginForm");
 
-const emailInput = document.getElementById("emailInput");
-const passwordInput = document.getElementById("passwordInput");
+const emailInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("emailInput")
+);
+const passwordInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("passwordInput")
+);
 const loginError = document.getElementById("loginError");
 
 const inputs = document.getElementsByClassName("inputWithIcon");

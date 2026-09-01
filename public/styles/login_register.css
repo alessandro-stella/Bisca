@@ -1,9 +1,3 @@
-body {
-  background-color: var(--bg-page);
-  color: var(--text-main);
-  line-height: 1.6;
-}
-
 #baseContainer {
   display: flex;
   flex-direction: column;
@@ -48,6 +42,7 @@ body {
 }
 
 .inputWithIcon {
+  background-color: var(--bg-input);
   border-radius: 0.25em;
   border: 1px solid var(--border-inactive);
 
@@ -125,16 +120,31 @@ body {
 
 #registerLink,
 #loginLink {
-  background-color: var(--bg-footer);
+  background-color: var(--bg-dark);
   color: var(--text-link);
   border-top-right-radius: 0;
   border-top-left-radius: 0;
   text-align: center;
   padding: 0.5em;
-  transition: all ease-in-out 100ms;
+  transition: color ease-in-out 100ms;
 }
 
 #registerLink:hover,
 #loginLink:hover {
   color: var(--text-link-hover);
+}
+
+/* Properties for mobile */
+@media (max-width: 768px) {
+  #loginContainer,
+  #registerLink,
+  #registerContainer,
+  #loginLink {
+    width: 90%;
+  }
+
+  #loginContainer,
+  #registerContainer {
+    padding: 1.25em;
+  }
 }

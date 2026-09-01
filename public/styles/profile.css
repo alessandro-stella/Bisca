@@ -1,121 +1,149 @@
-/* Body & Layout */
-body {
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Helvetica, Arial,
-    sans-serif;
-  padding: 20px;
+#baseContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 1em;
+
+  padding: 1em;
+  min-height: 100dvh;
 }
 
-.container {
+/* ================= */
+/* User info section */
+/* ================= */
+
+#userInfo {
   background-color: var(--bg-card);
-  width: 100%;
-  max-width: 900px;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  border-radius: 0.25em;
+  width: 65em;
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 1.5em;
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1em;
 }
 
-.title {
-  color: var(--text-heading);
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
+#usernameInfo::before {
+  content: "Welcome back, ";
 }
 
-/* Buttons */
-button {
-  background-color: var(--btn-dark);
-  color: var(--text-heading);
-  padding: 10px 16px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  margin-right: 12px;
-  margin-bottom: 12px;
+#usernameInfo::after {
+  content: "!";
 }
 
-button:hover {
-  background-color: var(--btn-dark-hover);
+#emailInfo::before {
+  content: "Email: ";
 }
 
-a button {
-  background-color: var(--brand-green);
-  color: #fff;
+#usernameInfo {
+  grid-column: 1 / -1;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--text-primary);
 }
 
-a button:hover {
-  background-color: var(--brand-green-hover);
+#emailInfo {
+  grid-column: 1 / -1;
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  margin-top: -1em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid var(--divider-line);
 }
 
-/* User Info */
-#usernameInfo,
-#emailInfo,
-#eloInfo {
-  padding: 12px;
-  background-color: var(--bg-main);
-  margin-bottom: 8px;
-  border-radius: 4px;
-  border-left: 4px solid var(--brand-green);
-}
-
-/* Match History Grid */
-#gameHistoryContainer {
+#eloInfo,
+#winRate {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.gameContainer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
-  background-color: var(--bg-main);
-  padding: 16px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
-}
-
-.gameContainer > div {
-  flex: 1 1 120px;
-  margin: 4px;
-  font-size: 0.95rem;
-}
-
-.eloChangeContainer {
-  font-weight: 700;
-  text-align: center;
-}
-
-.eloChangeContainer.positive {
   color: var(--brand-green);
+  font-weight: bold;
+  font-size: 1.2em;
 }
 
-.eloChangeContainer.positive::before {
-  content: "+";
+#eloInfo::before {
+  content: "ELO";
 }
 
-.eloChangeContainer.negative {
-  color: var(--accent-red);
+#winRate::before {
+  content: "Winrate";
 }
 
-.quittedContainer {
-  background-color: var(--accent-red);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  text-align: center;
-  font-weight: 700;
-  flex-basis: 100%;
-  margin-top: 8px;
+#eloInfo::before,
+#winRate::before {
+  color: var(--text-secondary);
+  font-size: 0.7em;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2em;
+}
+
+/* ===================== */
+/* Match history section */
+/* ===================== */
+
+#matchHistoryContainer {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 0.25em;
+  width: 65em;
+  max-width: 90%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+#totalMatches {
+  font-size: 1.5em;
+  font-weight: bold;
+  border-bottom: 1px solid var(--divider-line);
+
+  margin: 0.66em;
+  margin-bottom: 0;
+  padding-bottom: 0.66em;
+}
+
+#totalMatches:before {
+  content: "Storico partite (";
+}
+#totalMatches:after {
+  content: ")";
+}
+
+#matchHistory {
+  width: 100%;
+  overflow: hidden;
+}
+
+#matchHistory tr[data-quit="true"] {
+  opacity: 0.6;
+}
+
+.quit-badge {
+  background-color: var(--border-inactive);
+  color: var(--text-primary);
+  padding: 0.1em 0.4em;
+  border-radius: 0.25em;
+  font-size: 0.75em;
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
+
+/* Properties for mobile */
+@media (max-width: 768px) {
+  #userInfo,
+  #matchHistoryContainer {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #userInfo {
+    padding: 1em;
+  }
+
+  #matchHistory th {
+    padding-top: 0;
+  }
 }

@@ -6,29 +6,61 @@
     <title>Profile</title>
 
     <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="./styles/profile.css" />
 
     <script src="./scripts/profile.js" defer></script>
+    <script
+      src="https://kit.fontawesome.com/df57a58519.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
 
   <body>
-    <div class="container">
-      <div class="title">Your personal profile</div>
-      <br />
-      <button onclick="logout()">Logout</button>
-      <a href="lobbies.html"><button>See lobbies</button></a>
+    <div id="navbar">
+      <div id="logo">BISCA.IT</div>
+
+      <div class="buttons">
+        <a id="lobbies" class="primaryButton iconButton" href="lobbies.html">
+          <i class="fa-solid fa-door-closed"></i>
+          <p>Tavoli</p>
+        </a>
+
+        <button
+          id="logout"
+          class="secondaryButton iconButton"
+          onclick="logout()"
+        >
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <p>Esci</p>
+        </button>
+      </div>
     </div>
 
-    <div class="container">
-      <div class="title">User info</div>
-      <div id="usernameInfo"></div>
-      <div id="emailInfo"></div>
-      <div id="eloInfo"></div>
-    </div>
+    <div id="baseContainer">
+      <div id="userInfo">
+        <div id="usernameInfo"></div>
+        <div id="emailInfo"></div>
+        <div id="eloInfo"></div>
+        <div id="winRate"></div>
+      </div>
 
-    <div class="container">
-      <div class="title">Match history</div>
-      <div id="gameHistoryContainer"></div>
+      <div id="matchHistoryContainer">
+        <div id="totalMatches"></div>
+
+        <table id="matchHistory">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Placement</th>
+              <th>Elo</th>
+              <th>Opponents</th>
+              <th>Turns</th>
+            </tr>
+          </thead>
+          <tbody id="matchHistoryBody"></tbody>
+        </table>
+      </div>
     </div>
   </body>
 </html>

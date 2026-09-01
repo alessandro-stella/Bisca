@@ -36,7 +36,8 @@ async function getStats(user) {
     async (res) => await res.json(),
   );
 
-  displayProfileInfo(user, games);
+  displayProfileInfo(user);
+  showMatchHistory(games);
 }
 
 function formatDate(rawDate) {
@@ -50,54 +51,55 @@ function formatDate(rawDate) {
   }).format(new Date(rawDate));
 }
 
-function displayProfileInfo(userInfo, gamesHistory) {
-  console.log({ userInfo, gamesHistory });
-
+function displayProfileInfo(userInfo) {
   const usernameInfo = document.getElementById("usernameInfo");
   const emailInfo = document.getElementById("emailInfo");
   const eloInfo = document.getElementById("eloInfo");
 
-  usernameInfo.innerHTML = `Username: ${userInfo.username}`;
-  emailInfo.innerHTML = `Email: ${userInfo.email}`;
-  eloInfo.innerHTML = `Current elo: ${userInfo.elo}`;
+  usernameInfo.innerHTML = `${userInfo.username}`;
+  emailInfo.innerHTML = `${userInfo.email}`;
+  eloInfo.innerHTML = `${userInfo.elo}`;
+}
 
-  const gameHistoryContainer = document.getElementById("gameHistoryContainer");
+function showMatchHistory(gamesHistory) {
+  const totalMatches = document.getElementById("totalMatches");
+  totalMatches.innerHTML = gamesHistory.length;
+
+  let won = 0;
+
+  const tbody = document.getElementById("matchHistoryBody");
+  tbody.innerHTML = "";
 
   for (const game of gamesHistory) {
-    const gameContainer = document.createElement("div");
-    gameContainer.classList.add("gameContainer");
+    if (game.position === 1) won++;
 
-    const opponentsContainer = document.createElement("div");
-    opponentsContainer.innerHTML = `Opponents: ${game.opponents_count}`;
-    gameContainer.appendChild(opponentsContainer);
+    const tr = document.createElement("tr");
 
-    const durationContainer = document.createElement("div");
-    durationContainer.innerHTML = `Turns played: ${game.duration}`;
-    gameContainer.appendChild(durationContainer);
-
-    const dateContainer = document.createElement("div");
-    dateContainer.innerHTML = formatDate(game.created_at);
-    gameContainer.appendChild(dateContainer);
-
-    const placementContainer = document.createElement("div");
-    placementContainer.innerHTML = `Placement: ${game.position}`;
-    gameContainer.appendChild(placementContainer);
-
-    const eloChangeContainer = document.createElement("div");
-    eloChangeContainer.classList.add("eloChangeContainer");
-    eloChangeContainer.innerHTML = game.elo_change;
-    eloChangeContainer.classList.add(
-      game.elo_change < 0 ? "negative" : "positive",
-    );
-    gameContainer.appendChild(eloChangeContainer);
-
-    if (game.left_early === true) {
-      const quittedContainer = document.createElement("div");
-      quittedContainer.classList.add("quittedContainer");
-      quittedContainer.innerHTML = "LEFT EARLY";
-      gameContainer.appendChild(quittedContainer);
+    if (game.left_early) {
+      tr.setAttribute("data-quit", "true");
     }
 
-    gameHistoryContainer.appendChild(gameContainer);
+    const badge = game.left_early
+      ? `<span class="quit-badge" title="Hai abbandonato">Abbandonata</span>`
+      : "";
+    const eloColor = game.elo_change < 0 ? "#ff5555" : "var(--brand-green)";
+    const eloSign = game.elo_change > 0 ? "+" : "";
+
+    tr.innerHTML = `
+      <td>${formatDate(game.created_at)}</td>
+      <td>${game.position}° ${badge}</td>
+      <td style="color: ${eloColor}; font-weight: bold;">${eloSign}${game.elo_change}</td>
+      <td>${game.opponents_count}</td>
+      <td>${game.duration}</td>
+    `;
+
+    tbody.appendChild(tr);
+  }
+
+  const winRate = document.getElementById("winRate");
+  if (gamesHistory.length > 0) {
+    winRate.innerHTML = ((won / gamesHistory.length) * 100).toFixed(2) + "%";
+  } else {
+    winRate.innerHTML = "0.00%";
   }
 }
