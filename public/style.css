@@ -5,6 +5,7 @@
   --bg-card: #262421;
   --bg-input: #373532;
   --bg-dark: #1e1c1a;
+  --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
   /* Primary buttons */
   --brand-green: #81b64c;
@@ -164,4 +165,55 @@ tbody tr:nth-child(even) {
 
 tbody tr:hover {
   filter: brightness(1.2);
+}
+
+/* ================ */
+/* Style for inputs */
+/* ================ */
+
+.inputWithIcon {
+  background-color: var(--bg-input);
+  border-radius: 0.25em;
+  border: 1px solid var(--border-inactive);
+
+  padding: 0.5em;
+
+  transition: all ease-in-out 100ms;
+
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.inputWithIcon:hover,
+.inputWithIcon:focus-within {
+  cursor: text;
+  border: 1px solid var(--border-active);
+}
+
+.inputWithIcon input {
+  color: var(--text-active);
+  font-size: 0.9em;
+  flex: 1;
+}
+
+.inputWithIcon input::placeholder {
+  color: var(--text-placeholder);
+}
+
+.inputWithError:has(#loginError:not([hidden])) {
+  border-color: var(--accent-red);
+}
+
+.inputWithIcon.error {
+  border-color: var(--accent-red);
+}
+
+.inputError {
+  color: var(--accent-red);
+}
+
+.icon {
+  padding: 0 0.25em;
+  color: var(--icon-inactive);
 }

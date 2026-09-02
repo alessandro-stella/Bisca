@@ -41,53 +41,6 @@
   gap: 1em;
 }
 
-.inputWithIcon {
-  background-color: var(--bg-input);
-  border-radius: 0.25em;
-  border: 1px solid var(--border-inactive);
-
-  padding: 0.5em;
-
-  transition: all ease-in-out 100ms;
-
-  display: flex;
-  align-items: center;
-  gap: 0.25em;
-}
-
-.inputWithIcon:hover,
-.inputWithIcon:focus-within {
-  cursor: text;
-  border: 1px solid var(--border-active);
-}
-
-.inputWithIcon input {
-  color: var(--text-active);
-  font-size: 0.9em;
-  flex: 1;
-}
-
-.inputWithIcon input::placeholder {
-  color: var(--text-placeholder);
-}
-
-.inputWithError:has(#loginError:not([hidden])) {
-  border-color: var(--accent-red);
-}
-
-.inputWithIcon.error {
-  border-color: var(--accent-red);
-}
-
-.inputError {
-  color: var(--accent-red);
-}
-
-.icon {
-  padding: 0 0.25em;
-  color: var(--icon-inactive);
-}
-
 #showPassword,
 #showPasswordRepeat {
   width: 1.5em;

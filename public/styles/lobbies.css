@@ -1,0 +1,100 @@
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+#navbar {
+  background-color: var(--bg-page);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1em;
+
+  flex-shrink: 0;
+}
+
+#baseContainer {
+  flex-grow: 1;
+
+  min-height: 0;
+
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1em;
+  padding: 0 1em 1em 1em;
+}
+
+#leftColumn,
+#rightColumn {
+  background-color: var(--bg-card);
+  box-shadow: var(--card-shadow);
+  border-radius: 0.25em;
+  padding: 1em;
+
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1.5em;
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+/* ============== */
+/* Filter lobbies */
+/* ============== */
+
+#filterLobbies {
+  border-bottom: 1px solid var(--divider-line);
+  flex-grow: 1;
+}
+
+/* ==================== */
+/* Create lobby styling */
+/* ==================== */
+
+#createLobbyContainer,
+#createLobbyInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+#createLobbyContainer .title {
+  margin-top: 0.5em;
+}
+
+#createLobby {
+  padding: 0.75em;
+  font-weight: bolder;
+  font-size: 1.25em;
+  border-radius: 0.5em;
+}
+
+#showPassword {
+  width: 1.5em;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+#showPassword:hover .icon {
+  color: var(--icon-active);
+}
+
+/* =========== */
+/* All lobbies */
+/* =========== */
+
+#lobbiesContainer {
+  overflow-y: auto;
+}

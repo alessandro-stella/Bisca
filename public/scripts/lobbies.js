@@ -1,3 +1,24 @@
+const passwordInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("passwordInput")
+);
+const showPassword = document.getElementById("showPassword");
+
+showPassword.addEventListener("click", () => {
+  const showPasswordIcon = showPassword.getElementsByTagName("svg")[0];
+  showPasswordIcon.classList.toggle("fa-eye-slash");
+  showPasswordIcon.classList.toggle("fa-eye");
+
+  passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+});
+
+const inputs = document.getElementsByClassName("inputWithIcon");
+
+for (const input of inputs) {
+  const inputField = input.getElementsByTagName("input")[0];
+
+  input.addEventListener("click", () => inputField.focus());
+}
+
 let currentUser = null;
 let socket = null;
 

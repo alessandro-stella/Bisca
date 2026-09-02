@@ -4,13 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Lobbies</title>
+    <title>Tavoli</title>
 
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles/lobbies.css" />
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="scripts/lobbies.js"></script>
+    <script src="scripts/lobbies.js" defer></script>
 
     <script
       src="https://kit.fontawesome.com/df57a58519.js"
@@ -30,32 +31,85 @@
       </div>
     </div>
 
-    <div class="container">
-      <h1>Lobbies</h1>
+    <div id="baseContainer">
+      <div id="leftColumn">
+        <div id="filterLobbies">
+          <div class="title">Filtra tavoli</div>
+          <div>TESTOOO</div>
+        </div>
 
-      <ol id="lobbies"></ol>
-    </div>
+        <div id="createLobbyContainer">
+          <div class="title">Crea nuovo tavolo</div>
 
-    <div class="container">
-      <div>Impostazioni lobby</div>
+          <div id="createLobbyInputs">
+            <div class="inputWithError">
+              <div id="nameInputContainer" class="inputWithIcon">
+                <i class="icon fa-solid fa-pencil"></i>
+                <input id="nameInput" type="text" required placeholder="Nome" />
+              </div>
+              <div id="nameInputError" class="inputError" hidden></div>
+            </div>
 
-      <div class="inputWithError">
-        <div>Vite</div>
-        <input id="livesInput" type="number" placeholder="Vite" />
+            <div class="inputWithError">
+              <div id="livesInputContainer" class="inputWithIcon">
+                <i class="icon fa-solid fa-heart"></i>
+                <input
+                  id="livesInput"
+                  type="number"
+                  required
+                  min="1"
+                  placeholder="Vite"
+                />
+              </div>
+              <div id="livesInputError" class="inputError" hidden></div>
+            </div>
+
+            <div class="inputWithError">
+              <div id="cardsInputContainer" class="inputWithIcon">
+                <i class="icon fa-solid fa-layer-group"></i>
+                <input
+                  id="cardsInput"
+                  type="number"
+                  required
+                  min="1"
+                  placeholder="Carte"
+                />
+              </div>
+              <div id="cardsInputError" class="inputError" hidden></div>
+            </div>
+
+            <div class="inputWithError">
+              <div class="inputWithIcon inputPassword">
+                <i class="icon fa-solid fa-lock"></i>
+                <input
+                  id="passwordInput"
+                  type="password"
+                  required
+                  placeholder="Password"
+                />
+                <div id="showPassword" class="iconContainer">
+                  <i class="icon fa-solid fa-eye-slash"></i>
+                </div>
+              </div>
+
+              <div id="loginError" class="inputError" hidden>
+                Email o password non valida
+              </div>
+            </div>
+          </div>
+
+          <button id="createLobby" class="primaryButton">
+            <p>Crea tavolo</p>
+          </button>
+        </div>
       </div>
 
-      <div class="inputWithError">
-        <div>Carte</div>
-        <input id="cardsInput" type="number" placeholder="Carte" />
+      <div id="rightColumn">
+        <div id="lobbiesContainer">
+          <div class="title">Tavoli esistenti</div>
+          <div id="lobbies"></div>
+        </div>
       </div>
-
-      <button id="createLobby">Create lobby</button>
-    </div>
-
-    <div class="container">
-      <a href="profile.html">
-        <button type="button">Go to profile</button>
-      </a>
     </div>
   </body>
 </html>
