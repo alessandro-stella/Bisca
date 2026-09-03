@@ -171,13 +171,45 @@ const validators = {
     return { valid: true };
   },
 
-  validateLobbyParams(lives, cards) {
+  validateLobbyParams(name, password, lives, cards) {
+    if (typeof name !== "string" || name.trim() === "") {
+      return {
+        valid: false,
+        message: "Per favore, dai un nome alla tua lobby!",
+      };
+    }
+
+    if (name.length > 30) {
+      return {
+        valid: false,
+        message:
+          "Il nome della lobby è un po' troppo lungo, cerca di stare sotto i 30 caratteri.",
+      };
+    }
+
+    if (password && typeof password !== "string") {
+      return {
+        valid: false,
+        message: "La password inserita non è in un formato valido.",
+      };
+    }
+
     if (!Number.isInteger(lives) || lives < 1 || lives > 10) {
-      return { valid: false, message: "Lives must be between 1 and 10" };
+      return {
+        valid: false,
+        message:
+          "Le vite non sono valide. Scegli un numero compreso tra 1 e 10.",
+      };
     }
+
     if (!Number.isInteger(cards) || cards < 1 || cards > 10) {
-      return { valid: false, message: "Cards must be between 1 and 10" };
+      return {
+        valid: false,
+        message:
+          "Le carte non sono valide. Scegli un numero compreso tra 1 e 10.",
+      };
     }
+
     return { valid: true };
   },
 };

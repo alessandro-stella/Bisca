@@ -42,8 +42,15 @@ function setupSockets(io) {
     // LOBBY EVENTS
     // =============================================
 
-    socket.on("lobby:create", (lives, cards) => {
-      const validation = validators.validateLobbyParams(lives, cards);
+    socket.on("lobby:create", (name, lives, cards, password) => {
+      console.log("CREATE LOBBY RECEIVED");
+      const validation = validators.validateLobbyParams(
+        name,
+        lives,
+        cards,
+        password,
+      );
+      console.log({ validation });
       if (!validation.valid) {
         socket.emit("error", { message: validation.message });
         return;

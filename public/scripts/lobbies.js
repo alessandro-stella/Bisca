@@ -1,24 +1,3 @@
-const passwordInput = /** @type {HTMLInputElement} */ (
-  document.getElementById("passwordInput")
-);
-const showPassword = document.getElementById("showPassword");
-
-showPassword.addEventListener("click", () => {
-  const showPasswordIcon = showPassword.getElementsByTagName("svg")[0];
-  showPasswordIcon.classList.toggle("fa-eye-slash");
-  showPasswordIcon.classList.toggle("fa-eye");
-
-  passwordInput.type = passwordInput.type === "password" ? "text" : "password";
-});
-
-const inputs = document.getElementsByClassName("inputWithIcon");
-
-for (const input of inputs) {
-  const inputField = input.getElementsByTagName("input")[0];
-
-  input.addEventListener("click", () => inputField.focus());
-}
-
 let currentUser = null;
 let socket = null;
 
@@ -59,6 +38,11 @@ function setupSocket() {
   const createLobbyButton = document.getElementById("createLobby");
 
   createLobbyButton.addEventListener("click", () => {
+    console.log("CREATING LOBBY");
+    const name = /** @type {HTMLInputElement} */ (
+      document.getElementById("nameInput")
+    ).value;
+
     const lives = parseInt(
       /** @type {HTMLInputElement} */ (document.getElementById("livesInput"))
         .value,
@@ -69,8 +53,21 @@ function setupSocket() {
         .value,
       10,
     );
+    const password = /** @type {HTMLInputElement} */ (
+      document.getElementById("passwordInput")
+    ).value;
+
+    console.log({ name, lives, cards, password });
 
     socket.emit("lobby:create", lives, cards);
+  });
+
+  socket.on("error", (data) => {
+    console.error("Errore di validazione:", data.message);
+
+    // Qui puoi mostrare l'errore all'utente, ad esempio:
+    // alert(data.message);
+    // mostraToastErrore(data.message);
   });
 
   socket.on("connect_error", (error) => {
