@@ -20,7 +20,7 @@
       <a id="logo" href="index.html">BISCA.IT</a>
 
       <div class="buttons">
-        <a class="primaryButton iconButton" href="lobbies.html">
+        <a id="buttonLink" class="primaryButton iconButton">
           <p id="spinner"><i class="fa-solid fa-spinner"></i></p>
           <p id="lobbies" style="display: none">
             <i class="fa-solid fa-door-closed"></i>
@@ -177,9 +177,10 @@
       const lobbiesContainer = document.getElementById("lobbies");
       const loginContainer = document.getElementById("login");
 
-      async function checkSession() {
-        const buttonText = document.getElementById("buttonText");
+      const buttonLink = document.getElementById("buttonLink");
+      const buttonText = document.getElementById("buttonText");
 
+      async function checkSession() {
         const response = await fetch("/api/session/me", {
           method: "GET",
           credentials: "include",
@@ -188,13 +189,13 @@
         spinnerContainer.style.display = "none";
 
         if (response.ok) {
+          buttonLink.href = "lobbies.html";
           buttonText.innerHTML = "Vai ai tavoli";
           lobbiesContainer.style.display = "block";
-          console.log(lobbiesContainer);
         } else {
+          buttonLink.href = "login.html";
           buttonText.innerHTML = "Accedi";
           loginContainer.style.display = "block";
-          console.log(loginContainer);
         }
       }
 

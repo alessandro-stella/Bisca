@@ -1,3 +1,7 @@
+// ==========
+// Game logic
+// ==========
+
 let currentUser = null;
 let socket = null;
 
@@ -104,6 +108,22 @@ function setupSocket() {
   });
 }
 
+async function init() {
+  const authenticated = await checkSession();
+
+  if (!authenticated) {
+    return;
+  }
+
+  setupSocket();
+}
+
+init();
+
+// =========
+// GUI logic
+// =========
+
 function renderLobbies(lobbies) {
   const lobbiesList = document.getElementById("lobbies");
   lobbiesList.innerHTML = "";
@@ -158,14 +178,43 @@ function renderLobbies(lobbies) {
     lobbiesList.appendChild(item);
   }
 }
-async function init() {
-  const authenticated = await checkSession();
 
-  if (!authenticated) {
-    return;
-  }
+const leftColumn = document.getElementById("leftColumn");
+const backdrop = document.getElementById("backdrop");
+backdrop.addEventListener("click", closePopup);
 
-  setupSocket();
+const filterSection = document.getElementById("filterLobbies");
+const createSection = document.getElementById("createLobbyContainer");
+
+const createPopupButton = document.getElementById("createLobbyPopupButton");
+createPopupButton.addEventListener("click", openCreatePopup);
+
+const filterPopupButton = document.getElementById("filterLobbiesPopupButton");
+filterPopupButton.addEventListener("click", openFilterPopup);
+
+function openPopup() {
+  leftColumn.classList.add("shown");
+  backdrop.classList.add("shown");
 }
 
-init();
+function closePopup() {
+  leftColumn.classList.remove("shown");
+  backdrop.classList.remove("shown");
+
+  filterSection.classList.add("hidden");
+  createSection.classList.add("hidden");
+}
+
+function openCreatePopup() {
+  openPopup();
+
+  filterSection.classList.add("hidden");
+  createSection.classList.remove("hidden");
+}
+
+function openFilterPopup() {
+  openPopup();
+
+  createSection.classList.add("hidden");
+  filterSection.classList.remove("hidden");
+}

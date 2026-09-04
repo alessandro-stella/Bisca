@@ -31,8 +31,10 @@
       </div>
     </div>
 
+    <div id="backdrop" class=""></div>
+
     <div id="baseContainer">
-      <div id="leftColumn">
+      <div id="leftColumn" class="">
         <div id="filterLobbies">
           <div class="title">Filtra tavoli</div>
           <div>TESTOOO</div>
@@ -48,6 +50,20 @@
                 <input id="nameInput" type="text" required placeholder="Nome" />
               </div>
               <div id="nameInputError" class="inputError" hidden></div>
+            </div>
+
+            <div class="inputWithError">
+              <div id="playersInputContainer" class="inputWithIcon">
+                <i class="icon fa-solid fa-user"></i>
+                <input
+                  id="playersInput"
+                  type="number"
+                  required
+                  min="2"
+                  placeholder="Giocatori"
+                />
+              </div>
+              <div id="playersInputError" class="inputError" hidden></div>
             </div>
 
             <div class="inputWithError">
@@ -118,9 +134,18 @@
 
       <div id="rightColumn">
         <div id="lobbiesContainer">
-          <div class="title">Tavoli esistenti</div>
+          <div class="title">
+            <p>Tavoli esistenti</p>
+
+            <div id="filterLobbiesPopupButton" class="secondaryButton">
+              <i class="icon fa-solid fa-filter"></i>
+            </div>
+          </div>
           <div id="lobbies"></div>
         </div>
+        <button id="createLobbyPopupButton" class="primaryButton">
+          <p>Crea tavolo</p>
+        </button>
       </div>
     </div>
   </body>
