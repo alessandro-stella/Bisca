@@ -42,20 +42,22 @@ function setupSockets(io) {
     // LOBBY EVENTS
     // =============================================
 
-    socket.on("lobby:create", (name, lives, cards, password) => {
+    socket.on("lobby:create", (name, maxPlayers, lives, cards, password) => {
       console.log("CREATE LOBBY RECEIVED");
       const validation = validators.validateLobbyParams(
         name,
+        maxPlayers,
         lives,
         cards,
-        password,
       );
+
       console.log({ validation });
       if (!validation.valid) {
-        socket.emit("error", { message: validation.message });
+        socket.emit("lobby:create:error", { message: validation.message });
         return;
       }
-      handleCreateLobby(socket, io, lives, cards);
+
+      handleCreateLobby(socket, io, name, maxPlayers, lives, cards, password);
     });
 
     socket.on("lobby:join", (lobbyId) => {
@@ -97,6 +99,7 @@ function setupSockets(io) {
     // =============================================
 
     socket.on("game:start", () => {
+      console.log("Starting game...");
       startGame(socket, io);
     });
 

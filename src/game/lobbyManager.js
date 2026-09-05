@@ -19,14 +19,19 @@ function getLobby(lobbyId) {
 function getLobbies() {
   return Array.from(lobbies.values()).map((lobby) => ({
     id: lobby.id,
+    name: lobby.name,
     ownerId: lobby.ownerId,
     ownerUsername: lobby.ownerUsername,
     players: lobby.players.size,
+    maxPlayers: lobby.maxPlayers,
     started: lobby.started,
     closed: lobby.closed,
+    hasPassword: !!lobby.passwordHash,
     playersConnected: Array.from(lobby.players.values()).filter(
       (player) => player.connected,
     ).length,
+    startingLives: lobby.startingLives,
+    initialCards: lobby.initialCards,
   }));
 }
 
@@ -76,6 +81,13 @@ function addPlayer(lobbyId, userId, username) {
     return {
       success: false,
       error: "game already started",
+    };
+  }
+
+  if (lobby.players.size >= lobby.maxPlayers) {
+    return {
+      success: false,
+      error: "lobby full",
     };
   }
 
@@ -133,6 +145,39 @@ function setLobbyClosed(lobbyId, closed) {
   lobby.closed = closed;
 
   return true;
+}
+
+function updateLobbySettings(lobbyId, lives, cards) {
+  const lobby = lobbies.get(lobbyId);
+
+  if (!lobby) {
+    return {
+      success: false,
+      error: "missing lobby",
+    };
+  }
+
+  if (lives < 1) {
+    return {
+      success: false,
+      error: "lives must be at least 1",
+    };
+  }
+
+  if (cards < 1) {
+    return {
+      success: false,
+      error: "cards must be at least 1",
+    };
+  }
+
+  lobby.startingLives = lives;
+  lobby.initialCards = cards;
+
+  return {
+    success: true,
+    error: null,
+  };
 }
 
 function setPlayerConnected(lobbyId, userId, connected) {
@@ -193,4 +238,5 @@ module.exports = {
   setPlayerConnected,
   isPlayerConnected,
   getLobbyByPlayer,
+  updateLobbySettings,
 };

@@ -1,8 +1,6 @@
-// middleware.js
 const { getLobbyByPlayer } = require("../game/lobbyManager");
 const { getGame } = require("../game/gameManager");
 
-// Funzione helper per eseguire i tuoi middleware come controlli sincroni
 function runMiddleware(middlewareFn, socket) {
   let passed = true;
   const mockNext = (err) => {
@@ -171,42 +169,63 @@ const validators = {
     return { valid: true };
   },
 
-  validateLobbyParams(name, password, lives, cards) {
+  validateLobbyParams(name, maxPlayers, lives, cards) {
     if (typeof name !== "string" || name.trim() === "") {
       return {
         valid: false,
-        message: "Per favore, dai un nome alla tua lobby!",
+        message: "Dai un nome alla lobby",
+      };
+    }
+
+    if (name.length < 3) {
+      return {
+        valid: false,
+        message: "Nome della lobby troppo corto",
       };
     }
 
     if (name.length > 30) {
       return {
         valid: false,
-        message:
-          "Il nome della lobby è un po' troppo lungo, cerca di stare sotto i 30 caratteri.",
+        message: "Nome della lobby troppo lungo",
       };
     }
 
-    if (password && typeof password !== "string") {
+    if (!Number.isInteger(maxPlayers)) {
       return {
         valid: false,
-        message: "La password inserita non è in un formato valido.",
+        message: "Numero di giocatori non valido",
       };
     }
 
-    if (!Number.isInteger(lives) || lives < 1 || lives > 10) {
+    if (maxPlayers < 2 || maxPlayers > 6) {
       return {
         valid: false,
         message:
-          "Le vite non sono valide. Scegli un numero compreso tra 1 e 10.",
+          "Il numero massimo di giocatori deve essere compreso tra 2 e 6",
       };
     }
 
-    if (!Number.isInteger(cards) || cards < 1 || cards > 10) {
+    if (!Number.isInteger(lives) || lives < 1) {
       return {
         valid: false,
-        message:
-          "Le carte non sono valide. Scegli un numero compreso tra 1 e 10.",
+        message: "Numero di vite non valido",
+      };
+    }
+
+    const maxCards = Math.floor(40 / maxPlayers);
+
+    if (!Number.isInteger(cards) || cards < 1) {
+      return {
+        valid: false,
+        message: "Numero di carte non valido",
+      };
+    }
+
+    if (cards > maxCards) {
+      return {
+        valid: false,
+        message: "Troppe carte per ogni giocatore",
       };
     }
 

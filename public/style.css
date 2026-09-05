@@ -39,6 +39,40 @@
   --rows-even: #272523;
 }
 
+/* ==================== */
+/* Custom Scrollbar     */
+/* ==================== */
+
+/* Standard (Firefox) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-inactive) var(--bg-card);
+}
+
+/* WebKit (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-card);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-inactive);
+  border-radius: 5px;
+  border: 2px solid var(--bg-card);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--border-active);
+}
+
+/* ============ */
+/* Shared style */
+/* ============ */
+
 body {
   background-color: var(--bg-page);
   color: var(--text-main);

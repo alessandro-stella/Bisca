@@ -38,10 +38,9 @@ body {
   border-radius: 0.25em;
   padding: 1em;
 
-  overflow-y: auto;
-
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .title {
@@ -105,27 +104,36 @@ body {
 
 #lobbiesContainer {
   flex-grow: 1;
-  background-color: blue;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 #lobbiesContainer .title {
-  background-color: red;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.25em;
 }
 
 #filterLobbiesPopupButton {
   display: none;
 }
 
-#lobbies {
-  background-color: green;
-  flex-grow: 1;
-}
-
 /* =========== */
 /* All lobbies */
 /* =========== */
+
+#lobbiesListContainer {
+  border: 1px solid var(--divider-line);
+  border-radius: 0.5em;
+  flex-grow: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+#lobbiesList {
+  width: 100%;
+}
 
 #lobbies {
   overflow-y: auto;
@@ -166,6 +174,8 @@ body {
 
   #leftColumn.shown {
     width: 70%;
+    max-height: 85dvh;
+
     padding: 2em;
     display: flex;
 
@@ -186,14 +196,41 @@ body {
   }
 
   #rightColumn {
+    padding: 0;
     height: 100%;
-    overflow-y: auto;
   }
 
   #lobbiesContainer .title {
+    padding-left: 0.7em;
+    padding-right: 0.7em;
+    padding-top: 0.7em;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    border-bottom: 1px solid var(--divider-line);
+  }
+
+  #lobbiesListContainer {
+    border: none;
+    border-radius: 0;
+  }
+
+  #lobbiesList .mobileHidden {
+    display: none;
+  }
+
+  #lobbies {
+    overflow-y: scroll;
+  }
+
+  #lobbies tr {
+    cursor: pointer;
+  }
+
+  #createLobbyPopupButton {
+    margin: 0.65em;
   }
 
   #filterLobbiesPopupButton {

@@ -47,6 +47,12 @@ function setupSocket() {
       document.getElementById("nameInput")
     ).value;
 
+    const players = parseInt(
+      /** @type {HTMLInputElement} */ (document.getElementById("playersInput"))
+        .value,
+      10,
+    );
+
     const lives = parseInt(
       /** @type {HTMLInputElement} */ (document.getElementById("livesInput"))
         .value,
@@ -61,17 +67,13 @@ function setupSocket() {
       document.getElementById("passwordInput")
     ).value;
 
-    console.log({ name, lives, cards, password });
+    console.log({ name, players, lives, cards, password });
 
-    socket.emit("lobby:create", lives, cards);
+    socket.emit("lobby:create", name, players, lives, cards, password);
   });
 
-  socket.on("error", (data) => {
+  socket.on("lobby:create:error", (data) => {
     console.error("Errore di validazione:", data.message);
-
-    // Qui puoi mostrare l'errore all'utente, ad esempio:
-    // alert(data.message);
-    // mostraToastErrore(data.message);
   });
 
   socket.on("connect_error", (error) => {
@@ -129,19 +131,45 @@ function renderLobbies(lobbies) {
   lobbiesList.innerHTML = "";
 
   for (const lobby of lobbies) {
-    const item = document.createElement("li");
-
-    const info = document.createElement("span");
-    info.textContent = `${lobby.ownerUsername} - ${lobby.players} giocatori (${lobby.playersConnected} connessi)`;
+    console.log(lobby);
+    const tr = document.createElement("tr");
 
     if (lobby.started) {
-      info.textContent += " [IN CORSO]";
-      info.style.fontWeight = "bold";
-      item.style.opacity = "0.6";
-      item.classList.add("lobby-closed");
+      tr.style.opacity = "0.6";
+      tr.classList.add("lobby-closed");
     }
 
-    item.appendChild(info);
+    const nameTd = document.createElement("td");
+    nameTd.textContent = lobby.name;
+
+    const ownerTd = document.createElement("td");
+    ownerTd.textContent = lobby.ownerUsername;
+
+    const livesTd = document.createElement("td");
+    livesTd.textContent = lobby.startingLives;
+    livesTd.classList.add("mobileHidden");
+
+    const cardsTd = document.createElement("td");
+    cardsTd.textContent = lobby.initialCards;
+    cardsTd.classList.add("mobileHidden");
+
+    const playersTd = document.createElement("td");
+    if (lobby.started) {
+      playersTd.textContent = `${lobby.playersConnected} / ${lobby.players}`;
+    } else {
+      playersTd.textContent = `${lobby.playersConnected} / ${lobby.maxPlayers}`;
+    }
+
+    const statusTd = document.createElement("td");
+    if (lobby.started) {
+      statusTd.textContent = "IN CORSO";
+      statusTd.style.fontWeight = "bold";
+    } else {
+      statusTd.textContent = "In attesa";
+    }
+
+    const actionsTd = document.createElement("td");
+    actionsTd.classList.add("mobileHidden");
 
     if (!lobby.started) {
       if (lobby.isOwner) {
@@ -150,32 +178,40 @@ function renderLobbies(lobbies) {
         startButton.addEventListener("click", () => {
           socket.emit("game:start");
         });
-        item.appendChild(startButton);
+        actionsTd.appendChild(startButton);
 
         const deleteButton = document.createElement("button");
         deleteButton.textContent = "Delete";
         deleteButton.addEventListener("click", () => {
           socket.emit("lobby:delete", lobby.id);
         });
-        item.appendChild(deleteButton);
+        actionsTd.appendChild(deleteButton);
       } else if (!lobby.isMember) {
         const joinButton = document.createElement("button");
         joinButton.textContent = "Join";
         joinButton.addEventListener("click", () => {
           socket.emit("lobby:join", lobby.id);
         });
-        item.appendChild(joinButton);
+        actionsTd.appendChild(joinButton);
       } else {
         const leaveButton = document.createElement("button");
         leaveButton.textContent = "Leave";
         leaveButton.addEventListener("click", () => {
           socket.emit("lobby:leave");
         });
-        item.appendChild(leaveButton);
+        actionsTd.appendChild(leaveButton);
       }
     }
 
-    lobbiesList.appendChild(item);
+    tr.appendChild(nameTd);
+    tr.appendChild(ownerTd);
+    tr.appendChild(livesTd);
+    tr.appendChild(cardsTd);
+    tr.appendChild(playersTd);
+    tr.appendChild(statusTd);
+    tr.appendChild(actionsTd);
+
+    lobbiesList.appendChild(tr);
   }
 }
 
