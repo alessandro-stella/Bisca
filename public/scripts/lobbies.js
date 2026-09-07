@@ -192,7 +192,7 @@ function orderAndFilterLobbies(lobbies) {
   const owner = filterOwner.value;
 
   if (name !== "") {
-    lobbies = lobbies.filter((lobby) => lobby.name.include(name));
+    lobbies = lobbies.filter((lobby) => lobby.name.includes(name));
   }
 
   if (owner !== "") {
