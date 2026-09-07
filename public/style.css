@@ -73,6 +73,10 @@
 /* Shared style */
 /* ============ */
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   background-color: var(--bg-page);
   color: var(--text-main);
@@ -146,6 +150,7 @@ body {
 }
 
 .primaryButton * {
+  font-weight: bold;
   color: var(--text-primary);
 }
 
@@ -165,6 +170,16 @@ body {
 
 .secondaryButton:hover {
   background-color: var(--btn-secondary-hover);
+  cursor: pointer;
+}
+
+.dangerButton {
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+}
+
+.dangerButton:hover {
+  background-color: var(--accent-red);
   cursor: pointer;
 }
 
@@ -205,6 +220,10 @@ tbody tr:hover {
 /* Style for inputs */
 /* ================ */
 
+.inputWithError {
+  min-width: 0;
+}
+
 .inputWithIcon {
   background-color: var(--bg-input);
   border-radius: 0.25em;
@@ -229,6 +248,7 @@ tbody tr:hover {
   color: var(--text-active);
   font-size: 0.9em;
   flex: 1;
+  min-width: 0;
 }
 
 .inputWithIcon input::placeholder {

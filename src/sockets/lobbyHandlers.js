@@ -20,7 +20,7 @@ const {
 
 const { broadcastGameState } = require("./gameHandlers");
 
-// Costanti di validazione
+// Game constants
 const LOBBY_NAME_MIN = 3;
 const LOBBY_NAME_MAX = 30;
 const MAX_PLAYERS_MIN = 2;

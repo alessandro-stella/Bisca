@@ -37,11 +37,26 @@
       <div id="leftColumn" class="">
         <div id="filterLobbies">
           <div class="title">Filtra tavoli</div>
-          <div>TESTOOO</div>
+          <div id="nameInputContainer" class="inputWithIcon">
+            <i class="icon fa-solid fa-search"></i>
+            <input id="searchInput" type="text" placeholder="Nome" />
+          </div>
+          <div id="nameInputContainer" class="inputWithIcon">
+            <i class="icon fa-solid fa-search"></i>
+            <input id="ownerInput" type="text" placeholder="Proprietario" />
+          </div>
+
+          <div id="filterButtons">
+            <div id="onlyPublic" class="filterButton">Pubblici</div>
+            <div id="onlyPrivate" class="filterButton">Privati</div>
+            <div id="onlyAccessible" class="filterButton">Accessibili</div>
+          </div>
+
+          <button id="applyFilters" class="primaryButton"><p>Filtra</p></button>
         </div>
 
         <div id="createLobbyContainer">
-          <div class="title">Crea nuovo tavolo</div>
+          <div class="title">Crea tavolo</div>
 
           <div id="createLobbyInputs">
             <div class="inputWithError">
@@ -66,32 +81,34 @@
               <div id="playersInputError" class="inputError" hidden></div>
             </div>
 
-            <div class="inputWithError">
-              <div id="livesInputContainer" class="inputWithIcon">
-                <i class="icon fa-solid fa-heart"></i>
-                <input
-                  id="livesInput"
-                  type="number"
-                  required
-                  min="1"
-                  placeholder="Vite"
-                />
+            <div id="livesAndCards">
+              <div class="inputWithError">
+                <div id="livesInputContainer" class="inputWithIcon">
+                  <i class="icon fa-solid fa-heart"></i>
+                  <input
+                    id="livesInput"
+                    type="number"
+                    required
+                    min="1"
+                    placeholder="Vite"
+                  />
+                </div>
+                <div id="livesInputError" class="inputError" hidden></div>
               </div>
-              <div id="livesInputError" class="inputError" hidden></div>
-            </div>
 
-            <div class="inputWithError">
-              <div id="cardsInputContainer" class="inputWithIcon">
-                <i class="icon fa-solid fa-layer-group"></i>
-                <input
-                  id="cardsInput"
-                  type="number"
-                  required
-                  min="1"
-                  placeholder="Carte"
-                />
+              <div class="inputWithError">
+                <div id="cardsInputContainer" class="inputWithIcon">
+                  <i class="icon fa-solid fa-layer-group"></i>
+                  <input
+                    id="cardsInput"
+                    type="number"
+                    required
+                    min="1"
+                    placeholder="Carte"
+                  />
+                </div>
+                <div id="cardsInputError" class="inputError" hidden></div>
               </div>
-              <div id="cardsInputError" class="inputError" hidden></div>
             </div>
 
             <div class="inputWithError">
@@ -101,7 +118,7 @@
                   id="passwordInput"
                   type="password"
                   required
-                  placeholder="Password"
+                  placeholder="Password (vuoto se pubblica)"
                 />
                 <div id="showPassword" class="iconContainer">
                   <i class="icon fa-solid fa-eye-slash"></i>
@@ -120,13 +137,13 @@
 
           <div id="ownerButtonsContainer" hidden>
             <button id="startLobbyBtn" class="primaryButton">
-              Avvia partita
+              <p>Avvia partita</p>
             </button>
             <button id="updateLobbyBtn" class="secondaryButton">
-              Aggiorna valori
+              <p>Aggiorna valori</p>
             </button>
             <button id="deleteLobbyBtn" class="dangerButton">
-              Elimina lobby
+              <p>Elimina tavolo</p>
             </button>
           </div>
         </div>
@@ -151,7 +168,6 @@
                   <th class="mobileHidden">Carte</th>
                   <th>Giocatori</th>
                   <th>Stato</th>
-                  <th class="mobileHidden">Azioni</th>
                 </tr>
               </thead>
               <tbody id="lobbies"></tbody>

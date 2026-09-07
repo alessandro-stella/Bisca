@@ -42,7 +42,6 @@ function setupSocket() {
   const createLobbyButton = document.getElementById("createLobby");
 
   createLobbyButton.addEventListener("click", () => {
-    console.log("CREATING LOBBY");
     const name = /** @type {HTMLInputElement} */ (
       document.getElementById("nameInput")
     ).value;
@@ -67,7 +66,7 @@ function setupSocket() {
       document.getElementById("passwordInput")
     ).value;
 
-    console.log({ name, players, lives, cards, password });
+    closePopup();
 
     socket.emit("lobby:create", name, players, lives, cards, password);
   });
@@ -126,11 +125,102 @@ init();
 // GUI logic
 // =========
 
+const filterName = /** @type {HTMLInputElement} */ (
+  document.getElementById("searchInput")
+);
+const filterOwner = /** @type {HTMLInputElement} */ (
+  document.getElementById("ownerInput")
+);
+
+let onlyPublic = false;
+let onlyPrivate = false;
+let onlyAccessible = false;
+
+const filterButtons = {
+  public: document.getElementById("onlyPublic"),
+  private: document.getElementById("onlyPrivate"),
+  accessible: document.getElementById("onlyAccessible"),
+};
+
+for (const [key, button] of Object.entries(filterButtons)) {
+  button.addEventListener("click", () => {
+    updateButton(key);
+  });
+}
+
+function updateButton(buttonName) {
+  filterButtons[buttonName].classList.toggle("selected");
+
+  switch (buttonName) {
+    case "public": {
+      onlyPublic = !onlyPublic;
+
+      if (onlyPublic && onlyPrivate) {
+        onlyPrivate = false;
+        filterButtons.private.classList.remove("selected");
+      }
+
+      break;
+    }
+
+    case "private": {
+      onlyPrivate = !onlyPrivate;
+
+      if (onlyPrivate && onlyPublic) {
+        onlyPublic = false;
+        filterButtons.public.classList.remove("selected");
+      }
+
+      break;
+    }
+
+    case "accessible": {
+      onlyAccessible = !onlyAccessible;
+      break;
+    }
+  }
+}
+
+function orderAndFilterLobbies(lobbies) {
+  lobbies.sort((a, b) => {
+    if (a.isOwner && !b.isOwner) return -1;
+    if (!a.isOwner && b.isOwner) return 1;
+    return 0;
+  });
+
+  const name = filterName.value;
+  const owner = filterOwner.value;
+
+  if (name !== "") {
+    lobbies = lobbies.filter((lobby) => lobby.name.include(name));
+  }
+
+  if (owner !== "") {
+    lobbies = lobbies.filter((lobby) => lobby.ownerUsername === owner);
+  }
+
+  if (onlyPublic) {
+    lobbies = lobbies.filter((lobby) => !lobby.hasPassword);
+  }
+
+  if (onlyPrivate) {
+    lobbies = lobbies.filter((lobby) => lobby.hasPassword);
+  }
+
+  if (onlyAccessible) {
+    lobbies = lobbies.filter((lobby) => !lobby.started);
+  }
+
+  return lobbies;
+}
+
 function renderLobbies(lobbies) {
+  const filteredLobbies = orderAndFilterLobbies(lobbies);
+
   const lobbiesList = document.getElementById("lobbies");
   lobbiesList.innerHTML = "";
 
-  for (const lobby of lobbies) {
+  for (const lobby of filteredLobbies) {
     console.log(lobby);
     const tr = document.createElement("tr");
 
@@ -168,51 +258,47 @@ function renderLobbies(lobbies) {
       statusTd.textContent = "In attesa";
     }
 
-    const actionsTd = document.createElement("td");
-    actionsTd.classList.add("mobileHidden");
-
-    if (!lobby.started) {
-      if (lobby.isOwner) {
-        const startButton = document.createElement("button");
-        startButton.textContent = "Start Game";
-        startButton.addEventListener("click", () => {
-          socket.emit("game:start");
-        });
-        actionsTd.appendChild(startButton);
-
-        const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Delete";
-        deleteButton.addEventListener("click", () => {
-          socket.emit("lobby:delete", lobby.id);
-        });
-        actionsTd.appendChild(deleteButton);
-      } else if (!lobby.isMember) {
-        const joinButton = document.createElement("button");
-        joinButton.textContent = "Join";
-        joinButton.addEventListener("click", () => {
-          socket.emit("lobby:join", lobby.id);
-        });
-        actionsTd.appendChild(joinButton);
-      } else {
-        const leaveButton = document.createElement("button");
-        leaveButton.textContent = "Leave";
-        leaveButton.addEventListener("click", () => {
-          socket.emit("lobby:leave");
-        });
-        actionsTd.appendChild(leaveButton);
-      }
-    }
-
     tr.appendChild(nameTd);
     tr.appendChild(ownerTd);
     tr.appendChild(livesTd);
     tr.appendChild(cardsTd);
     tr.appendChild(playersTd);
     tr.appendChild(statusTd);
-    tr.appendChild(actionsTd);
 
     lobbiesList.appendChild(tr);
+
+    if (lobby.isOwner) {
+      switchLobbySettings(true);
+    }
+
+    if (lobby.isConnected) {
+      tr.classList.add("joined");
+    }
   }
+}
+
+function switchLobbySettings(lobbyCreated) {
+  document
+    .getElementById("createLobbyContainer")
+    .getElementsByClassName("title")[0].innerHTML = lobbyCreated
+    ? "Modifica tavolo"
+    : "Crea tavolo";
+
+  document
+    .getElementById("createLobbyPopupButton")
+    .getElementsByTagName("p")[0].innerHTML = lobbyCreated
+    ? "Modifica tavolo"
+    : "Crea tavolo";
+
+  document.getElementById("createLobby").hidden = lobbyCreated;
+  document.getElementById("ownerButtonsContainer").hidden = !lobbyCreated;
+
+  document.getElementById("nameInput").parentElement.parentElement.hidden =
+    lobbyCreated;
+  document.getElementById("playersInput").parentElement.parentElement.hidden =
+    lobbyCreated;
+  document.getElementById("passwordInput").parentElement.parentElement.hidden =
+    lobbyCreated;
 }
 
 const leftColumn = document.getElementById("leftColumn");

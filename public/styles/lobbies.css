@@ -26,7 +26,7 @@ body {
   min-height: 0;
 
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: minmax(0, 1fr) 2fr;
   gap: 1em;
   padding: 0 1em 1em 1em;
 }
@@ -44,7 +44,7 @@ body {
 }
 
 .title {
-  font-size: 1.5em;
+  font-size: 1.25em;
   color: var(--text-primary);
   font-weight: bold;
 }
@@ -55,12 +55,55 @@ body {
 
 #filterLobbies {
   border-bottom: 1px solid var(--divider-line);
-  flex-grow: 1;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+  padding-bottom: 1em;
+}
+
+#filterButtons {
+  display: flex;
+  gap: 1em;
+}
+
+.filterButton {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75em;
+
+  padding: 0.5em 1em;
+
+  border: 1px solid var(--text-primary);
+  border-radius: 0.25em;
+  color: var(--text-primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filterButton.selected,
+.filterButton:hover {
+  cursor: pointer;
+  color: var(--bg-card);
+  background-color: var(--text-primary);
+}
+
+#applyFilters {
+  padding: 0.75em;
+  border-radius: 0.5em;
 }
 
 /* ==================== */
 /* Create lobby styling */
 /* ==================== */
+
+#createLobbyContainer {
+  flex: 1;
+}
 
 #createLobbyContainer,
 #createLobbyInputs {
@@ -69,15 +112,45 @@ body {
   gap: 1em;
 }
 
+#livesAndCards {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+}
+
+#livesAndCards > * {
+  flex: 1;
+}
+
 #createLobbyContainer .title {
   margin-top: 0.5em;
 }
 
 #createLobby {
   padding: 0.75em;
-  font-weight: bolder;
-  font-size: 1.25em;
   border-radius: 0.5em;
+}
+
+#ownerButtonsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5em;
+}
+
+#ownerButtonsContainer > *:first-child {
+  grid-column: span 2;
+}
+
+#ownerButtonsContainer > * {
+  padding: 0.5em 0;
+  border-radius: 0.5em;
+}
+
+#deleteLobbyBtn:hover {
+  color: var(--bg-card);
 }
 
 #showPassword {
@@ -189,6 +262,11 @@ body {
 
   #leftColumn .hidden {
     display: none;
+  }
+
+  #livesAndCards {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   #createLobbyContainer .title {
