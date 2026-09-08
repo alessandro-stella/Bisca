@@ -147,39 +147,6 @@ function setLobbyClosed(lobbyId, closed) {
   return true;
 }
 
-function updateLobbySettings(lobbyId, lives, cards) {
-  const lobby = lobbies.get(lobbyId);
-
-  if (!lobby) {
-    return {
-      success: false,
-      error: "missing lobby",
-    };
-  }
-
-  if (lives < 1) {
-    return {
-      success: false,
-      error: "lives must be at least 1",
-    };
-  }
-
-  if (cards < 1) {
-    return {
-      success: false,
-      error: "cards must be at least 1",
-    };
-  }
-
-  lobby.startingLives = lives;
-  lobby.initialCards = cards;
-
-  return {
-    success: true,
-    error: null,
-  };
-}
-
 function setPlayerConnected(lobbyId, userId, connected) {
   const lobby = lobbies.get(lobbyId);
 
@@ -238,5 +205,4 @@ module.exports = {
   setPlayerConnected,
   isPlayerConnected,
   getLobbyByPlayer,
-  updateLobbySettings,
 };

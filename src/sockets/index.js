@@ -51,9 +51,8 @@ function setupSockets(io) {
         cards,
       );
 
-      console.log({ validation });
       if (!validation.valid) {
-        socket.emit("lobby:create:error", { message: validation.message });
+        socket.emit("lobby:create:error", { errors: validation.errors });
         return;
       }
 

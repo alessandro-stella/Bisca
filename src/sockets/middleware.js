@@ -170,64 +170,68 @@ const validators = {
   },
 
   validateLobbyParams(name, maxPlayers, lives, cards) {
+    let errors = [];
+
     if (typeof name !== "string" || name.trim() === "") {
-      return {
-        valid: false,
+      errors.push({
+        field: "name",
         message: "Dai un nome alla lobby",
-      };
-    }
+      });
+    } else {
+      if (name.length < 3) {
+        errors.push({
+          field: "name",
+          message: "Nome della lobby troppo corto",
+        });
+      }
 
-    if (name.length < 3) {
-      return {
-        valid: false,
-        message: "Nome della lobby troppo corto",
-      };
-    }
-
-    if (name.length > 30) {
-      return {
-        valid: false,
-        message: "Nome della lobby troppo lungo",
-      };
+      if (name.length > 30) {
+        errors.push({
+          field: "name",
+          message: "Nome della lobby troppo lungo",
+        });
+      }
     }
 
     if (!Number.isInteger(maxPlayers)) {
-      return {
-        valid: false,
+      errors.push({
+        field: "players",
         message: "Numero di giocatori non valido",
-      };
-    }
-
-    if (maxPlayers < 2 || maxPlayers > 6) {
-      return {
-        valid: false,
-        message:
-          "Il numero massimo di giocatori deve essere compreso tra 2 e 6",
-      };
+      });
+    } else {
+      if (maxPlayers < 2 || maxPlayers > 6) {
+        errors.push({
+          field: "players",
+          message:
+            "Il numero massimo di giocatori deve essere compreso tra 2 e 6",
+        });
+      }
     }
 
     if (!Number.isInteger(lives) || lives < 1) {
-      return {
-        valid: false,
+      errors.push({
+        field: "lives",
         message: "Numero di vite non valido",
-      };
+      });
     }
 
     const maxCards = Math.floor(40 / maxPlayers);
 
     if (!Number.isInteger(cards) || cards < 1) {
-      return {
-        valid: false,
+      errors.push({
+        field: "cards",
         message: "Numero di carte non valido",
-      };
+      });
     }
 
     if (cards > maxCards) {
-      return {
-        valid: false,
+      errors.push({
+        field: "cards",
         message: "Troppe carte per ogni giocatore",
-      };
+      });
     }
+
+    if (errors.length !== 0) return { valid: false, errors };
 
     return { valid: true };
   },

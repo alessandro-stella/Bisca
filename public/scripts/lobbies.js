@@ -1,4 +1,59 @@
 // ==========
+// DOM Elements
+// ==========
+
+const DOM = {
+  // Create Lobby Form
+  nameInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("nameInput")
+  ),
+  playersInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("playersInput")
+  ),
+  livesInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("livesInput")
+  ),
+  cardsInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("cardsInput")
+  ),
+  passwordInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("passwordInput")
+  ),
+
+  // Create Lobby Form Errors
+  nameInputError: document.getElementById("nameInputError"),
+  playersInputError: document.getElementById("playersInputError"),
+  livesInputError: document.getElementById("livesInputError"),
+  cardsInputError: document.getElementById("cardsInputError"),
+
+  // Filter Inputs
+  searchInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("searchInput")
+  ),
+  ownerInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("ownerInput")
+  ),
+
+  // Filter Buttons
+  filterPublic: document.getElementById("onlyPublic"),
+  filterPrivate: document.getElementById("onlyPrivate"),
+  filterAccessible: document.getElementById("onlyAccessible"),
+
+  // Buttons
+  createLobbyButton: document.getElementById("createLobby"),
+  createLobbyPopupButton: document.getElementById("createLobbyPopupButton"),
+  filterLobbyPopupButton: document.getElementById("filterLobbiesPopupButton"),
+
+  // Containers & Sections
+  lobbiesTable: document.getElementById("lobbies"),
+  createLobbyContainer: document.getElementById("createLobbyContainer"),
+  filterLobbiesSection: document.getElementById("filterLobbies"),
+  ownerButtonsContainer: document.getElementById("ownerButtonsContainer"),
+  leftColumn: document.getElementById("leftColumn"),
+  backdrop: document.getElementById("backdrop"),
+};
+
+// ==========
 // Game logic
 // ==========
 
@@ -39,32 +94,14 @@ function setupSocket() {
     transports: ["websocket", "polling"],
   });
 
-  const createLobbyButton = document.getElementById("createLobby");
+  DOM.createLobbyButton.addEventListener("click", () => {
+    resetErrors();
 
-  createLobbyButton.addEventListener("click", () => {
-    const name = /** @type {HTMLInputElement} */ (
-      document.getElementById("nameInput")
-    ).value;
-
-    const players = parseInt(
-      /** @type {HTMLInputElement} */ (document.getElementById("playersInput"))
-        .value,
-      10,
-    );
-
-    const lives = parseInt(
-      /** @type {HTMLInputElement} */ (document.getElementById("livesInput"))
-        .value,
-      10,
-    );
-    const cards = parseInt(
-      /** @type {HTMLInputElement} */ (document.getElementById("cardsInput"))
-        .value,
-      10,
-    );
-    const password = /** @type {HTMLInputElement} */ (
-      document.getElementById("passwordInput")
-    ).value;
+    const name = DOM.nameInput.value;
+    const players = parseInt(DOM.playersInput.value, 10);
+    const lives = parseInt(DOM.livesInput.value, 10);
+    const cards = parseInt(DOM.cardsInput.value, 10);
+    const password = DOM.passwordInput.value;
 
     closePopup();
 
@@ -72,7 +109,7 @@ function setupSocket() {
   });
 
   socket.on("lobby:create:error", (data) => {
-    console.error("Errore di validazione:", data.message);
+    displayErrors(data.errors);
   });
 
   socket.on("connect_error", (error) => {
@@ -125,21 +162,14 @@ init();
 // GUI logic
 // =========
 
-const filterName = /** @type {HTMLInputElement} */ (
-  document.getElementById("searchInput")
-);
-const filterOwner = /** @type {HTMLInputElement} */ (
-  document.getElementById("ownerInput")
-);
-
 let onlyPublic = false;
 let onlyPrivate = false;
 let onlyAccessible = false;
 
 const filterButtons = {
-  public: document.getElementById("onlyPublic"),
-  private: document.getElementById("onlyPrivate"),
-  accessible: document.getElementById("onlyAccessible"),
+  public: DOM.filterPublic,
+  private: DOM.filterPrivate,
+  accessible: DOM.filterAccessible,
 };
 
 for (const [key, button] of Object.entries(filterButtons)) {
@@ -188,8 +218,8 @@ function orderAndFilterLobbies(lobbies) {
     return 0;
   });
 
-  const name = filterName.value;
-  const owner = filterOwner.value;
+  const name = DOM.searchInput.value;
+  const owner = DOM.ownerInput.value;
 
   if (name !== "") {
     lobbies = lobbies.filter((lobby) => lobby.name.includes(name));
@@ -217,8 +247,7 @@ function orderAndFilterLobbies(lobbies) {
 function renderLobbies(lobbies) {
   const filteredLobbies = orderAndFilterLobbies(lobbies);
 
-  const lobbiesList = document.getElementById("lobbies");
-  lobbiesList.innerHTML = "";
+  DOM.lobbiesTable.innerHTML = "";
 
   for (const lobby of filteredLobbies) {
     console.log(lobby);
@@ -265,7 +294,7 @@ function renderLobbies(lobbies) {
     tr.appendChild(playersTd);
     tr.appendChild(statusTd);
 
-    lobbiesList.appendChild(tr);
+    DOM.lobbiesTable.appendChild(tr);
 
     if (lobby.isOwner) {
       switchLobbySettings(true);
@@ -278,65 +307,65 @@ function renderLobbies(lobbies) {
 }
 
 function switchLobbySettings(lobbyCreated) {
-  document
-    .getElementById("createLobbyContainer")
-    .getElementsByClassName("title")[0].innerHTML = lobbyCreated
-    ? "Modifica tavolo"
-    : "Crea tavolo";
+  DOM.createLobbyContainer.getElementsByClassName("title")[0].innerHTML =
+    lobbyCreated ? "Modifica tavolo" : "Crea tavolo";
 
-  document
-    .getElementById("createLobbyPopupButton")
-    .getElementsByTagName("p")[0].innerHTML = lobbyCreated
-    ? "Gestisci tavolo"
-    : "Crea tavolo";
+  DOM.createLobbyPopupButton.getElementsByTagName("p")[0].innerHTML =
+    lobbyCreated ? "Gestisci tavolo" : "Crea tavolo";
 
-  document.getElementById("createLobby").hidden = lobbyCreated;
-  document.getElementById("ownerButtonsContainer").hidden = !lobbyCreated;
+  DOM.createLobbyButton.hidden = lobbyCreated;
+  DOM.ownerButtonsContainer.hidden = !lobbyCreated;
 
-  document.getElementById("nameInput").parentElement.parentElement.hidden =
-    lobbyCreated;
-  document.getElementById("playersInput").parentElement.parentElement.hidden =
-    lobbyCreated;
-  document.getElementById("passwordInput").parentElement.parentElement.hidden =
-    lobbyCreated;
+  DOM.nameInput.parentElement.parentElement.hidden = lobbyCreated;
+  DOM.playersInput.parentElement.parentElement.hidden = lobbyCreated;
+  DOM.passwordInput.parentElement.parentElement.hidden = lobbyCreated;
 }
 
-const leftColumn = document.getElementById("leftColumn");
-const backdrop = document.getElementById("backdrop");
-backdrop.addEventListener("click", closePopup);
-
-const filterSection = document.getElementById("filterLobbies");
-const createSection = document.getElementById("createLobbyContainer");
-
-const createPopupButton = document.getElementById("createLobbyPopupButton");
-createPopupButton.addEventListener("click", openCreatePopup);
-
-const filterPopupButton = document.getElementById("filterLobbiesPopupButton");
-filterPopupButton.addEventListener("click", openFilterPopup);
+DOM.backdrop.addEventListener("click", closePopup);
+DOM.createLobbyPopupButton.addEventListener("click", openCreatePopup);
+DOM.filterLobbyPopupButton.addEventListener("click", openFilterPopup);
 
 function openPopup() {
-  leftColumn.classList.add("shown");
-  backdrop.classList.add("shown");
+  DOM.leftColumn.classList.add("shown");
+  DOM.backdrop.classList.add("shown");
 }
 
 function closePopup() {
-  leftColumn.classList.remove("shown");
-  backdrop.classList.remove("shown");
+  DOM.leftColumn.classList.remove("shown");
+  DOM.backdrop.classList.remove("shown");
 
-  filterSection.classList.add("hidden");
-  createSection.classList.add("hidden");
+  DOM.filterLobbiesSection.classList.add("hidden");
+  DOM.createLobbyContainer.classList.add("hidden");
 }
 
 function openCreatePopup() {
   openPopup();
 
-  filterSection.classList.add("hidden");
-  createSection.classList.remove("hidden");
+  DOM.filterLobbiesSection.classList.add("hidden");
+  DOM.createLobbyContainer.classList.remove("hidden");
 }
 
 function openFilterPopup() {
   openPopup();
 
-  createSection.classList.add("hidden");
-  filterSection.classList.remove("hidden");
+  DOM.createLobbyContainer.classList.add("hidden");
+  DOM.filterLobbiesSection.classList.remove("hidden");
+}
+
+const errorFields = {
+  name: DOM.nameInputError,
+  players: DOM.playersInputError,
+  lives: DOM.livesInputError,
+  cards: DOM.cardsInputError,
+};
+
+function displayErrors(errors) {
+  for (const error of errors) {
+    errorFields[error.field].hidden = false;
+    errorFields[error.field].innerHTML = error.message;
+  }
+}
+
+function resetErrors() {
+  console.log("Reset error");
 }
