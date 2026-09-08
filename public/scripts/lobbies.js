@@ -287,7 +287,7 @@ function switchLobbySettings(lobbyCreated) {
   document
     .getElementById("createLobbyPopupButton")
     .getElementsByTagName("p")[0].innerHTML = lobbyCreated
-    ? "Modifica tavolo"
+    ? "Gestisci tavolo"
     : "Crea tavolo";
 
   document.getElementById("createLobby").hidden = lobbyCreated;

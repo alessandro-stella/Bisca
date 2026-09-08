@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Regole di Bisca</title>
+
+    <link rel="icon" type="image/x-icon" href="./media/logo.svg" />
+
+    <title>BISCA | Home</title>
 
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
@@ -17,7 +20,10 @@
 
   <body>
     <div id="navbar">
-      <a id="logo" href="index.html">STELLA'S BISCA</a>
+      <a id="logo" href="index.html">
+        <img src="./media/logo.svg" alt="STELLA'S" />
+        <p>BISCA</p>
+      </a>
 
       <div class="buttons">
         <a id="buttonLink" class="primaryButton iconButton">
@@ -73,6 +79,13 @@
           perdere una vita; occorre prestare attenzione anche a quante mani
           perdere!
         </div>
+
+        <div class="warningBox">
+          <strong>In caso di pareggio:</strong> Se tutti i giocatori rimasti in
+          vita perdono le loro vite nello stesso turno, non potendo decretare un
+          vincitore, allora il turno si considera come non valido. Si procede
+          quindi al turno successivo, mantenendo però le vite immutate.
+        </div>
       </div>
 
       <div class="ruleCard">
@@ -85,11 +98,11 @@
         </p>
         <div class="highlightBox">
           <strong>Showdown (Il round con una carta):</strong><br />
-          Quando si resta con una sola carta, non si può guardarla. Ogni
-          giocatore se la mette sulla fronte mostrandola agli avversari.
-          Mantenendo il proprio turno, ognuno decide se vincerà o perderà la
-          mano. Alla fine si svelano le carte: chi ha sbagliato la previsione
-          perde una vita.
+          Quando si resta con una sola carta si possono vedere solo le carte
+          degli avversari, ma non la propria. Mantenendo il proprio turno,
+          ognuno decide se vincerà o perderà la mano in base alle carte
+          possedute dagli altri. Alla fine si svelano le carte: chi ha sbagliato
+          la previsione perde una vita.
         </div>
       </div>
 
@@ -136,9 +149,9 @@
           decidere al momento se considerarlo la carta <em>più alta</em> o
           <em>più bassa</em> della mano. Scavalca qualsiasi ordinamento, potendo
           battere il Re di Denari o farsi battere dall'Asso di Bastoni! <br />
-          Questa regola non vale durante la fase di showdown, poichè
-          assicurerebbe la vittoria in ogni caso al fortunato che ha ricevuto
-          l'asso di denari. In questo caso la carta segue la gerarchia
+          Questa regola <strong>non vale durante la fase di showdown</strong> ,
+          poichè assicurerebbe la vittoria in ogni caso al fortunato che ha
+          ricevuto l'asso di denari. In questo caso la carta segue la gerarchia
           precedente, prendendo sul re di coppe e venendo preso dal due di
           denari.
         </div>

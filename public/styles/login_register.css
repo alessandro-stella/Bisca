@@ -13,6 +13,18 @@
   font-weight: bold;
   color: var(--text-primary);
   padding-bottom: 0.5em;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25em;
+
+  padding-right: 0.3em;
+}
+
+#loginTitle img,
+#registerTitle img {
+  height: 1lh;
 }
 
 #loginContainer,
