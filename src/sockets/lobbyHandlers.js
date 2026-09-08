@@ -41,8 +41,6 @@ function sendLobbies(socket) {
 }
 
 function broadcastLobbies(io) {
-  console.log("Broadcasting lobbies");
-
   for (const socket of io.sockets.sockets.values()) {
     sendLobbies(socket);
   }
@@ -91,8 +89,6 @@ async function handleCreateLobby(
 
     socket.join(`lobby:${lobby.id}`);
 
-    console.log(`Lobby ${lobby.id} created by ${socket.user.username}`);
-
     broadcastLobbies(io);
   } catch (error) {
     console.error("Error creating lobby:", error);
@@ -107,29 +103,31 @@ async function joinLobby(lobbyId, socket, io, password) {
     const lobby = getLobby(lobbyId);
 
     if (!lobby) {
-      socket.emit("lobby:join:error", { message: "Lobby not found" });
+      socket.emit("lobby:join:error", {
+        message: "Il tavolo in cui si sta cercando di entrare non esiste",
+      });
       return;
     }
 
-    // Verifica password se presente
     if (lobby.passwordHash) {
       if (!password) {
         socket.emit("lobby:join:error", {
-          message: "This lobby requires a password",
+          message: "Il tavolo è privato, inserire la password",
         });
         return;
       }
 
       const passwordMatch = await bcrypt.compare(password, lobby.passwordHash);
       if (!passwordMatch) {
-        socket.emit("lobby:join:error", { message: "Incorrect password" });
+        socket.emit("lobby:join:error", {
+          message: "La password inserita è errata",
+        });
         return;
       }
     }
 
-    // Verifica se la lobby è piena
     if (lobby.players.size >= lobby.maxPlayers) {
-      socket.emit("lobby:join:error", { message: "Lobby is full" });
+      socket.emit("lobby:join:error", { message: "Tavolo al completo" });
       return;
     }
 
@@ -142,13 +140,12 @@ async function joinLobby(lobbyId, socket, io, password) {
 
     socket.join(`lobby:${lobbyId}`);
 
-    console.log(`${socket.user.username} joined lobby ${lobbyId}`);
-
     broadcastLobbies(io);
   } catch (error) {
-    console.error("Error joining lobby:", error);
+    console.error("Errore durante l'accesso alla lobby:", error);
+
     socket.emit("lobby:join:error", {
-      message: "An error occurred while joining the lobby",
+      message: "Problema imprevisto, per favore riprova",
     });
   }
 }
@@ -192,8 +189,6 @@ function leaveLobby(socket, io, reconnectTimers) {
 
     deleteLobby(lobby.id);
     deleteGame(lobby.id);
-
-    console.log(`Lobby ${lobby.id} deleted because it's empty`);
   }
 
   broadcastLobbies(io);
@@ -203,20 +198,20 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
   const lobby = getLobby(lobbyId);
 
   if (!lobby) {
-    socket.emit("lobby:delete:error", { message: "Lobby not found" });
+    socket.emit("lobby:delete:error", { message: "Tavolo non trovata" });
     return;
   }
 
   if (lobby.ownerId !== socket.user.id) {
     socket.emit("lobby:delete:error", {
-      message: "Only the owner can delete the lobby",
+      message: "Solo il proprietario può eliminare il tavolo",
     });
     return;
   }
 
   if (lobby.started) {
     socket.emit("lobby:delete:error", {
-      message: "Cannot delete a lobby that has already started",
+      message: "Impossibile eliminare il tavolo, la partita è già iniziata",
     });
     return;
   }
@@ -233,11 +228,8 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
   deleteLobby(lobbyId);
   deleteGame(lobbyId);
 
-  console.log(`Lobby ${lobbyId} deleted by owner ${socket.user.username}`);
-
   broadcastLobbies(io);
 }
-
 function clearReconnectTimer(userId, reconnectTimers) {
   const timer = reconnectTimers.get(userId);
 

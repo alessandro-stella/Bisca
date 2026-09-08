@@ -67,22 +67,30 @@ async function startGame(socket, io) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
-    console.log("START GAME: lobby not found");
+    socket.emit("game:start:error", {
+      message: "Non è stato possibile avviare la partita, il tavolo non esiste",
+    });
     return;
   }
 
   if (lobby.ownerId !== socket.user.id) {
-    console.log("START GAME: user is not owner");
+    socket.emit("game:start:error", {
+      message: "Solo chi ha creato il tavolo può avviare la partita",
+    });
     return;
   }
 
   if (getGame(lobby.id)) {
-    console.log("START GAME: game already exists");
+    socket.emit("game:start:error", {
+      message: "Partita già in corso",
+    });
     return;
   }
 
   if (lobby.players.size < 2) {
-    console.log("Too few players!");
+    socket.emit("game:start:error", {
+      message: "Servono almeno due giocatori per iniziare la partita",
+    });
     return;
   }
 

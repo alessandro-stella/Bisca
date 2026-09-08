@@ -2,7 +2,6 @@ body {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  overflow: hidden;
 }
 
 #backdrop {
@@ -93,7 +92,7 @@ body {
 }
 
 #applyFilters {
-  padding: 0.75em;
+  padding: 0.5em;
   border-radius: 0.5em;
 }
 
@@ -116,7 +115,7 @@ body {
   width: 100%;
 
   display: flex;
-  align-items: center;
+  align-items: top;
   justify-content: center;
   gap: 1em;
 }
@@ -130,7 +129,7 @@ body {
 }
 
 #createLobby {
-  padding: 0.75em;
+  padding: 0.5em;
   border-radius: 0.5em;
 }
 
@@ -149,7 +148,7 @@ body {
   border-radius: 0.5em;
 }
 
-#deleteLobbyBtn:hover {
+#deleteLobbyButton:hover {
   color: var(--bg-card);
 }
 

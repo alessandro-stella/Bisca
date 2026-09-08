@@ -43,9 +43,6 @@ function createConnectionHandlers() {
 
     if (activeGame && activeGame.status === "finished") {
       removePlayer(lobby.id, userId);
-      console.log(
-        `${socket.user.username} disconnected from finished lobby ${lobby.id} and was removed.`,
-      );
 
       if (lobby.players.size === 0) {
         const room = `lobby:${lobby.id}`;
@@ -55,10 +52,6 @@ function createConnectionHandlers() {
 
         deleteLobby(lobby.id);
         deleteGame(lobby.id);
-
-        console.log(
-          `Lobby ${lobby.id} deleted because it is empty (game finished)`,
-        );
       }
 
       broadcastLobbies(io);
@@ -66,8 +59,6 @@ function createConnectionHandlers() {
     }
 
     setPlayerConnected(lobby.id, userId, false);
-
-    console.log(`${socket.user.username} disconnected from lobby ${lobby.id}`);
 
     broadcastLobbies(io);
 
@@ -110,11 +101,6 @@ function createConnectionHandlers() {
       removePlayer(currentLobby.id, userId);
       reconnectTimers.delete(userId);
 
-      console.log(
-        `${socket.user.username} removed from lobby ` +
-          `${currentLobby.id} after 60 seconds`,
-      );
-
       if (currentLobby.players.size === 0) {
         const room = `lobby:${currentLobby.id}`;
 
@@ -123,8 +109,6 @@ function createConnectionHandlers() {
 
         deleteLobby(currentLobby.id);
         deleteGame(currentLobby.id);
-
-        console.log(`Lobby ${currentLobby.id} deleted because it is empty`);
       }
 
       broadcastLobbies(io);
@@ -145,13 +129,11 @@ function createConnectionHandlers() {
     socket.join(`lobby:${lobby.id}`);
 
     if (lobby.started) {
-      console.log(`${socket.user.username} online, waiting to join...`);
       setPlayerConnected(lobby.id, userId, true);
       socket.emit("game:reconnect");
       broadcastLobbies(io);
     } else {
       setPlayerConnected(lobby.id, userId, true);
-      console.log(`${socket.user.username} reconnected to lobby ${lobby.id}`);
       broadcastLobbies(io);
     }
   }

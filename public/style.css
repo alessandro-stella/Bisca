@@ -272,6 +272,7 @@ tbody tr:hover {
 
 .inputError {
   color: var(--accent-red);
+  font-size: 0.75em;
 }
 
 .icon {

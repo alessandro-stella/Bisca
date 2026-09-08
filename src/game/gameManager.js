@@ -417,8 +417,6 @@ function endTurn(game) {
   if (survivors.length === 1) {
     const winnerId = survivors[0][0];
 
-    console.log("VINCITORE!", winnerId);
-
     game.status = "finished";
     game.winnerId = winnerId;
 
@@ -508,8 +506,6 @@ function resolveShowdown(game) {
 }
 
 function restartCurrentTurn(game) {
-  console.log("Calling restartCurrentTurn");
-
   const alivePlayers = new Map(
     Array.from(game.players.entries()).filter(([, player]) => player.lives > 0),
   );
@@ -583,7 +579,6 @@ function removePlayerFromGame(game, playerId) {
 }
 
 async function saveGameData(game) {
-  console.log("Saving data of this game:", game);
   const gameId = game.id;
 
   const dbClient = await db.connect();
@@ -619,12 +614,8 @@ async function saveGameData(game) {
     }));
 
     await calculateAndUpdateElo(gameId, playersForElo);
-
-    console.log("ELO updated successfully for game:", gameId);
   } catch (error) {
     await dbClient.query("ROLLBACK");
-
-    console.error("Error in saveGameData & ELO calculation:", error);
 
     throw error;
   } finally {

@@ -26,6 +26,12 @@ const DOM = {
   livesInputError: document.getElementById("livesInputError"),
   cardsInputError: document.getElementById("cardsInputError"),
 
+  // Create Lobby Form Container
+  nameInputContainer: document.getElementById("nameInputContainer"),
+  playersInputContainer: document.getElementById("playersInputContainer"),
+  livesInputContainer: document.getElementById("livesInputContainer"),
+  cardsInputContainer: document.getElementById("cardsInputContainer"),
+
   // Filter Inputs
   searchInput: /** @type {HTMLInputElement} */ (
     document.getElementById("searchInput")
@@ -43,6 +49,9 @@ const DOM = {
   createLobbyButton: document.getElementById("createLobby"),
   createLobbyPopupButton: document.getElementById("createLobbyPopupButton"),
   filterLobbyPopupButton: document.getElementById("filterLobbiesPopupButton"),
+  startLobbyButton: document.getElementById("startLobbyButton"),
+  updateLobbyButton: document.getElementById("updateLobbyButton"),
+  deleteLobbyButton: document.getElementById("deleteLobbyButton"),
 
   // Containers & Sections
   lobbiesTable: document.getElementById("lobbies"),
@@ -56,6 +65,14 @@ const DOM = {
 // ==========
 // Game logic
 // ==========
+
+DOM.startLobbyButton.addEventListener("click", () => socket.emit("game:start"));
+DOM.updateLobbyButton.addEventListener("click", () =>
+  socket.emit("lobby:update"),
+);
+DOM.deleteLobbyButton.addEventListener("click", () =>
+  socket.emit("lobby:delete"),
+);
 
 let currentUser = null;
 let socket = null;
@@ -94,6 +111,17 @@ function setupSocket() {
     transports: ["websocket", "polling"],
   });
 
+  // Built-in events
+  socket.on("connect_error", (error) => {
+    console.error("Socket connection error:", error.message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected");
+  });
+
+  // Custom events
+
   DOM.createLobbyButton.addEventListener("click", () => {
     resetErrors();
 
@@ -112,21 +140,20 @@ function setupSocket() {
     displayErrors(data.errors);
   });
 
-  socket.on("connect_error", (error) => {
-    console.error("Socket connection error:", error.message);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Socket disconnected");
-  });
-
   socket.on("lobbies:update", (lobbies) => {
-    console.log("Receiving lobbies:update");
     renderLobbies(lobbies);
   });
 
   socket.on("lobby:join:error", (data) => {
-    console.error("Cannot join lobby:", data.message);
+    window.alert(data.message);
+  });
+
+  socket.on("lobby:delete:error", (data) => {
+    window.alert(data.message);
+  });
+
+  socket.on("game:start:error", (data) => {
+    window.alert(data.message);
   });
 
   socket.on("game:started", () => {
@@ -245,9 +272,16 @@ function orderAndFilterLobbies(lobbies) {
 }
 
 function renderLobbies(lobbies) {
+  DOM.lobbiesTable.innerHTML = "";
+
+  if (lobbies.length === 0) {
+    // switchLobbySettings(false);
+    return;
+  }
   const filteredLobbies = orderAndFilterLobbies(lobbies);
 
-  DOM.lobbiesTable.innerHTML = "";
+  // Show or hide buttons to edit lobby
+  switchLobbySettings(filteredLobbies[0].isOwner);
 
   for (const lobby of filteredLobbies) {
     console.log(lobby);
@@ -297,7 +331,6 @@ function renderLobbies(lobbies) {
     DOM.lobbiesTable.appendChild(tr);
 
     if (lobby.isOwner) {
-      switchLobbySettings(true);
     }
 
     if (lobby.isConnected) {
@@ -353,19 +386,27 @@ function openFilterPopup() {
 }
 
 const errorFields = {
-  name: DOM.nameInputError,
-  players: DOM.playersInputError,
-  lives: DOM.livesInputError,
-  cards: DOM.cardsInputError,
+  name: { container: DOM.nameInputContainer, message: DOM.nameInputError },
+  players: {
+    container: DOM.playersInputContainer,
+    message: DOM.playersInputError,
+  },
+  lives: { container: DOM.livesInputContainer, message: DOM.livesInputError },
+  cards: { container: DOM.cardsInputContainer, message: DOM.cardsInputError },
 };
 
 function displayErrors(errors) {
   for (const error of errors) {
-    errorFields[error.field].hidden = false;
-    errorFields[error.field].innerHTML = error.message;
+    errorFields[error.field].message.hidden = false;
+    errorFields[error.field].message.innerHTML = error.message;
+    errorFields[error.field].container.classList.add("error");
   }
 }
 
 function resetErrors() {
-  console.log("Reset error");
+  for (const field of Object.values(errorFields)) {
+    field.message.hidden = true;
+    field.message.innerHTML = "";
+    field.container.classList.remove("error");
+  }
 }

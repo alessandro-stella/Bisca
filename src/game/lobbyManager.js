@@ -36,8 +36,6 @@ function getLobbies() {
 }
 
 async function deleteLobby(lobbyId) {
-  console.log("Deleting lobby...");
-
   const game = getGame(lobbyId);
 
   if (game) {
@@ -58,7 +56,6 @@ async function deleteLobby(lobbyId) {
 
     try {
       await saveGameData(dataToSave);
-      console.log("Game data saved successfully");
     } catch (e) {
       console.log("Error while saving game data: ", e);
     }

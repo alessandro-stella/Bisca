@@ -78,8 +78,6 @@ function setReadonly(blockInput) {
 function addErrors(errors) {
   errors = errors || {};
 
-  console.log({ errors });
-
   if (errors.username) {
     usernameInputError.hidden = false;
     usernameInputError.innerHTML = errors.username.msg;
@@ -265,8 +263,6 @@ async function registerUser(username, email, password) {
     } catch (parseError) {
       registrationResponse = null;
     }
-
-    console.log({ registrationResponse });
 
     if (!res.ok) {
       addErrors(registrationResponse && registrationResponse.errors);

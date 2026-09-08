@@ -43,7 +43,6 @@ function setupSockets(io) {
     // =============================================
 
     socket.on("lobby:create", (name, maxPlayers, lives, cards, password) => {
-      console.log("CREATE LOBBY RECEIVED");
       const validation = validators.validateLobbyParams(
         name,
         maxPlayers,
@@ -72,16 +71,10 @@ function setupSockets(io) {
       leaveLobby(socket, io, reconnect.reconnectTimers);
     });
 
-    socket.on("lobby:delete", (lobbyId) => {
-      const validation = validators.validateLobbyId(lobbyId);
-      if (!validation.valid) {
-        socket.emit("error", { message: validation.message });
-        return;
-      }
-
-      const lobby = getLobby(lobbyId);
+    socket.on("lobby:delete", () => {
+      const lobby = getLobbyByPlayer(socket.user.id);
       if (!lobby) {
-        socket.emit("error", { message: "Lobby not found" });
+        socket.emit("lobby:delete:error", { message: "Non sei in una lobby" });
         return;
       }
 
@@ -89,7 +82,7 @@ function setupSockets(io) {
         runMiddleware(requireLobbyOwner, socket) &&
         runMiddleware(requireLobbyNotStarted, socket)
       ) {
-        handleDeleteLobby(lobbyId, socket, io, reconnect.reconnectTimers);
+        handleDeleteLobby(lobby.id, socket, io, reconnect.reconnectTimers);
       }
     });
 
@@ -98,7 +91,6 @@ function setupSockets(io) {
     // =============================================
 
     socket.on("game:start", () => {
-      console.log("Starting game...");
       startGame(socket, io);
     });
 
