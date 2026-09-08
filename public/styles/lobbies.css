@@ -40,6 +40,8 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
+
+  overflow-y: scroll;
 }
 
 .title {
@@ -209,6 +211,10 @@ body {
 
 #lobbies {
   overflow-y: auto;
+}
+
+#lobbies .joined {
+  background-color: red;
 }
 
 #filterLobbyPopupButton {

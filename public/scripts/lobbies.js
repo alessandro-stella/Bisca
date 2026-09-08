@@ -52,6 +52,7 @@ const DOM = {
   startLobbyButton: document.getElementById("startLobbyButton"),
   updateLobbyButton: document.getElementById("updateLobbyButton"),
   deleteLobbyButton: document.getElementById("deleteLobbyButton"),
+  applyFiltersButton: document.getElementById("applyFilters"),
 
   // Containers & Sections
   lobbiesTable: document.getElementById("lobbies"),
@@ -141,7 +142,8 @@ function setupSocket() {
   });
 
   socket.on("lobbies:update", (lobbies) => {
-    renderLobbies(lobbies);
+    currentLobbies = lobbies;
+    updateLobbies();
   });
 
   socket.on("lobby:join:error", (data) => {
@@ -189,6 +191,15 @@ init();
 // GUI logic
 // =========
 
+DOM.applyFiltersButton.addEventListener("click", updateLobbies);
+
+let currentLobbies = [];
+
+function updateLobbies() {
+  renderLobbies(currentLobbies);
+  closePopup();
+}
+
 let onlyPublic = false;
 let onlyPrivate = false;
 let onlyAccessible = false;
@@ -201,11 +212,11 @@ const filterButtons = {
 
 for (const [key, button] of Object.entries(filterButtons)) {
   button.addEventListener("click", () => {
-    updateButton(key);
+    updateButtons(key);
   });
 }
 
-function updateButton(buttonName) {
+function updateButtons(buttonName) {
   filterButtons[buttonName].classList.toggle("selected");
 
   switch (buttonName) {
@@ -239,52 +250,54 @@ function updateButton(buttonName) {
 }
 
 function orderAndFilterLobbies(lobbies) {
-  lobbies.sort((a, b) => {
-    if (a.isOwner && !b.isOwner) return -1;
-    if (!a.isOwner && b.isOwner) return 1;
+  const nameFilter = DOM.searchInput.value;
+  const ownerFilter = DOM.ownerInput.value;
+
+  let filteredLobbies = lobbies.filter((lobby) => {
+    if (lobby.isOwner || lobby.isMember) {
+      return true;
+    }
+
+    if (nameFilter !== "" && !lobby.name.includes(nameFilter)) return false;
+    if (ownerFilter !== "" && lobby.ownerUsername !== ownerFilter) return false;
+    if (onlyPublic && lobby.hasPassword) return false;
+    if (onlyPrivate && !lobby.hasPassword) return false;
+    if (onlyAccessible && lobby.started) return false;
+
+    return true;
+  });
+
+  filteredLobbies.sort((a, b) => {
+    const aIsMine = a.isOwner || a.isMember;
+    const bIsMine = b.isOwner || b.isMember;
+
+    if (aIsMine && !bIsMine) return -1;
+    if (!aIsMine && bIsMine) return 1;
+
     return 0;
   });
 
-  const name = DOM.searchInput.value;
-  const owner = DOM.ownerInput.value;
-
-  if (name !== "") {
-    lobbies = lobbies.filter((lobby) => lobby.name.includes(name));
-  }
-
-  if (owner !== "") {
-    lobbies = lobbies.filter((lobby) => lobby.ownerUsername === owner);
-  }
-
-  if (onlyPublic) {
-    lobbies = lobbies.filter((lobby) => !lobby.hasPassword);
-  }
-
-  if (onlyPrivate) {
-    lobbies = lobbies.filter((lobby) => lobby.hasPassword);
-  }
-
-  if (onlyAccessible) {
-    lobbies = lobbies.filter((lobby) => !lobby.started);
-  }
-
-  return lobbies;
+  return filteredLobbies;
 }
 
 function renderLobbies(lobbies) {
   DOM.lobbiesTable.innerHTML = "";
 
   if (lobbies.length === 0) {
-    // switchLobbySettings(false);
+    switchLobbySettings(false);
     return;
   }
+
   const filteredLobbies = orderAndFilterLobbies(lobbies);
 
-  // Show or hide buttons to edit lobby
+  if (filteredLobbies.length === 0) {
+    switchLobbySettings(false);
+    return;
+  }
+
   switchLobbySettings(filteredLobbies[0].isOwner);
 
   for (const lobby of filteredLobbies) {
-    console.log(lobby);
     const tr = document.createElement("tr");
 
     if (lobby.started) {
