@@ -1,10 +1,47 @@
 #baseContainer {
+  position: relative; /* Fondamentale per posizionare il ::before al suo interno */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 1em;
   min-height: 100dvh;
+  overflow: hidden; /* Evita che eventuali sbordi escano dallo schermo */
+}
+
+#baseContainer::before {
+  content: "";
+  position: absolute;
+
+  width: 80%;
+  height: 80vh;
+
+  bottom: 0;
+  left: 50%;
+  /* Decommenta e modifica questa riga quando vuoi riprovare la trasformazione */
+  /* transform: translateX(-50%) perspective(500px) rotateX(15deg); */
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+
+  z-index: -1;
+
+  background-image: url("../media/logo.svg");
+  background-size: 100% 100%;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 40%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 40%,
+    rgba(0, 0, 0, 0) 100%
+  );
+
+  border: 1px solid red;
 }
 
 #loginTitle,
