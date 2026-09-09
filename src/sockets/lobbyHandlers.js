@@ -198,7 +198,7 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
   const lobby = getLobby(lobbyId);
 
   if (!lobby) {
-    socket.emit("lobby:delete:error", { message: "Tavolo non trovata" });
+    socket.emit("lobby:delete:error", { message: "Tavolo non trovato" });
     return;
   }
 
@@ -222,7 +222,7 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
     clearReconnectTimer(userId, reconnectTimers);
   }
 
-  io.to(room).emit("lobby:deleted");
+  socket.to(room).emit("lobby:deleted");
   io.in(room).socketsLeave(room);
 
   deleteLobby(lobbyId);
@@ -230,6 +230,7 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
 
   broadcastLobbies(io);
 }
+
 function clearReconnectTimer(userId, reconnectTimers) {
   const timer = reconnectTimers.get(userId);
 

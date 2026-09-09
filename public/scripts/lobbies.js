@@ -154,6 +154,10 @@ function setupSocket() {
     window.alert(data.message);
   });
 
+  socket.on("lobby:deleted", () => {
+    window.alert("Il tavolo in cui eri è stato eliminato");
+  });
+
   socket.on("game:start:error", (data) => {
     window.alert(data.message);
   });
@@ -285,6 +289,8 @@ function renderLobbies(lobbies) {
 
   if (lobbies.length === 0) {
     switchLobbySettings(false);
+    allowCreateTable();
+    allowPopup();
     return;
   }
 
@@ -296,6 +302,7 @@ function renderLobbies(lobbies) {
   }
 
   switchLobbySettings(filteredLobbies[0].isOwner);
+  let inLobby = false;
 
   for (const lobby of filteredLobbies) {
     const tr = document.createElement("tr");
@@ -343,13 +350,55 @@ function renderLobbies(lobbies) {
 
     DOM.lobbiesTable.appendChild(tr);
 
-    if (lobby.isOwner) {
-    }
-
     if (lobby.isConnected) {
       tr.classList.add("joined");
+      inLobby = true;
+
+      if (!lobby.isOwner) {
+        blockPopup();
+        blockCreateTable();
+      }
+    } else {
+      tr.addEventListener("click", () => {
+        socket.emit("lobby:join", lobby.id);
+
+        blockCreateTable();
+      });
     }
   }
+
+  if (!inLobby) {
+    allowCreateTable();
+    allowPopup();
+  }
+}
+
+function blockPopup() {
+  DOM.createLobbyPopupButton.classList.add("disabled");
+}
+
+function allowPopup() {
+  DOM.createLobbyPopupButton.classList.remove("disabled");
+}
+
+function blockCreateTable() {
+  DOM.createLobbyButton.classList.add("disabled");
+
+  DOM.nameInput.parentElement.parentElement.classList.add("disabled");
+  DOM.playersInput.parentElement.parentElement.classList.add("disabled");
+  DOM.livesInput.parentElement.parentElement.classList.add("disabled");
+  DOM.cardsInput.parentElement.parentElement.classList.add("disabled");
+  DOM.passwordInput.parentElement.parentElement.classList.add("disabled");
+}
+
+function allowCreateTable() {
+  DOM.createLobbyButton.classList.remove("disabled");
+
+  DOM.nameInput.parentElement.parentElement.classList.remove("disabled");
+  DOM.playersInput.parentElement.parentElement.classList.remove("disabled");
+  DOM.livesInput.parentElement.parentElement.classList.remove("disabled");
+  DOM.cardsInput.parentElement.parentElement.classList.remove("disabled");
+  DOM.passwordInput.parentElement.parentElement.classList.remove("disabled");
 }
 
 function switchLobbySettings(lobbyCreated) {

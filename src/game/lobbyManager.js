@@ -1,13 +1,53 @@
 const { getGame, saveGameData } = require("./gameManager");
 
 const lobbies = new Map();
+const LOBBY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+let cleanupInterval;
+
+function startLobbyCleanup() {
+  cleanupInterval = setInterval(() => {
+    const now = Date.now();
+
+    for (const [lobbyId, lobby] of lobbies.entries()) {
+      const isAnyoneConnected = Array.from(lobby.players.values()).some((p) => p.connected);
+
+      if (!isAnyoneConnected) {
+        if (!lobby.offlineSince) {
+          lobby.offlineSince = now;
+        } else if (now - lobby.offlineSince >= LOBBY_TIMEOUT) {
+          console.log(`Eliminazione lobby per inattività totale: ${lobbyId}`);
+          deleteLobby(lobbyId);
+        }
+      } else {
+        lobby.offlineSince = null;
+      }
+      
+      if (lobby.players.size === 1 && now - lobby.createdAt >= LOBBY_TIMEOUT) {
+        console.log(`Eliminazione lobby ferma a 1 player: ${lobbyId}`);
+        deleteLobby(lobbyId);
+      }
+    }
+
+    if (lobbies.size === 0) {
+      clearInterval(cleanupInterval);
+      cleanupInterval = null;
+    }
+  }, 60*1000);
+}
 
 function createLobby(lobby) {
   if (lobbies.has(lobby.id)) {
     throw new Error("Lobby already exists");
   }
 
+  lobby.createdAt = Date.now();
+  lobby.offlineSince = null;
+
   lobbies.set(lobby.id, lobby);
+
+  if (!cleanupInterval) {
+    startLobbyCleanup();
+  }
 
   return lobby;
 }
@@ -102,6 +142,9 @@ function addPlayer(lobbyId, userId, username) {
     username,
   });
 
+  lobby.createdAt = Date.now();
+  lobby.offlineSince = null;
+
   return {
     success: true,
     error: null,
@@ -151,19 +194,18 @@ function setPlayerConnected(lobbyId, userId, connected) {
     return false;
   }
 
+  const lobbyPlayer = lobby.players.get(userId);
+  if (lobbyPlayer) {
+    lobbyPlayer.connected = connected;
+  }
+
   const game = getGame(lobbyId);
-
-  if (!game) {
-    return false;
+  if (game) {
+    const gamePlayer = game.players.get(userId);
+    if (gamePlayer) {
+      gamePlayer.connected = connected;
+    }
   }
-
-  const player = game.players.get(userId);
-
-  if (!player) {
-    return false;
-  }
-
-  player.connected = connected;
 
   return true;
 }
@@ -190,6 +232,14 @@ function getLobbyByPlayer(userId) {
   return null;
 }
 
+function isOwnerOnline(lobbyId) {
+  const lobby = lobbies.get(lobbyId);
+  if (!lobby) return false;
+
+  const owner = lobby.players.get(lobby.ownerId);
+  return owner?.connected ?? false;
+}
+
 module.exports = {
   createLobby,
   getLobby,
@@ -202,4 +252,5 @@ module.exports = {
   setPlayerConnected,
   isPlayerConnected,
   getLobbyByPlayer,
+  isOwnerOnline,
 };
