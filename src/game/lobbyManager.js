@@ -9,7 +9,9 @@ function startLobbyCleanup() {
     const now = Date.now();
 
     for (const [lobbyId, lobby] of lobbies.entries()) {
-      const isAnyoneConnected = Array.from(lobby.players.values()).some((p) => p.connected);
+      const isAnyoneConnected = Array.from(lobby.players.values()).some(
+        (p) => p.connected,
+      );
 
       if (!isAnyoneConnected) {
         if (!lobby.offlineSince) {
@@ -21,7 +23,7 @@ function startLobbyCleanup() {
       } else {
         lobby.offlineSince = null;
       }
-      
+
       if (lobby.players.size === 1 && now - lobby.createdAt >= LOBBY_TIMEOUT) {
         console.log(`Eliminazione lobby ferma a 1 player: ${lobbyId}`);
         deleteLobby(lobbyId);
@@ -32,7 +34,7 @@ function startLobbyCleanup() {
       clearInterval(cleanupInterval);
       cleanupInterval = null;
     }
-  }, 60*1000);
+  }, 60 * 1000);
 }
 
 function createLobby(lobby) {
@@ -240,6 +242,19 @@ function isOwnerOnline(lobbyId) {
   return owner?.connected ?? false;
 }
 
+function updateLobbySettings(lobbyId, startingLives, initialCards) {
+  const lobby = lobbies.get(lobbyId);
+
+  if (!lobby) {
+    return false;
+  }
+
+  lobby.startingLives = startingLives;
+  lobby.initialCards = initialCards;
+
+  return true;
+}
+
 module.exports = {
   createLobby,
   getLobby,
@@ -253,4 +268,5 @@ module.exports = {
   isPlayerConnected,
   getLobbyByPlayer,
   isOwnerOnline,
+  updateLobbySettings,
 };

@@ -235,6 +235,39 @@ const validators = {
 
     return { valid: true };
   },
+
+  validateLobbyUpdateParams(lives, cards, maxPlayers) {
+    console.log("Valori di validateLobbyParams:", { lives, cards, maxPlayers });
+
+    let errors = [];
+
+    if (!Number.isInteger(lives) || lives < 1) {
+      errors.push({
+        field: "lives",
+        message: "Numero di vite non valido",
+      });
+    }
+
+    const maxCards = Math.floor(40 / maxPlayers);
+
+    if (!Number.isInteger(cards) || cards < 1) {
+      errors.push({
+        field: "cards",
+        message: "Numero di carte non valido",
+      });
+    }
+
+    if (cards > maxCards) {
+      errors.push({
+        field: "cards",
+        message: "Troppe carte per ogni giocatore",
+      });
+    }
+
+    if (errors.length !== 0) return { valid: false, errors };
+
+    return { valid: true };
+  },
 };
 
 module.exports = {

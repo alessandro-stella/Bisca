@@ -9,6 +9,7 @@ const {
   getLobbyByPlayer,
   getLobby,
   deleteLobby,
+  updateLobbySettings,
 } = require("../game/lobbyManager");
 
 const {
@@ -231,6 +232,16 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
   broadcastLobbies(io);
 }
 
+function handleUpdateLobbySettings(lobbyId, io, startingLives, initialCards) {
+  try {
+    updateLobbySettings(lobbyId, startingLives, initialCards);
+
+    broadcastLobbies(io);
+  } catch (error) {
+    console.error("Errore durante l'aggiornamento del tavolo:", error);
+  }
+}
+
 function clearReconnectTimer(userId, reconnectTimers) {
   const timer = reconnectTimers.get(userId);
 
@@ -249,5 +260,6 @@ module.exports = {
   joinLobby,
   leaveLobby,
   handleDeleteLobby,
+  handleUpdateLobbySettings,
   clearReconnectTimer,
 };

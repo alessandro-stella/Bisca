@@ -275,6 +275,22 @@ body {
   width: 2px;
 }
 
+#lobbies .joined td:last-child {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+#lobbies #quitButton {
+  padding: 0.5em;
+  border-radius: 0.5em;
+
+  height: fit-content;
+
+  display: grid;
+  place-content: center;
+}
+
 #filterLobbyPopupButton {
   display: none;
 }
@@ -309,7 +325,7 @@ body {
   }
 
   #leftColumn.shown {
-    width: 70%;
+    width: 90%;
     max-height: 85dvh;
 
     padding: 2em;

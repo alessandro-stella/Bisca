@@ -8,7 +8,7 @@ const {
   validators,
 } = require("./middleware");
 
-const { getLobby, getLobbyByPlayer } = require("../game/lobbyManager");
+const { getLobbyByPlayer } = require("../game/lobbyManager");
 const { getGame } = require("../game/gameManager");
 
 const {
@@ -18,6 +18,7 @@ const {
   joinLobby,
   leaveLobby,
   handleDeleteLobby,
+  handleUpdateLobbySettings,
 } = require("./lobbyHandlers");
 
 const {
@@ -56,6 +57,34 @@ function setupSockets(io) {
       }
 
       handleCreateLobby(socket, io, name, maxPlayers, lives, cards, password);
+    });
+
+    socket.on("lobby:update", (lives, cards) => {
+      const lobby = getLobbyByPlayer(socket.user.id);
+      if (!lobby) {
+        socket.emit("lobby:update:error", { message: "Non sei in una lobby" });
+        return;
+      }
+
+      if (
+        runMiddleware(requireLobbyOwner, socket) &&
+        runMiddleware(requireLobbyNotStarted, socket)
+      ) {
+        const validation = validators.validateLobbyUpdateParams(
+          lives,
+          cards,
+          lobby.maxPlayers,
+        );
+
+        console.log({ validation });
+
+        if (!validation.valid) {
+          socket.emit("lobby:update:error", { errors: validation.errors });
+          return;
+        }
+
+        handleUpdateLobbySettings(lobby.id, io, lives, cards);
+      }
     });
 
     socket.on("lobby:join", (lobbyId) => {

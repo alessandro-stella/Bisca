@@ -4,6 +4,7 @@
 
 const DOM = {
   // Create Lobby Form
+
   nameInput: /** @type {HTMLInputElement} */ (
     document.getElementById("nameInput")
   ),
@@ -67,14 +68,6 @@ const DOM = {
 // Game logic
 // ==========
 
-DOM.startLobbyButton.addEventListener("click", () => socket.emit("game:start"));
-DOM.updateLobbyButton.addEventListener("click", () =>
-  socket.emit("lobby:update"),
-);
-DOM.deleteLobbyButton.addEventListener("click", () =>
-  socket.emit("lobby:delete"),
-);
-
 let currentUser = null;
 let socket = null;
 
@@ -113,6 +106,7 @@ function setupSocket() {
   });
 
   // Built-in events
+
   socket.on("connect_error", (error) => {
     console.error("Socket connection error:", error.message);
   });
@@ -137,6 +131,23 @@ function setupSocket() {
     socket.emit("lobby:create", name, players, lives, cards, password);
   });
 
+  DOM.startLobbyButton.addEventListener("click", () =>
+    socket.emit("game:start"),
+  );
+
+  DOM.updateLobbyButton.addEventListener("click", () => {
+    resetErrors();
+
+    const newLives = parseInt(DOM.livesInput.value, 10);
+    const newCards = parseInt(DOM.cardsInput.value, 10);
+
+    socket.emit("lobby:update", newLives, newCards);
+  });
+
+  DOM.deleteLobbyButton.addEventListener("click", () =>
+    socket.emit("lobby:delete"),
+  );
+
   socket.on("lobby:create:error", (data) => {
     displayErrors(data.errors);
   });
@@ -148,6 +159,10 @@ function setupSocket() {
 
   socket.on("lobby:join:error", (data) => {
     window.alert(data.message);
+  });
+
+  socket.on("lobby:update:error", (data) => {
+    displayErrors(data.errors);
   });
 
   socket.on("lobby:delete:error", (data) => {
@@ -346,9 +361,6 @@ function renderLobbies(lobbies) {
     tr.appendChild(livesTd);
     tr.appendChild(cardsTd);
     tr.appendChild(playersTd);
-    tr.appendChild(statusTd);
-
-    DOM.lobbiesTable.appendChild(tr);
 
     if (lobby.isConnected) {
       tr.classList.add("joined");
@@ -357,6 +369,14 @@ function renderLobbies(lobbies) {
       if (!lobby.isOwner) {
         blockPopup();
         blockCreateTable();
+
+        const quitButton = document.createElement("button");
+        quitButton.id = "quitButton";
+        quitButton.classList.add("secondaryButton");
+        quitButton.addEventListener("click", () => socket.emit("lobby:leave"));
+        quitButton.innerHTML =
+          '<i class="icon fa-solid fa-arrow-right-from-bracket"></i>';
+        statusTd.appendChild(quitButton);
       }
     } else {
       tr.addEventListener("click", () => {
@@ -365,6 +385,9 @@ function renderLobbies(lobbies) {
         blockCreateTable();
       });
     }
+
+    tr.appendChild(statusTd);
+    DOM.lobbiesTable.appendChild(tr);
   }
 
   if (!inLobby) {
