@@ -54,6 +54,7 @@ const DOM = {
   updateLobbyButton: document.getElementById("updateLobbyButton"),
   deleteLobbyButton: document.getElementById("deleteLobbyButton"),
   applyFiltersButton: document.getElementById("applyFilters"),
+  quitLobbyButton: document.getElementById("quitButtonMobile"),
 
   // Containers & Sections
   lobbiesTable: document.getElementById("lobbies"),
@@ -147,6 +148,10 @@ function setupSocket() {
   DOM.deleteLobbyButton.addEventListener("click", () =>
     socket.emit("lobby:delete"),
   );
+
+  DOM.quitLobbyButton.addEventListener("click", () => {
+    socket.emit("lobby:leave");
+  });
 
   socket.on("lobby:create:error", (data) => {
     displayErrors(data.errors);
@@ -305,7 +310,7 @@ function renderLobbies(lobbies) {
   if (lobbies.length === 0) {
     switchLobbySettings(false);
     allowCreateTable();
-    allowPopup();
+    hideQuitButton();
     return;
   }
 
@@ -367,16 +372,17 @@ function renderLobbies(lobbies) {
       inLobby = true;
 
       if (!lobby.isOwner) {
-        blockPopup();
         blockCreateTable();
 
         const quitButton = document.createElement("button");
-        quitButton.id = "quitButton";
+        quitButton.id = "quitButtonDesktop";
         quitButton.classList.add("secondaryButton");
         quitButton.addEventListener("click", () => socket.emit("lobby:leave"));
         quitButton.innerHTML =
           '<i class="icon fa-solid fa-arrow-right-from-bracket"></i>';
         statusTd.appendChild(quitButton);
+
+        showQuitButton();
       }
     } else {
       tr.addEventListener("click", () => {
@@ -392,16 +398,18 @@ function renderLobbies(lobbies) {
 
   if (!inLobby) {
     allowCreateTable();
-    allowPopup();
+    hideQuitButton();
   }
 }
 
-function blockPopup() {
-  DOM.createLobbyPopupButton.classList.add("disabled");
+function showQuitButton() {
+  DOM.createLobbyPopupButton.hidden = true;
+  DOM.quitLobbyButton.hidden = false;
 }
 
-function allowPopup() {
-  DOM.createLobbyPopupButton.classList.remove("disabled");
+function hideQuitButton() {
+  DOM.createLobbyPopupButton.hidden = false;
+  DOM.quitLobbyButton.hidden = true;
 }
 
 function blockCreateTable() {

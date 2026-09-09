@@ -281,7 +281,7 @@ body {
   gap: 1em;
 }
 
-#lobbies #quitButton {
+#lobbies #quitButtonDesktop {
   padding: 0.5em;
   border-radius: 0.5em;
 
@@ -386,6 +386,11 @@ body {
     cursor: pointer;
   }
 
+  #lobbies #quitButtonDesktop {
+    display: none;
+  }
+
+  #quitButtonMobile,
   #createLobbyPopupButton {
     margin: 0.65em;
   }
