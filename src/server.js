@@ -13,23 +13,25 @@ const { router: sessionRouter } = require("./routes/sessionRouter");
 
 const app = express();
 const server = http.createServer(app);
+
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+
 const io = new Server(server, {
   pingInterval: 25000,
   pingTimeout: 60000,
   transports: ["websocket", "polling"],
-
-  cors: {
-    origin: process.env.CLIENT_URL || "*",
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
+  cors: corsOptions,
 });
 
 const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use("/api/user", userRouter);
 app.use("/api/session", sessionRouter);
