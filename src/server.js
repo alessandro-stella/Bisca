@@ -41,6 +41,43 @@ app.use(express.static(path.join(__dirname, "../public")));
 const setupSockets = require("./sockets");
 setupSockets(io);
 
+async function purgeCloudflareCache() {
+  const zoneId = process.env.CLOUDFLARE_ZONE_ID;
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+
+  if (!zoneId || !apiToken) {
+    console.log(
+      "Missing Cloudflare variabled in .env, skipping cache purge...",
+    );
+    return;
+  }
+
+  try {
+    console.log("Requesting cache purge to Cloudflare...");
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ purge_everything: true }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (data.success) {
+      console.log("Cloudflare cache emptied successfully!");
+    } else {
+      console.error("Cloudflare API error:", data.errors);
+    }
+  } catch (error) {
+    console.error("Couldn't reach Cloudflare:", error.message);
+  }
+}
+
 server.listen(PORT, async () => {
   console.log(`Server started on port ${PORT}`);
 
@@ -51,6 +88,8 @@ server.listen(PORT, async () => {
     console.error("Database connection failed:");
     console.error(error);
   }
+
+  await purgeCloudflareCache();
 });
 
 app.use((err, _, res, __) => {
