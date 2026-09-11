@@ -1,7 +1,6 @@
 const {
   getLobbyByPlayer,
   setPlayerConnected,
-  isPlayerConnected,
   removePlayer,
   deleteLobby,
 } = require("../game/lobbyManager");
@@ -17,21 +16,46 @@ const { broadcastGameState } = require("./gameHandlers");
 const RECONNECT_TIMEOUT = 60 * 1000;
 
 function createConnectionHandlers() {
-  const reconnectTimers = new Map();
+  const deviceReconnectTimers = new Map();
 
-  function clearReconnectTimer(userId) {
-    const timer = reconnectTimers.get(userId);
+  function clearReconnectTimer(userId, deviceId) {
+    const key = `${userId}_${deviceId}`;
+    const timer = deviceReconnectTimers.get(key);
 
     if (!timer) {
       return;
     }
 
     clearTimeout(timer);
-    reconnectTimers.delete(userId);
+    deviceReconnectTimers.delete(key);
+  }
+
+  function isUserOnline(socket, io, lobby) {
+    const userId = socket.user?.id;
+    const currentDeviceId = socket.deviceId;
+
+    for (const otherSocket of io.sockets.sockets.values()) {
+      if (
+        otherSocket.user?.id === userId &&
+        otherSocket.deviceId !== currentDeviceId &&
+        otherSocket.connected
+      ) {
+        if (lobby.started) {
+          if (otherSocket.rooms.has(`lobby:${lobby.id}`)) {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   function handleDisconnect(socket, io, broadcastLobbies) {
-    const userId = socket.user.id;
+    const userId = socket.user?.id;
+    const deviceId = socket.deviceId;
 
     const lobby = getLobbyByPlayer(userId);
 
@@ -42,23 +66,25 @@ function createConnectionHandlers() {
     const activeGame = getGame(lobby.id);
 
     if (activeGame && activeGame.status === "finished") {
-      removePlayer(lobby.id, userId);
+      if (!isUserOnline(socket, io, lobby)) {
+        removePlayer(lobby.id, userId);
 
-      if (lobby.players.size === 0) {
-        const room = `lobby:${lobby.id}`;
-
-        io.to(room).emit("lobby:deleted");
-        io.in(room).socketsLeave(room);
-
-        deleteLobby(lobby.id);
-        deleteGame(lobby.id);
+        if (lobby.players.size === 0) {
+          const room = `lobby:${lobby.id}`;
+          io.to(room).emit("lobby:deleted");
+          io.in(room).socketsLeave(room);
+          deleteLobby(lobby.id);
+          deleteGame(lobby.id);
+        }
       }
 
       broadcastLobbies(io);
       return;
     }
 
-    setPlayerConnected(lobby.id, userId, false);
+    if (!isUserOnline(socket, io, lobby)) {
+      setPlayerConnected(lobby.id, userId, false);
+    }
 
     broadcastLobbies(io);
 
@@ -66,16 +92,30 @@ function createConnectionHandlers() {
       broadcastGameState(io, lobby.id);
     }
 
+    const key = `${userId}_${deviceId}`;
     const timer = setTimeout(() => {
       const currentLobby = getLobbyByPlayer(userId);
 
       if (!currentLobby) {
-        reconnectTimers.delete(userId);
+        deviceReconnectTimers.delete(key);
         return;
       }
 
-      if (isPlayerConnected(currentLobby.id, userId)) {
-        reconnectTimers.delete(userId);
+      let thisDeviceReconnected = false;
+      for (const s of io.sockets.sockets.values()) {
+        if (s.user?.id === userId && s.deviceId === deviceId && s.connected) {
+          thisDeviceReconnected = true;
+          break;
+        }
+      }
+
+      if (thisDeviceReconnected) {
+        deviceReconnectTimers.delete(key);
+        return;
+      }
+
+      if (isUserOnline(socket, io, currentLobby)) {
+        deviceReconnectTimers.delete(key);
         return;
       }
 
@@ -99,14 +139,12 @@ function createConnectionHandlers() {
       }
 
       removePlayer(currentLobby.id, userId);
-      reconnectTimers.delete(userId);
+      deviceReconnectTimers.delete(key);
 
       if (currentLobby.players.size === 0) {
         const room = `lobby:${currentLobby.id}`;
-
         io.to(room).emit("lobby:deleted");
         io.in(room).socketsLeave(room);
-
         deleteLobby(currentLobby.id);
         deleteGame(currentLobby.id);
       }
@@ -114,32 +152,33 @@ function createConnectionHandlers() {
       broadcastLobbies(io);
     }, RECONNECT_TIMEOUT);
 
-    reconnectTimers.set(userId, timer);
+    deviceReconnectTimers.set(key, timer);
   }
 
   function handleReconnect(socket, io, broadcastLobbies) {
-    const userId = socket.user.id;
+    const userId = socket.user?.id;
+    const deviceId = socket.deviceId;
+
     const lobby = getLobbyByPlayer(userId);
 
     if (!lobby) {
       return;
     }
 
-    clearReconnectTimer(userId);
+    clearReconnectTimer(userId, deviceId);
     socket.join(`lobby:${lobby.id}`);
 
+    setPlayerConnected(lobby.id, userId, true);
+
     if (lobby.started) {
-      setPlayerConnected(lobby.id, userId, true);
       socket.emit("game:reconnect");
-      broadcastLobbies(io);
-    } else {
-      setPlayerConnected(lobby.id, userId, true);
-      broadcastLobbies(io);
     }
+
+    broadcastLobbies(io);
   }
 
   return {
-    reconnectTimers,
+    deviceReconnectTimers,
     clearReconnectTimer,
     handleDisconnect,
     handleReconnect,

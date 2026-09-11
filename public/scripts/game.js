@@ -1,39 +1,94 @@
+function getOrCreateDeviceId() {
+  let id = localStorage.getItem("bisca_device_id");
+  if (!id) {
+    id =
+      (typeof crypto !== "undefined" &&
+        crypto.randomUUID &&
+        crypto.randomUUID()) ||
+      "dev_" + Math.random().toString(36).substring(2, 11);
+    localStorage.setItem("bisca_device_id", id);
+  }
+  return id;
+}
+
 const socket = io({
+  auth: {
+    deviceId: getOrCreateDeviceId(),
+  },
   reconnection: true,
   reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  reconnectionAttempts: 5,
-
+  reconnectionDelayMax: 10000,
+  reconnectionAttempts: Infinity,
   transports: ["websocket", "polling"],
 });
 
+window.addEventListener("beforeunload", () => {
+  if (socket) {
+    socket.disconnect();
+  }
+});
+
+let heartbeatInterval;
+
+function startHeartbeat() {
+  stopHeartbeat();
+  heartbeatInterval = setInterval(() => {
+    if (socket.connected) {
+      socket.emit("ping");
+    }
+  }, 20000);
+}
+
+function stopHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+  }
+}
+
 socket.on("connect", () => {
   console.log("Connected to game:", socket.id);
-
   socket.emit("game:get-state");
+  startHeartbeat();
 });
 
 socket.on("connect_error", (error) => {
   console.error("Socket connection error:", error.message);
+  const statusEl = document.getElementById("gameStatus");
+  if (statusEl) {
+    statusEl.textContent = "Errore di connessione... Riprovo...";
+  }
+});
 
-  window.location.replace("login.html");
+socket.on("disconnect", (reason) => {
+  console.log("Disconnected from game:", reason);
+  stopHeartbeat();
+
+  const statusEl = document.getElementById("gameStatus");
+  if (statusEl) {
+    statusEl.textContent = "Connessione persa... Riconnessione in corso...";
+  }
+
+  if (reason === "io server disconnect") {
+    socket.connect();
+  }
+});
+
+socket.on("pong", () => {
+  console.log("Heartbeat received");
 });
 
 socket.on("game:reconnect", () => {
   console.log("Game reconnect signal received");
-
   socket.emit("game:get-state");
 });
 
 socket.on("game:not-found", () => {
   console.log("Game not found");
-
   window.location.replace("/lobbies.html");
 });
 
-socket.on("game:state", (game) => {
-  console.log("Game state:", game);
-
+function renderGameState(game) {
   if (game.turnPhase === "finished") {
     document.getElementById("gameStatus").textContent =
       "La partita è conclusa!";
@@ -64,24 +119,50 @@ socket.on("game:state", (game) => {
 
   const bidButtonsContainer = document.getElementById("bidButtonsContainer");
 
-  if (game.turnPhase == "bidding" && game.isMyTurn) {
+  if (game.turnPhase === "bidding" && game.isMyTurn) {
     createBidButtons(game, bidButtonsContainer);
   }
+}
 
-  if (!game.isMyTurn) {
-    return;
-  }
+socket.on("game:state", (game) => {
+  console.log("Game state:", game);
+  renderGameState(game);
 });
 
-socket.on("game:finished", ({ winnerId, winnerUsername }) => {
-  console.log("Partita terminata. Vincitore:", winnerId);
+socket.on("game:state:sync", (game) => {
+  console.log("Game state sync from another device:", game);
+  renderGameState(game);
+});
 
+function handleGameFinishedUI(winnerUsername) {
   document.getElementById("gameStatus").textContent =
     `Partita terminata! Il vincitore è ${winnerUsername}!`;
 
   document.getElementById("bidButtonsContainer").innerHTML = "";
   document.getElementById("myCardsContainer").innerHTML = "";
   document.getElementById("livesContainer").innerHTML = "";
+}
+
+socket.on("game:finished", ({ winnerId, winnerUsername }) => {
+  console.log("Partita terminata. Vincitore:", winnerId);
+  handleGameFinishedUI(winnerUsername);
+});
+
+socket.on("game:finished:sync", ({ winnerId, winnerUsername }) => {
+  console.log("Game finished sync from another device:", winnerId);
+  handleGameFinishedUI(winnerUsername);
+});
+
+socket.on("lobbies:update:sync", (data) => {
+  console.log("Lobby action from another device:", data);
+  socket.emit("game:get-state");
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && socket.connected) {
+    console.log("App tornata in primo piano, richiedo stato");
+    socket.emit("game:get-state");
+  }
 });
 
 function createPlayerInfo(game) {

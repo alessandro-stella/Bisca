@@ -34,10 +34,23 @@ const createConnectionHandlers = require("./connectionHandlers");
 function setupSockets(io) {
   io.use(authenticateSocket);
 
+  const reconnect = createConnectionHandlers();
+
   io.on("connection", (socket) => {
-    const reconnect = createConnectionHandlers();
+    console.log(
+      `User ${socket.user.username} connected on device ${socket.deviceId}`,
+    );
+
     reconnect.handleReconnect(socket, io, broadcastLobbies);
     sendLobbies(socket);
+
+    // =============================================
+    // HEARTBEAT - Keep alive mobile
+    // =============================================
+
+    socket.on("ping", () => {
+      socket.emit("pong");
+    });
 
     // =============================================
     // LOBBY EVENTS
@@ -76,8 +89,6 @@ function setupSockets(io) {
           lobby.maxPlayers,
         );
 
-        console.log({ validation });
-
         if (!validation.valid) {
           socket.emit("lobby:update:error", { errors: validation.errors });
           return;
@@ -97,7 +108,7 @@ function setupSockets(io) {
     });
 
     socket.on("lobby:leave", () => {
-      leaveLobby(socket, io, reconnect.reconnectTimers);
+      leaveLobby(socket, io, reconnect.deviceReconnectTimers);
     });
 
     socket.on("lobby:delete", () => {
@@ -111,7 +122,12 @@ function setupSockets(io) {
         runMiddleware(requireLobbyOwner, socket) &&
         runMiddleware(requireLobbyNotStarted, socket)
       ) {
-        handleDeleteLobby(lobby.id, socket, io, reconnect.reconnectTimers);
+        handleDeleteLobby(
+          lobby.id,
+          socket,
+          io,
+          reconnect.deviceReconnectTimers,
+        );
       }
     });
 
@@ -145,7 +161,7 @@ function setupSockets(io) {
           return;
         }
 
-        const maxBid = Array.from(game.hands.values()).length + 1; // Include 0 as bid
+        const maxBid = Array.from(game.hands.values()).length + 1;
         const validation = validators.validateBid(bid, maxBid);
         if (!validation.valid) {
           socket.emit("error", { message: validation.message });
@@ -177,6 +193,9 @@ function setupSockets(io) {
     // =============================================
 
     socket.on("disconnect", () => {
+      console.log(
+        `User ${socket.user.username} disconnected from device ${socket.deviceId}`,
+      );
       reconnect.handleDisconnect(socket, io, broadcastLobbies);
     });
   });

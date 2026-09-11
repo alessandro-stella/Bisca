@@ -10,20 +10,16 @@ body {
 
 #navbar {
   background-color: var(--bg-page);
-
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1em;
-
   flex-shrink: 0;
 }
 
 #baseContainer {
   flex-grow: 1;
-
   min-height: 0;
-
   display: grid;
   grid-template-columns: minmax(0, 1fr) 2fr;
   gap: 1em;
@@ -41,11 +37,9 @@ body {
   box-shadow: var(--card-shadow);
   border-radius: 0.25em;
   padding: 1em;
-
   display: flex;
   flex-direction: column;
   min-height: 0;
-
   overflow-y: auto;
 }
 
@@ -55,18 +49,12 @@ body {
   font-weight: bold;
 }
 
-/* ============== */
-/* Filter lobbies */
-/* ============== */
-
 #filterLobbies {
   border-bottom: 1px solid var(--divider-line);
   flex: 1;
-
   display: flex;
   flex-direction: column;
   gap: 1em;
-
   padding-bottom: 1em;
 }
 
@@ -79,13 +67,10 @@ body {
   flex: 1;
   min-width: 0;
   font-size: 0.75em;
-
   padding: 0.5em 1em;
-
   border: 1px solid var(--text-primary);
   border-radius: 0.25em;
   color: var(--text-primary);
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,10 +88,6 @@ body {
   border-radius: 0.5em;
 }
 
-/* ==================== */
-/* Create lobby styling */
-/* ==================== */
-
 #createLobbyContainer {
   flex: 1;
 }
@@ -120,7 +101,6 @@ body {
 
 #livesAndCards {
   width: 100%;
-
   display: flex;
   align-items: top;
   justify-content: center;
@@ -161,21 +141,15 @@ body {
 
 #showPassword {
   width: 1.5em;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
 }
 
 #showPassword:hover .icon {
   color: var(--icon-active);
 }
-
-/* =============== */
-/* Lobbies section */
-/* =============== */
 
 #rightColumn .primaryButton {
   display: none;
@@ -197,60 +171,106 @@ body {
   display: none;
 }
 
-/* =========== */
-/* All lobbies */
-/* =========== */
-
 #lobbiesListContainer {
   border: 1px solid var(--divider-line);
   border-radius: 0.5em;
   flex-grow: 1;
   width: 100%;
   min-height: 0;
-  overflow: auto;
+  overflow-y: auto;
+  background-color: var(--rows-odd);
 }
 
-#lobbiesList {
+#lobbiesGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 4rem 4rem 6rem 7rem;
   width: 100%;
 }
 
-#lobbies {
-  overflow-y: auto;
+.gridHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--rows-even);
+  color: var(--text-primary);
+  font-weight: bold;
+  padding: 0.85em 1em;
+  border-bottom: 1px solid var(--divider-line);
+  user-select: none;
+  white-space: nowrap;
 }
 
-#lobbies tr {
+.lobbyItem {
+  display: contents;
   cursor: pointer;
+  color: var(--text-primary);
 }
 
-#lobbies .joined {
-  cursor: initial;
+.lobbyItem:nth-child(even) .lobbyCell {
+  background-color: var(--rows-even);
 }
 
-#lobbies .joined td:first-child,
-#lobbies .joined td:last-child {
+.lobbyCell {
+  padding: 0.85em 1em;
+  border-bottom: 1px solid var(--divider-line);
+  background-color: var(--rows-odd);
+  display: flex;
+  align-items: center;
+  transition: background-color 150ms ease;
+}
+
+.lobbyItem:hover .lobbyCell {
+  filter: brightness(1.15);
+}
+
+.lobbyItem.lobbyClosed .lobbyCell {
+  opacity: 0.6;
+}
+
+.lobbyName,
+.lobbyOwner {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.lobbyLives,
+.lobbyCards,
+.lobbyPlayers {
+  white-space: nowrap;
+}
+
+.lobbyStatus {
+  justify-content: flex-end;
+  white-space: nowrap;
+  text-align: right;
+  gap: 0.5em;
+}
+
+.gridHeader.lobbyStatus {
+  text-align: right;
+  display: block;
+}
+
+.lobbyItem.joined .lobbyCell:first-child {
   position: relative;
 }
 
-#lobbies .joined td:first-child::before,
-#lobbies .joined td:last-child::after {
+.lobbyItem.joined .lobbyCell:first-child::before {
   content: "";
-
   position: absolute;
   top: 0;
-
+  left: 0;
+  width: 3.5px;
   height: 100%;
-
   background: linear-gradient(
     180deg,
     var(--brand-green-shadow) 0%,
-    var(--brand-green-shadow) 30%,
     var(--brand-green-hover) 50%,
-    var(--brand-green-shadow) 70%,
     var(--brand-green-shadow) 100%
   );
-
   background-size: 100% 200%;
-
   animation: scroll-gradient 2s linear infinite;
 }
 
@@ -263,49 +283,22 @@ body {
   }
 }
 
-#lobbies .joined td:first-child::before {
-  left: 0;
-
-  width: 2.5px;
-}
-
-#lobbies .joined td:last-child::after {
-  right: 0;
-
-  width: 2px;
-}
-
-#lobbies .joined td:last-child {
-  display: flex;
+#quitButtonDesktop {
+  padding: 0.35em 0.55em;
+  border-radius: 0.35em;
+  display: inline-flex;
   align-items: center;
-  gap: 1em;
+  justify-content: center;
 }
 
-#lobbies #quitButtonDesktop {
-  padding: 0.5em;
-  border-radius: 0.5em;
-
-  height: fit-content;
-
-  display: grid;
-  place-content: center;
-}
-
-#filterLobbyPopupButton {
-  display: none;
-}
-
-/* Mobile Responsive */
+/* Properties for mobile */
 @media (max-width: 768px) {
   #backdrop.shown {
     display: initial;
-
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
-
     width: 100%;
     height: 100%;
-
     position: absolute;
     top: 0;
     left: 0;
@@ -327,15 +320,12 @@ body {
   #leftColumn.shown {
     width: 90%;
     max-height: 85dvh;
-
-    padding: 2em;
+    padding: 1em;
     display: flex;
-
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
     z-index: 2;
   }
 
@@ -358,35 +348,146 @@ body {
   }
 
   #lobbiesContainer .title {
-    padding-left: 0.7em;
-    padding-right: 0.7em;
-    padding-top: 0.7em;
-
+    padding: 0.7em;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     border-bottom: 1px solid var(--divider-line);
   }
 
   #lobbiesListContainer {
     border: none;
-    border-radius: 0;
+    background: transparent;
+    padding: 0.75em;
   }
 
-  #lobbiesList .mobileHidden {
-    display: none;
+  #lobbiesGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65em;
   }
 
-  #lobbies {
-    overflow-y: scroll;
+  .gridHeader {
+    display: none !important;
   }
 
-  #lobbies tr {
-    cursor: pointer;
+  .lobbyItem {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-inactive);
+    border-radius: 0.35em;
+    padding: 0.75em 1em;
+    position: relative;
   }
 
-  #lobbies #quitButtonDesktop {
+  .lobbyItem .lobbyCell {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  .lobbyItem .lobbyName {
+    order: 1;
+    flex: 1 1 auto;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--text-primary);
+  }
+
+  .lobbyItem .lobbyStatus {
+    order: 2;
+    flex: 0 0 auto;
+    font-size: 1.05em;
+    font-weight: bold;
+    color: var(--text-active);
+  }
+
+  .lobbyItem .lobbyOwner {
+    order: 3;
+    flex: 1 1 100%;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    margin-bottom: 0.15em;
+  }
+
+  .lobbyItem .lobbyOwner::before {
+    content: "Creato da:\00a0";
+  }
+
+  .lobbyItem .mobileHidden {
+    display: inline-flex !important;
+  }
+
+  .lobbyItem .lobbyLives {
+    order: 4;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .lobbyItem .lobbyLives::before {
+    content: "Vite:\00a0";
+  }
+
+  .lobbyItem .lobbyCards {
+    order: 5;
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    margin-left: 0.6em;
+  }
+
+  .lobbyItem .lobbyCards::before {
+    content: "• Carte:\00a0";
+  }
+
+  .lobbyItem .lobbyPlayers {
+    order: 6;
+    margin-left: auto;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: var(--text-active);
+    white-space: nowrap;
+  }
+
+  .lobbyItem .lobbyPlayers::before {
+    content: "Giocatori:\00a0";
+    font-weight: normal;
+    color: var(--text-secondary);
+  }
+
+  .lobbyItem.joined {
+    border-color: var(--brand-green);
+    background-color: var(--rows-odd);
+    padding-left: 1.25em;
+  }
+
+  .lobbyItem.joined::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    border-top-left-radius: 0.35em;
+    border-bottom-left-radius: 0.35em;
+    background: linear-gradient(
+      180deg,
+      var(--brand-green-shadow) 0%,
+      var(--brand-green-hover) 50%,
+      var(--brand-green-shadow) 100%
+    );
+    background-size: 100% 200%;
+    animation: scroll-gradient 2s linear infinite;
+  }
+
+  .lobbyItem.joined .lobbyCell:first-child::before {
+    display: none !important;
+  }
+
+  #quitButtonDesktop {
     display: none;
   }
 
@@ -395,14 +496,17 @@ body {
     margin: 0.65em;
   }
 
+  #filterLobbies {
+    padding: 0;
+    border: none;
+  }
+
   #filterLobbiesPopupButton {
     display: flex;
     align-items: center;
     justify-content: center;
-
     height: 1.5em;
     aspect-ratio: 1 / 1;
-
     border-radius: 0.25em;
   }
 

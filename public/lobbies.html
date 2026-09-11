@@ -163,20 +163,16 @@
               <i class="icon fa-solid fa-filter"></i>
             </div>
           </div>
+
           <div id="lobbiesListContainer">
-            <table id="lobbiesList">
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Creatore</th>
-                  <th class="mobileHidden">Vite</th>
-                  <th class="mobileHidden">Carte</th>
-                  <th>Giocatori</th>
-                  <th>Stato</th>
-                </tr>
-              </thead>
-              <tbody id="lobbies"></tbody>
-            </table>
+            <div id="lobbiesGrid">
+              <div class="gridHeader lobbyName">Nome</div>
+              <div class="gridHeader lobbyOwner">Creatore</div>
+              <div class="gridHeader lobbyLives mobileHidden">Vite</div>
+              <div class="gridHeader lobbyCards mobileHidden">Carte</div>
+              <div class="gridHeader lobbyPlayers">Giocatori</div>
+              <div class="gridHeader lobbyStatus">Stato</div>
+            </div>
           </div>
         </div>
 

@@ -1,52 +1,49 @@
-// ==========
-// DOM Elements
-// ==========
+let currentUser = null;
+let socket = null;
+
+function getOrCreateDeviceId() {
+  let id = localStorage.getItem("bisca_device_id");
+  if (!id) {
+    id =
+      (typeof crypto !== "undefined" &&
+        crypto.randomUUID &&
+        crypto.randomUUID()) ||
+      "dev_" + Math.random().toString(36).substring(2, 11);
+    localStorage.setItem("bisca_device_id", id);
+  }
+  return id;
+}
+
+window.addEventListener("beforeunload", () => {
+  if (socket) {
+    socket.disconnect();
+  }
+});
 
 const DOM = {
-  // Create Lobby Form
+  nameInput: document.getElementById("nameInput"),
+  playersInput: document.getElementById("playersInput"),
+  livesInput: document.getElementById("livesInput"),
+  cardsInput: document.getElementById("cardsInput"),
+  passwordInput: document.getElementById("passwordInput"),
 
-  nameInput: /** @type {HTMLInputElement} */ (
-    document.getElementById("nameInput")
-  ),
-  playersInput: /** @type {HTMLInputElement} */ (
-    document.getElementById("playersInput")
-  ),
-  livesInput: /** @type {HTMLInputElement} */ (
-    document.getElementById("livesInput")
-  ),
-  cardsInput: /** @type {HTMLInputElement} */ (
-    document.getElementById("cardsInput")
-  ),
-  passwordInput: /** @type {HTMLInputElement} */ (
-    document.getElementById("passwordInput")
-  ),
-
-  // Create Lobby Form Errors
   nameInputError: document.getElementById("nameInputError"),
   playersInputError: document.getElementById("playersInputError"),
   livesInputError: document.getElementById("livesInputError"),
   cardsInputError: document.getElementById("cardsInputError"),
 
-  // Create Lobby Form Container
   nameInputContainer: document.getElementById("nameInputContainer"),
   playersInputContainer: document.getElementById("playersInputContainer"),
   livesInputContainer: document.getElementById("livesInputContainer"),
   cardsInputContainer: document.getElementById("cardsInputContainer"),
 
-  // Filter Inputs
-  searchInput: /** @type {HTMLInputElement} */ (
-    document.getElementById("searchInput")
-  ),
-  ownerInput: /** @type {HTMLInputElement} */ (
-    document.getElementById("ownerInput")
-  ),
+  searchInput: document.getElementById("searchInput"),
+  ownerInput: document.getElementById("ownerInput"),
 
-  // Filter Buttons
   filterPublic: document.getElementById("onlyPublic"),
   filterPrivate: document.getElementById("onlyPrivate"),
   filterAccessible: document.getElementById("onlyAccessible"),
 
-  // Buttons
   createLobbyButton: document.getElementById("createLobby"),
   createLobbyPopupButton: document.getElementById("createLobbyPopupButton"),
   filterLobbyPopupButton: document.getElementById("filterLobbiesPopupButton"),
@@ -56,21 +53,13 @@ const DOM = {
   applyFiltersButton: document.getElementById("applyFilters"),
   quitLobbyButton: document.getElementById("quitButtonMobile"),
 
-  // Containers & Sections
-  lobbiesTable: document.getElementById("lobbies"),
+  lobbiesGrid: document.getElementById("lobbiesGrid"),
   createLobbyContainer: document.getElementById("createLobbyContainer"),
   filterLobbiesSection: document.getElementById("filterLobbies"),
   ownerButtonsContainer: document.getElementById("ownerButtonsContainer"),
   leftColumn: document.getElementById("leftColumn"),
   backdrop: document.getElementById("backdrop"),
 };
-
-// ==========
-// Game logic
-// ==========
-
-let currentUser = null;
-let socket = null;
 
 window.addEventListener("pageshow", () => {
   if (socket?.connected) {
@@ -90,7 +79,6 @@ async function checkSession() {
   }
 
   const data = await response.json();
-
   currentUser = data.user;
 
   return true;
@@ -98,15 +86,15 @@ async function checkSession() {
 
 function setupSocket() {
   socket = io({
+    auth: {
+      deviceId: getOrCreateDeviceId(),
+    },
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
     reconnectionAttempts: 5,
-
     transports: ["websocket", "polling"],
   });
-
-  // Built-in events
 
   socket.on("connect_error", (error) => {
     console.error("Socket connection error:", error.message);
@@ -115,8 +103,6 @@ function setupSocket() {
   socket.on("disconnect", () => {
     console.log("Socket disconnected");
   });
-
-  // Custom events
 
   DOM.createLobbyButton.addEventListener("click", () => {
     resetErrors();
@@ -160,6 +146,10 @@ function setupSocket() {
   socket.on("lobbies:update", (lobbies) => {
     currentLobbies = lobbies;
     updateLobbies();
+  });
+
+  socket.on("lobbies:update:sync", () => {
+    socket.emit("lobbies:check");
   });
 
   socket.on("lobby:join:error", (data) => {
@@ -210,10 +200,6 @@ async function init() {
 }
 
 init();
-
-// =========
-// GUI logic
-// =========
 
 DOM.applyFiltersButton.addEventListener("click", updateLobbies);
 
@@ -305,7 +291,8 @@ function orderAndFilterLobbies(lobbies) {
 }
 
 function renderLobbies(lobbies) {
-  DOM.lobbiesTable.innerHTML = "";
+  const existingItems = DOM.lobbiesGrid.querySelectorAll(".lobbyItem");
+  existingItems.forEach((el) => el.remove());
 
   if (lobbies.length === 0) {
     switchLobbySettings(false);
@@ -325,50 +312,48 @@ function renderLobbies(lobbies) {
   let inLobby = false;
 
   for (const lobby of filteredLobbies) {
-    const tr = document.createElement("tr");
+    const card = document.createElement("div");
+    card.classList.add("lobbyItem");
 
     if (lobby.started) {
-      tr.style.opacity = "0.6";
-      tr.classList.add("lobby-closed");
+      card.classList.add("lobbyClosed");
     }
 
-    const nameTd = document.createElement("td");
-    nameTd.textContent = lobby.name;
+    const nameEl = document.createElement("div");
+    nameEl.classList.add("lobbyCell", "lobbyName");
+    nameEl.textContent = lobby.name;
 
-    const ownerTd = document.createElement("td");
-    ownerTd.textContent = lobby.ownerUsername;
+    const ownerEl = document.createElement("div");
+    ownerEl.classList.add("lobbyCell", "lobbyOwner");
+    ownerEl.textContent = lobby.ownerUsername;
 
-    const livesTd = document.createElement("td");
-    livesTd.textContent = lobby.startingLives;
-    livesTd.classList.add("mobileHidden");
+    const livesEl = document.createElement("div");
+    livesEl.classList.add("lobbyCell", "lobbyLives", "mobileHidden");
+    livesEl.textContent = lobby.startingLives;
 
-    const cardsTd = document.createElement("td");
-    cardsTd.textContent = lobby.initialCards;
-    cardsTd.classList.add("mobileHidden");
+    const cardsEl = document.createElement("div");
+    cardsEl.classList.add("lobbyCell", "lobbyCards", "mobileHidden");
+    cardsEl.textContent = lobby.initialCards;
 
-    const playersTd = document.createElement("td");
-    if (lobby.started) {
-      playersTd.textContent = `${lobby.playersConnected} / ${lobby.players}`;
-    } else {
-      playersTd.textContent = `${lobby.playersConnected} / ${lobby.maxPlayers}`;
-    }
+    const playersEl = document.createElement("div");
+    playersEl.classList.add("lobbyCell", "lobbyPlayers");
+    playersEl.textContent = lobby.started
+      ? `${lobby.playersConnected} / ${lobby.players}`
+      : `${lobby.playersConnected} / ${lobby.maxPlayers}`;
 
-    const statusTd = document.createElement("td");
-    if (lobby.started) {
-      statusTd.textContent = "IN CORSO";
-      statusTd.style.fontWeight = "bold";
-    } else {
-      statusTd.textContent = "In attesa";
-    }
+    const statusEl = document.createElement("div");
+    statusEl.classList.add("lobbyCell", "lobbyStatus");
+    statusEl.textContent = lobby.started ? "IN CORSO" : "In attesa";
 
-    tr.appendChild(nameTd);
-    tr.appendChild(ownerTd);
-    tr.appendChild(livesTd);
-    tr.appendChild(cardsTd);
-    tr.appendChild(playersTd);
+    card.appendChild(nameEl);
+    card.appendChild(ownerEl);
+    card.appendChild(livesEl);
+    card.appendChild(cardsEl);
+    card.appendChild(playersEl);
+    card.appendChild(statusEl);
 
     if (lobby.isConnected) {
-      tr.classList.add("joined");
+      card.classList.add("joined");
       inLobby = true;
 
       if (!lobby.isOwner) {
@@ -377,23 +362,24 @@ function renderLobbies(lobbies) {
         const quitButton = document.createElement("button");
         quitButton.id = "quitButtonDesktop";
         quitButton.classList.add("secondaryButton");
-        quitButton.addEventListener("click", () => socket.emit("lobby:leave"));
+        quitButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          socket.emit("lobby:leave");
+        });
         quitButton.innerHTML =
           '<i class="icon fa-solid fa-arrow-right-from-bracket"></i>';
-        statusTd.appendChild(quitButton);
+        statusEl.appendChild(quitButton);
 
         showQuitButton();
       }
     } else {
-      tr.addEventListener("click", () => {
+      card.addEventListener("click", () => {
         socket.emit("lobby:join", lobby.id);
-
         blockCreateTable();
       });
     }
 
-    tr.appendChild(statusTd);
-    DOM.lobbiesTable.appendChild(tr);
+    DOM.lobbiesGrid.appendChild(card);
   }
 
   if (!inLobby) {

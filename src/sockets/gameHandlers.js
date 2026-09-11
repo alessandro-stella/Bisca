@@ -31,8 +31,11 @@ function broadcastGameState(io, lobbyId) {
     }
 
     const playerId = socket.user.id;
+    const playerState = getPlayerGameState(game, playerId);
 
-    socket.emit("game:state", getPlayerGameState(game, playerId));
+    socket.emit("game:state", playerState);
+
+    io.to(`user:${playerId}`).emit("game:state:sync", playerState);
   }
 }
 
@@ -145,6 +148,8 @@ async function startGame(socket, io) {
   const room = `lobby:${lobby.id}`;
 
   io.to(room).emit("game:started");
+
+  io.to(`user:${socket.user.id}`).emit("game:started");
 }
 
 function emitGameResult(io, lobbyId, game, result) {
@@ -167,11 +172,15 @@ function emitGameResult(io, lobbyId, game, result) {
     const playerId = socket.user.id;
     const isWinner = playerId === result.winnerId;
 
-    socket.emit("game:finished", {
+    const payload = {
       winnerId: result.winnerId,
       winnerUsername: winner?.username,
       isWinner,
-    });
+    };
+
+    socket.emit("game:finished", payload);
+
+    io.to(`user:${playerId}`).emit("game:finished:sync", payload);
   }
 
   setLobbyStarted(lobbyId, false);

@@ -26,7 +26,6 @@ function parseCookies(cookieHeader) {
 async function authenticateSocket(socket, next) {
   try {
     const cookies = parseCookies(socket.handshake.headers.cookie);
-
     const sessionId = cookies.sessionId;
 
     const user = await getUserFromSession(sessionId);
@@ -36,6 +35,10 @@ async function authenticateSocket(socket, next) {
     }
 
     socket.user = user;
+
+    socket.join(`user:${user.id}`);
+
+    socket.deviceId = socket.handshake.auth?.deviceId || socket.id;
 
     next();
   } catch (error) {

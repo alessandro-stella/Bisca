@@ -91,6 +91,11 @@ async function handleCreateLobby(
     socket.join(`lobby:${lobby.id}`);
 
     broadcastLobbies(io);
+
+    io.to(`user:${socket.user.id}`).emit("lobbies:update:sync", {
+      lobbyId: lobby.id,
+      action: "created",
+    });
   } catch (error) {
     console.error("Error creating lobby:", error);
     socket.emit("lobby:create:error", {
@@ -142,6 +147,11 @@ async function joinLobby(lobbyId, socket, io, password) {
     socket.join(`lobby:${lobbyId}`);
 
     broadcastLobbies(io);
+
+    io.to(`user:${socket.user.id}`).emit("lobbies:update:sync", {
+      lobbyId: lobbyId,
+      action: "joined",
+    });
   } catch (error) {
     console.error("Errore durante l'accesso alla lobby:", error);
 
@@ -193,6 +203,11 @@ function leaveLobby(socket, io, reconnectTimers) {
   }
 
   broadcastLobbies(io);
+
+  io.to(`user:${socket.user.id}`).emit("lobbies:update:sync", {
+    lobbyId: lobby.id,
+    action: "left",
+  });
 }
 
 function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
@@ -223,13 +238,18 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
     clearReconnectTimer(userId, reconnectTimers);
   }
 
-  socket.to(room).emit("lobby:deleted");
+  io.to(room).emit("lobby:deleted");
   io.in(room).socketsLeave(room);
 
   deleteLobby(lobbyId);
   deleteGame(lobbyId);
 
   broadcastLobbies(io);
+
+  io.to(`user:${socket.user.id}`).emit("lobbies:update:sync", {
+    lobbyId: lobbyId,
+    action: "deleted",
+  });
 }
 
 function handleUpdateLobbySettings(lobbyId, io, startingLives, initialCards) {
@@ -243,14 +263,14 @@ function handleUpdateLobbySettings(lobbyId, io, startingLives, initialCards) {
 }
 
 function clearReconnectTimer(userId, reconnectTimers) {
-  const timer = reconnectTimers.get(userId);
+  if (!reconnectTimers) return;
 
-  if (!timer) {
-    return;
+  for (const [key, timer] of reconnectTimers.entries()) {
+    if (key === userId || key.startsWith(`${userId}_`)) {
+      clearTimeout(timer);
+      reconnectTimers.delete(key);
+    }
   }
-
-  clearTimeout(timer);
-  reconnectTimers.delete(userId);
 }
 
 module.exports = {
