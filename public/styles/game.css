@@ -1,0 +1,221 @@
+/* ==================== */
+/* Stile Pagina Partita */
+/* ==================== */
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5em 1em;
+  gap: 1.25em;
+  min-height: 100vh;
+}
+
+/* Contenitori principali a blocchi */
+.container {
+  background-color: var(--bg-card);
+  border-radius: 0.5em;
+  padding: 1.25em 1.5em;
+  width: 100%;
+  max-width: 45em;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  border: 1px solid var(--border-inactive);
+}
+
+/* Intestazione principale */
+h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 0.25em;
+}
+
+/* Testi di stato e informazioni di gioco */
+#gameStatus {
+  font-size: 0.95em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+#currentPlayer,
+#myUsername {
+  font-size: 1.1em;
+  font-weight: 500;
+  text-align: center;
+  color: var(--text-active);
+}
+
+/* Informazioni sui giocatori e vite */
+#livesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.playerInfo {
+  background-color: var(--bg-input);
+  padding: 0.75em 1em;
+  border-radius: 0.35em;
+  font-size: 0.95em;
+  color: var(--text-active);
+  border-left: 4px solid var(--border-active);
+}
+
+/* Evidenzia il giocatore corrente (tu) */
+.playerInfo.myInfo {
+  background-color: #3b4335;
+  border-left: 4px solid var(--brand-green);
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+/* Gestione giocatore disconnesso gestita via JS */
+.playerInfo[style*="opacity: 0.5"] {
+  font-style: italic;
+}
+
+/* Sezioni delle carte */
+#cardsTitle,
+.container > div:first-child {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--divider-line);
+  padding-bottom: 0.5em;
+}
+
+.cardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75em;
+  justify-content: center;
+  padding: 0.5em 0;
+}
+
+/* Stile delle singole immagini delle carte */
+.card {
+  width: 5.5em;
+  height: auto;
+  border-radius: 0.35em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+/* Le mie carte (cliccabili) */
+#myCardsContainer .card {
+  cursor: pointer;
+}
+
+#myCardsContainer .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.1);
+}
+
+/* Carte giocate sul tavolo (non cliccabili) */
+#playedCardsContainer .card {
+  cursor: default;
+}
+
+/* Pulsanti delle scommesse/azioni */
+#bidButtonsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  justify-content: center;
+}
+
+.bidButton {
+  background: linear-gradient(
+    180deg,
+    var(--brand-green) 0%,
+    var(--brand-green-shadow) 100%
+  );
+  color: var(--text-primary);
+  font-weight: bold;
+  padding: 0.6em 1.2em;
+  border-radius: 0.25em;
+  cursor: pointer;
+  font-size: 1em;
+  transition:
+    filter 0.2s ease,
+    transform 0.1s ease;
+}
+
+.bidButton:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+/* Popup per la scelta dell'Asso di Denari (Jolly) */
+#acePopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-active);
+  padding: 1.5em;
+  border-radius: 0.5em;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  z-index: 1000;
+  text-align: center;
+  max-width: 90%;
+  width: 22em;
+}
+
+#acePopup div {
+  color: var(--text-primary);
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+
+#acePopup button {
+  background: linear-gradient(
+    180deg,
+    var(--brand-green) 0%,
+    var(--brand-green-shadow) 100%
+  );
+  color: var(--text-primary);
+  font-weight: bold;
+  padding: 0.6em 1em;
+  border-radius: 0.25em;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+#acePopup button:hover {
+  filter: brightness(1.1);
+}
+
+/* Adattamento per dispositivi mobili */
+@media (max-width: 768px) {
+  body {
+    padding: 0.5em;
+    gap: 0.75em;
+  }
+
+  .container {
+    padding: 1em;
+    max-width: 100%;
+  }
+
+  .card {
+    width: 4.5em;
+  }
+}

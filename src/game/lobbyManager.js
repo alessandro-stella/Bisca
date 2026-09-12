@@ -112,21 +112,21 @@ function addPlayer(lobbyId, userId, username) {
   if (!lobby) {
     return {
       success: false,
-      error: "missing lobby",
+      error: "Il tavolo a cui vuoi unirti non esiste",
     };
   }
 
   if (lobby.started) {
     return {
       success: false,
-      error: "game already started",
+      error: "La partita è già iniziata",
     };
   }
 
   if (lobby.players.size >= lobby.maxPlayers) {
     return {
       success: false,
-      error: "lobby full",
+      error: "Il tavolo è al completo",
     };
   }
 
@@ -135,7 +135,7 @@ function addPlayer(lobbyId, userId, username) {
   if (currentLobby) {
     return {
       success: false,
-      error: "already in a lobby",
+      error: "Sei già in un tavolo",
     };
   }
 

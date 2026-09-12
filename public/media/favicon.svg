@@ -31,9 +31,13 @@
      inkscape:current-layer="svg2" />
   <style
      id="style1">path {
-      fill: #ffffff;
+      fill: #000000;
     }
-  </style>
+    @media (prefers-color-scheme: dark) {
+      path {
+        fill: #ffffff;
+      }
+    }</style>
   <g
      transform="matrix(0.10875098,0,0,-0.10875098,-69.658404,412.75178)"
      stroke="none"
