@@ -5,6 +5,7 @@ const http = require("http");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 const { Server } = require("socket.io");
 
 const db = require("./db");
@@ -33,8 +34,31 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
 
+const SERVER_START_TIME = Date.now().toString();
+
 app.use("/api/user", userRouter);
 app.use("/api/session", sessionRouter);
+
+app.get("/sw.js", (_, res) => {
+  const swPath = path.join(__dirname, "../public/sw.js");
+
+  fs.readFile(swPath, "utf8", (err, data) => {
+    if (err) {
+      res.status(500).send("Errore nel caricamento del Service Worker");
+      return;
+    }
+
+    const modifiedSw = data.replace("{{SERVER_VERSION}}", SERVER_START_TIME);
+
+    res.setHeader("Content-Type", "application/javascript");
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate",
+    );
+
+    res.send(modifiedSw);
+  });
+});
 
 app.use(
   express.static(path.join(__dirname, "../public"), {

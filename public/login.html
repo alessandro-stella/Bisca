@@ -3,8 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <link rel="icon" type="image/x-icon" href="./media/logo.svg" />
+
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1e1c1a" />
+
+    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) =>
+              console.log("Service Worker registered successfully!", reg),
+            )
+            .catch((err) =>
+              console.error("Error during Service Worker registration:", err),
+            );
+        });
+      }
+    </script>
 
     <title>BISCA | Accesso</title>
 

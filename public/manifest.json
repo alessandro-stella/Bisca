@@ -1,0 +1,26 @@
+{
+  "name": "Bisca",
+  "short_name": "Bisca",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#302e2b",
+  "theme_color": "#1e1c1a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/media/app/logo_dark.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/media/app/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/media/app/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
