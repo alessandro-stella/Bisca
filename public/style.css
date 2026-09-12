@@ -81,6 +81,7 @@ body {
   background-color: var(--bg-page);
   color: var(--text-main);
   line-height: 1.6;
+  min-height: 100vh;
 }
 
 @keyframes spin {

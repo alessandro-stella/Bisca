@@ -99,4 +99,12 @@ ul {
 
     gap: 0.5em;
   }
+
+  .ruleCard {
+    padding: 1em;
+  }
+
+  .ruleCard h2 {
+    margin-bottom: 0.25em;
+  }
 }
