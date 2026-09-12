@@ -29,6 +29,7 @@ window.addEventListener("beforeunload", () => {
 });
 
 let heartbeatInterval;
+let resolvingTimeout;
 
 function startHeartbeat() {
   stopHeartbeat();
@@ -95,13 +96,33 @@ function renderGameState(game) {
     return;
   }
 
+  if (game.turnPhase === "resolving") {
+    if (!resolvingTimeout) {
+      resolvingTimeout = setTimeout(() => {
+        socket.emit("game:get-state");
+        resolvingTimeout = null;
+      }, 3000);
+    }
+  } else {
+    if (resolvingTimeout) {
+      clearTimeout(resolvingTimeout);
+      resolvingTimeout = null;
+    }
+  }
+
   document.getElementById("cardsTitle").textContent = game.showdown
     ? "Carte degli avversari"
     : "Le mie carte";
 
-  document.getElementById("gameStatus").textContent = game.showdown
-    ? `Stato corrente: ${game.turnPhase} (showdown - guarda le carte degli avversari)`
-    : `Stato corrente: ${game.turnPhase}`;
+  let phaseText = game.turnPhase;
+  if (game.turnPhase === "resolving") {
+    phaseText = "risoluzione turno...";
+  } else if (game.showdown) {
+    phaseText = `${game.turnPhase} (showdown - guarda le carte degli avversari)`;
+  }
+
+  document.getElementById("gameStatus").textContent =
+    `Stato corrente: ${phaseText}`;
 
   document.getElementById("myUsername").textContent = `Tu: ${game.myUsername}`;
 
@@ -111,7 +132,9 @@ function renderGameState(game) {
 
   createPlayerInfo(game);
 
-  createCards(game.hand, "myCardsContainer", !game.showdown);
+  const canPlayCards = !game.showdown && game.turnPhase !== "resolving";
+
+  createCards(game.hand, "myCardsContainer", canPlayCards);
   createCards(
     game.playedCards.map((cardValues) => cardValues.card),
     "playedCardsContainer",
@@ -121,6 +144,8 @@ function renderGameState(game) {
 
   if (game.turnPhase === "bidding" && game.isMyTurn) {
     createBidButtons(game, bidButtonsContainer);
+  } else {
+    bidButtonsContainer.innerHTML = "";
   }
 }
 
@@ -197,7 +222,7 @@ function createPlayerInfo(game) {
       text += ` - ${isMe ? "hai scommesso" : "scommette"} ${player.bid} prese`;
     }
 
-    if (game.turnPhase === "play") {
+    if (game.turnPhase === "play" || game.turnPhase === "resolving") {
       text += ` - vinte ${player.won} mani finora`;
     }
 

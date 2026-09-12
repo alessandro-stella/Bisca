@@ -1,6 +1,7 @@
 const db = require("../db");
 const { calculateAndUpdateElo } = require("./eloManager");
 
+const TURN_DELAY_MS = 3000;
 const games = new Map();
 
 function getRandomizedDeck() {
@@ -226,7 +227,6 @@ function placeBid(game, playerId, bid) {
     return false;
   }
 
-  // Skip denied bidding rule when in showdown
   if (!game.showdown && playerId === game.lastPlayer) {
     const forbiddenBid = handSize - game.totalBids;
 
@@ -257,7 +257,7 @@ function placeBid(game, playerId, bid) {
   return true;
 }
 
-function playCard(game, playerId, card) {
+async function playCard(game, playerId, card) {
   if (game.turnPhase !== "play") {
     return;
   }
@@ -302,7 +302,7 @@ function playCard(game, playerId, card) {
   const alivePlayers = getAlivePlayers(game);
 
   if (game.playedCards.size === alivePlayers.length) {
-    return updateScore(game);
+    return await updateScore(game);
   }
 
   nextPlayer(game, playerId);
@@ -339,7 +339,7 @@ function getCardValue(card) {
   }
 }
 
-function updateScore(game) {
+async function updateScore(game) {
   const playedCards = Array.from(game.playedCards.entries());
 
   if (playedCards.length === 0) {
@@ -355,6 +355,16 @@ function updateScore(game) {
   }
 
   const winnerId = highestCard[0];
+
+  game.turnPhase = "resolving";
+
+  await new Promise((resolve) => setTimeout(resolve, TURN_DELAY_MS));
+
+  if (game.turnPhase !== "resolving") {
+    return;
+  }
+
+  game.turnPhase = "play";
 
   game.playedCards.clear();
   game.currentPlayer = winnerId;
@@ -479,7 +489,7 @@ function assignPlayersPosition(game, playerIds) {
   game.nextPosition -= players.length;
 }
 
-function resolveShowdown(game) {
+async function resolveShowdown(game) {
   if (!game.showdown || game.turnPhase !== "play") {
     return null;
   }
@@ -495,7 +505,7 @@ function resolveShowdown(game) {
     }
 
     const card = hand[0];
-    const stepResult = playCard(game, playerId, card);
+    const stepResult = await playCard(game, playerId, card);
 
     if (stepResult) {
       result = stepResult;
@@ -616,6 +626,8 @@ async function saveGameData(game) {
     await calculateAndUpdateElo(gameId, playersForElo);
   } catch (error) {
     await dbClient.query("ROLLBACK");
+
+    console.error("Error in saveGameData & ELO calculation:", error);
 
     throw error;
   } finally {
