@@ -29,14 +29,14 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log(
-        `[Service Worker] Scarico tutti i file per la nuova versione: ${CACHE_NAME}`,
+        `[Service Worker] Downloading files for new version: ${CACHE_NAME}`,
       );
 
       return Promise.all(
         urlsToCache.map((url) => {
           return fetch(new Request(url, { cache: "reload" })).then(
             (response) => {
-              if (!response.ok) throw new Error(`Impossibile scaricare ${url}`);
+              if (!response.ok) throw new Error(`Can't download ${url}`);
               return cache.put(url, response);
             },
           );
@@ -54,9 +54,7 @@ self.addEventListener("activate", (event) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (cacheName !== CACHE_NAME) {
-              console.log(
-                `[Service Worker] Elimino la vecchia cache: ${cacheName}`,
-              );
+              console.log(`[Service Worker] Deleting old cache: ${cacheName}`);
               return caches.delete(cacheName);
             }
           }),
