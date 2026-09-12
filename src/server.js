@@ -40,22 +40,35 @@ app.use("/api/user", userRouter);
 app.use("/api/session", sessionRouter);
 
 app.get("/sw.js", (_, res) => {
+  res.setHeader("Content-Type", "application/javascript");
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate",
+  );
+
+  if (process.env.NODE_ENV === "development") {
+    const killSwitch = `
+      self.addEventListener('install', e => self.skipWaiting());
+      self.addEventListener('activate', e => {
+        e.waitUntil(
+          caches.keys()
+            .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+            .then(() => self.registration.unregister())
+        );
+      });
+    `;
+    return res.send(killSwitch);
+  }
+
   const swPath = path.join(__dirname, "../public/sw.js");
 
   fs.readFile(swPath, "utf8", (err, data) => {
     if (err) {
-      res.status(500).send("Errore nel caricamento del Service Worker");
+      res.status(500).send("Error during Service Worker loading");
       return;
     }
 
     const modifiedSw = data.replace("{{SERVER_VERSION}}", SERVER_START_TIME);
-
-    res.setHeader("Content-Type", "application/javascript");
-    res.setHeader(
-      "Cache-Control",
-      "no-store, no-cache, must-revalidate, proxy-revalidate",
-    );
-
     res.send(modifiedSw);
   });
 });
