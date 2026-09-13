@@ -67,7 +67,8 @@ const DOM = {
   updateLobbyButton: document.getElementById("updateLobbyButton"),
   deleteLobbyButton: document.getElementById("deleteLobbyButton"),
   applyFiltersButton: document.getElementById("applyFilters"),
-  quitLobbyButton: document.getElementById("quitButtonMobile"),
+  quitLobbyDesktop: document.getElementById("quitButtonDesktop"),
+  quitLobbyMobile: document.getElementById("quitButtonMobile"),
 
   lobbiesGrid: document.getElementById("lobbiesGrid"),
   createLobbyContainer: document.getElementById("createLobbyContainer"),
@@ -160,8 +161,14 @@ function setupSocket() {
     socket.emit("lobby:delete"),
   );
 
-  DOM.quitLobbyButton.addEventListener("click", () => {
+  DOM.quitLobbyMobile.addEventListener("click", () => {
     socket.emit("lobby:leave");
+    DOM.quitLobbyDesktop.hidden = true;
+  });
+
+  DOM.quitLobbyDesktop.addEventListener("click", () => {
+    socket.emit("lobby:leave");
+    DOM.quitLobbyDesktop.hidden = true;
   });
 
   socket.on("lobby:create:error", (data) => {
@@ -350,20 +357,31 @@ function renderLobbies(lobbies) {
       card.classList.add("lobbyClosed");
     }
 
-    const nameEl = document.createElement("div");
-    nameEl.classList.add("lobbyCell", "lobbyName");
-    nameEl.textContent = lobby.name;
+    const nameWrapperEl = document.createElement("div");
+    nameWrapperEl.classList.add("lobbyCell", "lobbyNameWrapper");
+
+    if (lobby.hasPassword) {
+      const lockIcon = document.createElement("i");
+      lockIcon.classList.add("icon", "fa-solid", "fa-lock", "lockIcon");
+      nameWrapperEl.appendChild(lockIcon);
+    }
+
+    const nameTextEl = document.createElement("span");
+    nameTextEl.classList.add("lobbyName");
+    nameTextEl.textContent = lobby.name;
+
+    nameWrapperEl.appendChild(nameTextEl);
 
     const ownerEl = document.createElement("div");
     ownerEl.classList.add("lobbyCell", "lobbyOwner");
     ownerEl.textContent = lobby.ownerUsername;
 
     const livesEl = document.createElement("div");
-    livesEl.classList.add("lobbyCell", "lobbyLives", "mobileHidden");
+    livesEl.classList.add("lobbyCell", "lobbyLives");
     livesEl.textContent = lobby.startingLives;
 
     const cardsEl = document.createElement("div");
-    cardsEl.classList.add("lobbyCell", "lobbyCards", "mobileHidden");
+    cardsEl.classList.add("lobbyCell", "lobbyCards");
     cardsEl.textContent = lobby.initialCards;
 
     const playersEl = document.createElement("div");
@@ -376,7 +394,7 @@ function renderLobbies(lobbies) {
     statusEl.classList.add("lobbyCell", "lobbyStatus");
     statusEl.textContent = lobby.started ? "IN CORSO" : "In attesa";
 
-    card.appendChild(nameEl);
+    card.appendChild(nameWrapperEl);
     card.appendChild(ownerEl);
     card.appendChild(livesEl);
     card.appendChild(cardsEl);
@@ -390,16 +408,7 @@ function renderLobbies(lobbies) {
       if (!lobby.isOwner) {
         blockCreateTable();
 
-        const quitButton = document.createElement("button");
-        quitButton.id = "quitButtonDesktop";
-        quitButton.classList.add("secondaryButton");
-        quitButton.addEventListener("click", (e) => {
-          e.stopPropagation();
-          socket.emit("lobby:leave");
-        });
-        quitButton.innerHTML =
-          '<i class="icon fa-solid fa-arrow-right-from-bracket"></i>';
-        statusEl.appendChild(quitButton);
+        DOM.quitLobbyDesktop.hidden = false;
 
         showQuitButton();
       }
@@ -429,12 +438,12 @@ function renderLobbies(lobbies) {
 
 function showQuitButton() {
   DOM.createLobbyPopupButton.hidden = true;
-  DOM.quitLobbyButton.hidden = false;
+  DOM.quitLobbyMobile.hidden = false;
 }
 
 function hideQuitButton() {
   DOM.createLobbyPopupButton.hidden = false;
-  DOM.quitLobbyButton.hidden = true;
+  DOM.quitLobbyMobile.hidden = true;
 }
 
 function blockCreateTable() {

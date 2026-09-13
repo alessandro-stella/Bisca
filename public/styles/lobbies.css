@@ -17,7 +17,7 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 10;
+  z-index: 1;
 }
 
 #joinLobbyPopup {
@@ -37,13 +37,8 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 11;
+  z-index: 2;
   min-width: 350px;
-}
-
-.popupSubtitle {
-  font-size: 0.9em;
-  opacity: 0.8;
 }
 
 #joinLobbyButtons {
@@ -87,6 +82,10 @@ body {
   font-size: 1.25em;
   color: var(--text-primary);
   font-weight: bold;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 #filterLobbies {
@@ -279,12 +278,25 @@ body {
   opacity: 0.6;
 }
 
+.lobbyNameWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.lockIcon {
+  flex-shrink: 0;
+  font-size: 0.9em;
+}
+
 .lobbyName,
 .lobbyOwner {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-align: left;
+  min-width: 0;
 }
 
 .lobbyLives,
@@ -333,11 +345,15 @@ body {
 }
 
 #quitButtonDesktop {
-  padding: 0.35em 0.55em;
-  border-radius: 0.35em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-size: initial;
+  font-weight: initial;
+
+  border-radius: 0.25em;
+  padding: 0 1em;
+}
+
+#quitButtonDesktop:hover {
+  color: var(--bg-card);
 }
 
 /* Properties for mobile */
@@ -392,9 +408,6 @@ body {
 
   #lobbiesContainer .title {
     padding: 0.7em;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     border-bottom: 1px solid var(--divider-line);
   }
 
@@ -431,9 +444,12 @@ body {
     background: transparent !important;
   }
 
-  .lobbyItem .lobbyName {
+  .lobbyItem .lobbyNameWrapper {
     order: 1;
     flex: 1 1 auto;
+  }
+
+  .lobbyItem .lobbyName {
     font-size: 1.2em;
     font-weight: bold;
     color: var(--text-primary);
@@ -459,10 +475,6 @@ body {
     content: "Creato da:\00a0";
   }
 
-  .lobbyItem .mobileHidden {
-    display: inline-flex !important;
-  }
-
   .lobbyItem .lobbyLives {
     order: 4;
     font-size: 0.8em;
@@ -471,7 +483,8 @@ body {
   }
 
   .lobbyItem .lobbyLives::before {
-    content: "Vite:\00a0";
+    content: "Vite:";
+    margin-right: 0.125em;
   }
 
   .lobbyItem .lobbyCards {
@@ -483,7 +496,8 @@ body {
   }
 
   .lobbyItem .lobbyCards::before {
-    content: "• Carte:\00a0";
+    content: "Carte:";
+    margin-right: 0.125em;
   }
 
   .lobbyItem .lobbyPlayers {
@@ -496,7 +510,8 @@ body {
   }
 
   .lobbyItem .lobbyPlayers::before {
-    content: "Giocatori:\00a0";
+    content: "Giocatori:";
+    margin-right: 0.25em;
     font-weight: normal;
     color: var(--text-secondary);
   }
