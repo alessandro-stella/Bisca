@@ -98,13 +98,13 @@ function setupSockets(io) {
       }
     });
 
-    socket.on("lobby:join", (lobbyId) => {
+    socket.on("lobby:join", (lobbyId, password) => {
       const validation = validators.validateLobbyId(lobbyId);
       if (!validation.valid) {
         socket.emit("error", { message: validation.message });
         return;
       }
-      joinLobby(lobbyId, socket, io);
+      joinLobby(lobbyId, socket, io, password);
     });
 
     socket.on("lobby:leave", () => {

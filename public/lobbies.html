@@ -63,6 +63,36 @@
 
     <div id="backdrop" class=""></div>
 
+    <div id="joinLobbyPopup">
+      <div class="title">Tavolo Privato</div>
+
+      <div class="inputWithError">
+        <div class="inputWithIcon inputPassword">
+          <i class="icon fa-solid fa-lock"></i>
+          <input
+            id="joinPasswordInput"
+            type="password"
+            placeholder="Password del tavolo"
+          />
+          <div id="showJoinPassword" class="iconContainer">
+            <i class="icon fa-solid fa-eye-slash"></i>
+          </div>
+        </div>
+        <div id="joinPasswordError" class="inputError" hidden>
+          Password errata. Riprova.
+        </div>
+      </div>
+
+      <div id="joinLobbyButtons">
+        <button id="cancelJoinButton" class="secondaryButton">
+          <p>Annulla</p>
+        </button>
+        <button id="confirmJoinButton" class="primaryButton">
+          <p>Entra</p>
+        </button>
+      </div>
+    </div>
+
     <div id="baseContainer">
       <div id="leftColumn" class="">
         <div id="filterLobbies">

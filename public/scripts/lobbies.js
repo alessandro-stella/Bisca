@@ -1,5 +1,6 @@
 let currentUser = null;
 let socket = null;
+let pendingLobbyId = null;
 
 function getOrCreateDeviceId() {
   let id = localStorage.getItem("bisca_device_id");
@@ -21,11 +22,22 @@ window.addEventListener("beforeunload", () => {
 });
 
 const DOM = {
-  nameInput: document.getElementById("nameInput"),
-  playersInput: document.getElementById("playersInput"),
-  livesInput: document.getElementById("livesInput"),
-  cardsInput: document.getElementById("cardsInput"),
-  passwordInput: document.getElementById("passwordInput"),
+  nameInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("nameInput")
+  ),
+  playersInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("playersInput")
+  ),
+  livesInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("livesInput")
+  ),
+  cardsInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("cardsInput")
+  ),
+  passwordInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("passwordInput")
+  ),
+  showPassword: document.getElementById("showPassword"),
 
   nameInputError: document.getElementById("nameInputError"),
   playersInputError: document.getElementById("playersInputError"),
@@ -37,8 +49,12 @@ const DOM = {
   livesInputContainer: document.getElementById("livesInputContainer"),
   cardsInputContainer: document.getElementById("cardsInputContainer"),
 
-  searchInput: document.getElementById("searchInput"),
-  ownerInput: document.getElementById("ownerInput"),
+  searchInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("searchInput")
+  ),
+  ownerInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("ownerInput")
+  ),
 
   filterPublic: document.getElementById("onlyPublic"),
   filterPrivate: document.getElementById("onlyPrivate"),
@@ -59,6 +75,15 @@ const DOM = {
   ownerButtonsContainer: document.getElementById("ownerButtonsContainer"),
   leftColumn: document.getElementById("leftColumn"),
   backdrop: document.getElementById("backdrop"),
+
+  joinLobbyPopup: document.getElementById("joinLobbyPopup"),
+  joinPasswordInput: /** @type {HTMLInputElement} */ (
+    document.getElementById("joinPasswordInput")
+  ),
+  showJoinPassword: document.getElementById("showJoinPassword"),
+  joinPasswordError: document.getElementById("joinPasswordError"),
+  cancelJoinButton: document.getElementById("cancelJoinButton"),
+  confirmJoinButton: document.getElementById("confirmJoinButton"),
 };
 
 window.addEventListener("pageshow", () => {
@@ -153,7 +178,12 @@ function setupSocket() {
   });
 
   socket.on("lobby:join:error", (data) => {
-    window.alert(data.message);
+    if (DOM.joinLobbyPopup && DOM.joinLobbyPopup.classList.contains("shown")) {
+      DOM.joinPasswordError.textContent = data.message;
+      DOM.joinPasswordError.hidden = false;
+    } else {
+      window.alert(data.message);
+    }
   });
 
   socket.on("lobby:update:error", (data) => {
@@ -310,6 +340,7 @@ function renderLobbies(lobbies) {
 
   switchLobbySettings(filteredLobbies[0].isOwner);
   let inLobby = false;
+  const isCurrentlyInLobby = filteredLobbies.some((lobby) => lobby.isConnected);
 
   for (const lobby of filteredLobbies) {
     const card = document.createElement("div");
@@ -373,10 +404,18 @@ function renderLobbies(lobbies) {
         showQuitButton();
       }
     } else {
-      card.addEventListener("click", () => {
-        socket.emit("lobby:join", lobby.id);
-        blockCreateTable();
-      });
+      if (!isCurrentlyInLobby) {
+        card.addEventListener("click", () => {
+          if (lobby.hasPassword) {
+            openPasswordPopup(lobby.id);
+          } else {
+            socket.emit("lobby:join", lobby.id);
+            blockCreateTable();
+          }
+        });
+      } else {
+        card.classList.add("unclickable");
+      }
     }
 
     DOM.lobbiesGrid.appendChild(card);
@@ -437,6 +476,20 @@ DOM.backdrop.addEventListener("click", closePopup);
 DOM.createLobbyPopupButton.addEventListener("click", openCreatePopup);
 DOM.filterLobbyPopupButton.addEventListener("click", openFilterPopup);
 
+function openPasswordPopup(lobbyId) {
+  pendingLobbyId = lobbyId;
+  DOM.joinPasswordInput.value = "";
+  DOM.joinPasswordError.hidden = true;
+  DOM.joinPasswordInput.type = "password";
+  DOM.showJoinPassword.querySelector(".icon").className =
+    "icon fa-solid fa-eye-slash";
+
+  DOM.backdrop.classList.add("shown");
+  DOM.joinLobbyPopup.classList.add("shown");
+
+  setTimeout(() => DOM.joinPasswordInput.focus(), 100);
+}
+
 function openPopup() {
   DOM.leftColumn.classList.add("shown");
   DOM.backdrop.classList.add("shown");
@@ -448,6 +501,61 @@ function closePopup() {
 
   DOM.filterLobbiesSection.classList.add("hidden");
   DOM.createLobbyContainer.classList.add("hidden");
+
+  if (DOM.joinLobbyPopup) {
+    DOM.joinLobbyPopup.classList.remove("shown");
+  }
+  pendingLobbyId = null;
+}
+
+if (DOM.cancelJoinButton) {
+  DOM.cancelJoinButton.addEventListener("click", closePopup);
+}
+
+if (DOM.showPassword) {
+  DOM.showPassword.addEventListener("click", () => {
+    const iconSvg = DOM.showPassword.getElementsByTagName("svg")[0];
+    iconSvg.classList.toggle("fa-eye-slash");
+    iconSvg.classList.toggle("fa-eye");
+
+    DOM.passwordInput.type =
+      DOM.passwordInput.type === "password" ? "text" : "password";
+  });
+}
+
+if (DOM.showJoinPassword) {
+  DOM.showJoinPassword.addEventListener("click", () => {
+    const iconSvg = DOM.showJoinPassword.getElementsByTagName("svg")[0];
+    iconSvg.classList.toggle("fa-eye-slash");
+    iconSvg.classList.toggle("fa-eye");
+
+    DOM.joinPasswordInput.type =
+      DOM.joinPasswordInput.type === "password" ? "text" : "password";
+  });
+}
+
+if (DOM.confirmJoinButton) {
+  DOM.confirmJoinButton.addEventListener("click", () => {
+    const password = DOM.joinPasswordInput.value.trim();
+
+    if (!password) {
+      DOM.joinPasswordError.textContent = "Inserisci la password per entrare.";
+      DOM.joinPasswordError.hidden = false;
+      return;
+    }
+
+    DOM.joinPasswordError.hidden = true;
+    socket.emit("lobby:join", pendingLobbyId, password);
+    blockCreateTable();
+  });
+}
+
+if (DOM.joinPasswordInput) {
+  DOM.joinPasswordInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      DOM.confirmJoinButton.click();
+    }
+  });
 }
 
 function openCreatePopup() {
@@ -489,3 +597,23 @@ function resetErrors() {
     field.container.classList.remove("error");
   }
 }
+
+// Add focus on field when its container is clicked
+document.querySelectorAll(".inputWithIcon").forEach((container) => {
+  container.addEventListener("click", (e) => {
+    if (e.target.closest(".iconContainer")) {
+      return;
+    }
+
+    const input = container.querySelector("input");
+    if (input) {
+      input.focus();
+    }
+  });
+});
+
+document.querySelectorAll(".iconContainer").forEach((iconDiv) => {
+  iconDiv.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+  });
+});

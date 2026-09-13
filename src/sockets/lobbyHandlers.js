@@ -238,7 +238,7 @@ function handleDeleteLobby(lobbyId, socket, io, reconnectTimers) {
     clearReconnectTimer(userId, reconnectTimers);
   }
 
-  io.to(room).emit("lobby:deleted");
+  socket.to(room).emit("lobby:deleted");
   io.in(room).socketsLeave(room);
 
   deleteLobby(lobbyId);
