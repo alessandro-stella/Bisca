@@ -42,32 +42,19 @@
   </head>
 
   <body>
-    <div class="container">
-      <h1>Partita</h1>
-
-      <p id="gameStatus">Connecting to the game...</p>
-
-      <p id="currentPlayer">Turn: ...</p>
-
-      <p id="myUsername"></p>
-    </div>
-
-    <div class="container">
-      <div id="livesContainer"></div>
-    </div>
-
-    <div class="container">
-      <div id="cardsTitle">Le mie carte</div>
-      <div id="myCardsContainer" class="cardsContainer"></div>
-    </div>
-
-    <div class="container">
-      <div>Carte giocate</div>
-      <div id="playedCardsContainer" class="cardsContainer"></div>
-    </div>
-
-    <div class="container">
-      <div id="bidButtonsContainer"></div>
+    <div id="baseContainer">
+      <div id="table"></div>
+      <div id="myHand">
+        <div id="myCards"></div>
+        <div id="myStats">
+          <div id="myUsername">Sup3r_</div>
+          <div id="myLives">2</div>
+          <div id="myBids">
+            <div id="myWon">1</div>
+            <div id="myTotal">3</div>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>

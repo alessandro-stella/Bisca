@@ -26,7 +26,7 @@ body {
 
 #joinLobbyPopup.shown {
   background-color: var(--bg-card);
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--shadow);
   border-radius: 0.25em;
   padding: 1em;
   display: flex;
@@ -69,7 +69,7 @@ body {
 #leftColumn,
 #rightColumn {
   background-color: var(--bg-card);
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--shadow);
   border-radius: 0.25em;
   padding: 1em;
   display: flex;
@@ -231,7 +231,6 @@ body {
 .gridHeader {
   position: sticky;
   top: 0;
-  z-index: 2;
   background-color: var(--rows-even);
   color: var(--text-primary);
   font-weight: bold;

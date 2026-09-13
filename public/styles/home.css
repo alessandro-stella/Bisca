@@ -42,7 +42,7 @@ ul {
   background: var(--bg-card);
   border-radius: 0.5em;
   padding: 1.875em;
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--shadow);
 }
 
 .ruleCard h2 {

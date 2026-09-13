@@ -86,67 +86,15 @@ socket.on("game:reconnect", () => {
 
 socket.on("game:not-found", () => {
   console.log("Game not found");
-  window.location.replace("/lobbies.html");
+  // window.location.replace("/lobbies.html");
+
+  renderGameState();
 });
 
 function renderGameState(game) {
-  if (game.turnPhase === "finished") {
-    document.getElementById("gameStatus").textContent =
-      "La partita è conclusa!";
-    return;
-  }
+  const testCards = ["coppe1", "bastoni4", "denari7", "spade3", "coppe9"];
 
-  if (game.turnPhase === "resolving") {
-    if (!resolvingTimeout) {
-      resolvingTimeout = setTimeout(() => {
-        socket.emit("game:get-state");
-        resolvingTimeout = null;
-      }, 3000);
-    }
-  } else {
-    if (resolvingTimeout) {
-      clearTimeout(resolvingTimeout);
-      resolvingTimeout = null;
-    }
-  }
-
-  document.getElementById("cardsTitle").textContent = game.showdown
-    ? "Carte degli avversari"
-    : "Le mie carte";
-
-  let phaseText = game.turnPhase;
-  if (game.turnPhase === "resolving") {
-    phaseText = "risoluzione turno...";
-  } else if (game.showdown) {
-    phaseText = `${game.turnPhase} (showdown - guarda le carte degli avversari)`;
-  }
-
-  document.getElementById("gameStatus").textContent =
-    `Stato corrente: ${phaseText}`;
-
-  document.getElementById("myUsername").textContent = `Tu: ${game.myUsername}`;
-
-  document.getElementById("currentPlayer").textContent = game.isMyTurn
-    ? `Current player: ${game.currentPlayer} (tu)`
-    : `Current player: ${game.currentPlayer}`;
-
-  createPlayerInfo(game);
-
-  const canPlayCards = !game.showdown && game.turnPhase !== "resolving";
-
-  createCards(game.hand, "myCardsContainer", canPlayCards);
-  createCards(
-    game.playedCards.map((cardValues) => cardValues.card),
-    "playedCardsContainer",
-  );
-
-  const bidButtonsContainer = document.getElementById("bidButtonsContainer");
-
-  if (game.turnPhase === "bidding" && game.isMyTurn) {
-    createBidButtons(game, bidButtonsContainer);
-  } else {
-    bidButtonsContainer.innerHTML = "";
-  }
+  createCards(testCards, "myCards", false);
 }
 
 socket.on("game:state", (game) => {
@@ -189,57 +137,6 @@ document.addEventListener("visibilitychange", () => {
     socket.emit("game:get-state");
   }
 });
-
-function createPlayerInfo(game) {
-  const container = document.getElementById("livesContainer");
-  container.innerHTML = "";
-
-  for (const player of game.players) {
-    const row = document.createElement("div");
-    row.classList.add("playerInfo");
-
-    const isMe = player.username === game.myUsername;
-
-    if (isMe) {
-      row.classList.add("myInfo");
-    }
-
-    let text = `${isMe ? "* " : ""}${player.username}: ${player.lives} vite`;
-
-    if (player.bid === -1) {
-      if (isMe) {
-        text +=
-          game.currentPlayer === player.username
-            ? " - Scegli quanto scommettere"
-            : " - Attendi il tuo turno";
-      } else {
-        text +=
-          game.currentPlayer === player.username
-            ? " - Sta decidendo quanto scommettere"
-            : " - Attende il suo turno";
-      }
-    } else {
-      text += ` - ${isMe ? "hai scommesso" : "scommette"} ${player.bid} prese`;
-    }
-
-    if (game.turnPhase === "play" || game.turnPhase === "resolving") {
-      text += ` - vinte ${player.won} mani finora`;
-    }
-
-    if (!player.connected) {
-      if (player.lives > 0) {
-        text += " [Disconnesso in attesa...]";
-      } else {
-        text += " [Disconnesso]";
-      }
-      row.style.opacity = "0.5";
-      row.style.fontStyle = "italic";
-    }
-
-    row.textContent = text;
-    container.appendChild(row);
-  }
-}
 
 function createBidButtons(game, container) {
   container.innerHTML = "";
@@ -369,6 +266,40 @@ function createCards(cards, containerId, eventListener = false) {
 
     cardsContainer.appendChild(newCard);
   }
+
+  updateCardAngles();
+}
+
+function updateCardAngles() {
+  const cards = document.querySelectorAll("#myCards .card");
+  const total = cards.length;
+
+  if (total === 0) return;
+
+  if (total === 1) {
+    cards[0].style.setProperty("--card-x", "0px");
+    cards[0].style.setProperty("--card-angle", "0deg");
+    cards[0].style.setProperty("--card-y", "0px");
+    return;
+  }
+
+  const maxAngle = 40;
+  const angleStep = maxAngle / (total - 1);
+
+  const containerWidth = Math.min(window.innerWidth * 0.8, 300);
+  const xStep = containerWidth / (total - 1);
+
+  cards.forEach((card, index) => {
+    const angle = index * angleStep - maxAngle / 2;
+    const yOffset = Math.pow(angle, 2) * 0.04;
+
+    const xOffset = index * xStep - containerWidth / 2;
+
+    card.style.setProperty("--card-x", `${xOffset}px`);
+    card.style.setProperty("--card-angle", `${angle}deg`);
+    card.style.setProperty("--card-y", `${yOffset}px`);
+    card.style.zIndex = index;
+  });
 }
 
 socket.on("lobby:deleted", () => {

@@ -102,13 +102,13 @@ function getPlayerGameState(game, playerId) {
   let hand = game.hands.get(playerId);
 
   if (game.showdown) {
-    hand = [];
-
-    for (const [opponentId, opponentHand] of game.hands.entries()) {
-      if (opponentId === playerId) continue;
-
-      hand.push(opponentHand[0]);
-    }
+    hand = Array.from(game.hands.entries())
+      .filter(([opponentId]) => opponentId !== playerId)
+      .map(([opponentId, opponentHand]) => ({
+        card: opponentHand[0],
+        opponentId,
+        opponentUsername: game.players.get(opponentId)?.username || "Unknown",
+      }));
   }
 
   return {
@@ -116,12 +116,25 @@ function getPlayerGameState(game, playerId) {
     totalBids: game.totalBids,
     showdown: game.showdown,
 
-    players: Array.from(game.players.values()),
-    playedCards: Array.from(game.playedCards.values()),
+    players: Array.from(game.players.entries()).map(([pId, playerData]) => ({
+      playerId: pId,
+      ...playerData,
+      isMe: pId === playerId,
+    })),
+
+    playedCards: Array.from(game.playedCards.entries()).map(([pId, cardData]) => ({
+      playerId: pId,
+      playerUsername: game.players.get(pId)?.username || "Unknown",
+      card: cardData.card,
+      value: cardData.value,
+    })),
 
     currentPlayer: game.players.get(game.currentPlayer)?.username || "",
+    currentPlayerId: game.currentPlayer,
 
     myUsername: game.players.get(playerId).username,
+    myPlayerId: playerId,
+
     hand,
 
     isMyTurn: game.currentPlayer === playerId,
