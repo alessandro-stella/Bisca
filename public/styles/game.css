@@ -6,7 +6,7 @@
   overflow: hidden;
 }
 
-#table,
+#tableContainer,
 #myHand {
   width: 65em;
   max-width: 90%;
@@ -14,9 +14,135 @@
   min-height: 0;
 }
 
-#table {
+#tableContainer {
   background-color: blue;
   flex: 4;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#table {
+  height: 80%;
+  aspect-ratio: 1/1;
+  background-color: yellow;
+
+  position: relative;
+  border-radius: 50%;
+
+  border: 0.25em solid var(--bg-dark);
+}
+
+#table::before {
+  content: "";
+  position: absolute;
+
+  height: 80%;
+  width: 80%;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  -webkit-mask-image: url("../media/logo.svg");
+  mask-image: url("../media/logo.svg");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  background-color: var(--bg-page);
+  filter: brightness(1.1);
+}
+
+#table .tableSeat {
+  position: absolute;
+
+  width: 120%;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(var(--angle));
+
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 2.5em;
+}
+
+#table .tableSeat .opponentInfo {
+  transform: rotate(calc(-1 * var(--angle)));
+}
+
+#table .tableSeat .playedCard {
+  transform: rotate(90deg);
+}
+
+.opponentInfo {
+  background-color: blueviolet;
+
+  display: flex;
+  flex-direction: column;
+  padding: 0.5em;
+  border-radius: 0.25em;
+
+  height: fit-content;
+}
+
+.opponentInfo .avatar {
+  width: 60%;
+  aspect-ratio: 1/1;
+  background-color: pink;
+
+  margin: 0 auto;
+
+  display: grid;
+  place-content: center;
+
+  border-radius: 50%;
+  border: 2px solid red;
+}
+
+.opponentInfo.currentPlayer .avatar {
+  border-color: var(--brand-green) !important;
+}
+
+.opponentInfo .username {
+  background-color: palevioletred;
+  text-align: center;
+}
+
+.opponentInfo .stats {
+  display: flex;
+  gap: 0.5em;
+}
+
+.opponentInfo .lives,
+.opponentInfo .bids {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.opponentInfo .lives {
+  background-color: yellowgreen;
+}
+
+.opponentInfo .bids {
+  background-color: magenta;
+}
+
+.opponentInfo .bidsIcon {
+  content: "";
+  height: 0.8lh;
+  aspect-ratio: 1/1.6;
+  background-color: blue;
+
+  border-radius: 0.125em;
 }
 
 #myHand {
@@ -42,9 +168,6 @@
   width: auto;
   object-fit: contain;
 
-  border-radius: 0.2em;
-
-  box-shadow: var(--shadow);
   transition: all 0.2s ease-in-out;
 }
 
@@ -54,13 +177,38 @@
   cursor: pointer;
 }
 
+/* ============================ */
+/* General properties for cards */
+/* ============================ */
+
+.card {
+  border-radius: 5%;
+  box-shadow: var(--shadow);
+}
+
+.playedCard {
+  height: 15vh;
+}
+
+.opponentSeat .playedCard {
+  height: 10vh;
+}
+
 /* Properties for mobile */
 @media (max-width: 768px) {
-  #table,
+  #tableContainer,
   #myHand {
     width: 100%;
     max-width: 100%;
     margin: 0;
+  }
+
+  #table {
+    height: 70%;
+  }
+
+  #table .tableSeat {
+    width: 125%;
   }
 
   #myHand {
@@ -76,24 +224,5 @@
     align-items: flex-end;
     padding-bottom: 1em;
     position: relative;
-  }
-
-  #myCards .card {
-    height: auto;
-    width: 25vw;
-    max-width: 90px;
-
-    position: absolute;
-
-    transform-origin: bottom center;
-    transform: translateX(var(--card-x, 0px)) translateY(var(--card-y, 0px))
-      rotate(var(--card-angle, 0deg));
-    transition: transform 0.15s ease-out;
-  }
-
-  #myCards .card:hover {
-    transform: translateX(var(--card-x, 0px))
-      translateY(calc(var(--card-y, 0px) - 1em)) rotate(var(--card-angle, 0deg));
-    z-index: 100 !important;
   }
 }

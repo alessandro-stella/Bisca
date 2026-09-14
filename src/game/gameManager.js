@@ -122,12 +122,12 @@ function getPlayerGameState(game, playerId) {
       isMe: pId === playerId,
     })),
 
-    playedCards: Array.from(game.playedCards.entries()).map(([pId, cardData]) => ({
-      playerId: pId,
-      playerUsername: game.players.get(pId)?.username || "Unknown",
-      card: cardData.card,
-      value: cardData.value,
-    })),
+    playedCards: Array.from(game.playedCards.entries()).map(
+      ([pId, cardData]) => ({
+        playerId: pId,
+        card: cardData.card,
+      }),
+    ),
 
     currentPlayer: game.players.get(game.currentPlayer)?.username || "",
     currentPlayerId: game.currentPlayer,
