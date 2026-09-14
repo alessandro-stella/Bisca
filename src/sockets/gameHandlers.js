@@ -157,8 +157,6 @@ function emitGameResult(io, lobbyId, game, result) {
 
   broadcastGameState(io, lobbyId);
 
-  const winner = game.players.get(result.winnerId);
-
   for (const socket of io.sockets.sockets.values()) {
     if (!socket.rooms.has(`lobby:${lobbyId}`)) {
       continue;
@@ -168,9 +166,8 @@ function emitGameResult(io, lobbyId, game, result) {
     const isWinner = playerId === result.winnerId;
 
     socket.emit("game:finished", {
-      winnerId: result.winnerId,
-      winnerUsername: winner?.username,
       isWinner,
+      position: game.players.get(playerId)?.position || (isWinner ? 1 : null),
     });
   }
 
@@ -178,7 +175,7 @@ function emitGameResult(io, lobbyId, game, result) {
   setLobbyClosed(lobbyId, true);
 }
 
-function handlePlaceBid(io, socket, bid) {
+async function handlePlaceBid(io, socket, bid) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
@@ -206,17 +203,20 @@ function handlePlaceBid(io, socket, bid) {
   }
 
   if (game.showdown && game.turnPhase === "play") {
-    const result = resolveShowdown(game);
+    const onResolving = () => {
+      broadcastGameState(io, lobby.id);
+    };
+
+    const result = await resolveShowdown(game, onResolving);
 
     emitGameResult(io, lobby.id, game, result);
-
     return;
   }
 
   broadcastGameState(io, lobby.id);
 }
 
-function handlePlayCard(io, socket, card) {
+async function handlePlayCard(io, socket, card) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
@@ -274,7 +274,11 @@ function handlePlayCard(io, socket, card) {
     }
   }
 
-  const result = playCard(game, playerId, card);
+  const onResolving = () => {
+    broadcastGameState(io, lobby.id);
+  };
+
+  const result = await playCard(game, playerId, card, onResolving);
 
   emitGameResult(io, lobby.id, game, result);
 }

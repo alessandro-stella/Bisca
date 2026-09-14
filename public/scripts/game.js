@@ -86,140 +86,7 @@ socket.on("game:reconnect", () => {
 
 socket.on("game:not-found", () => {
   console.log("Game not found");
-  // window.location.replace("/lobbies.html");
-
-  const testGame = {
-    turnPhase: "play",
-    totalBids: 5,
-    showdown: false,
-    players: [
-      {
-        playerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
-        connected: true,
-        username: "ale",
-        bid: 2,
-        lives: 3,
-        won: 0,
-        position: null,
-        isMe: true,
-      },
-      {
-        playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
-        connected: true,
-        username: "test",
-        bid: 2,
-        lives: 3,
-        won: 0,
-        position: null,
-        isMe: false,
-      },
-      {
-        playerId: "3f8b1a45-12d4-4e90-8c22-94b150c77a83",
-        connected: true,
-        username: "marco",
-        bid: 1,
-        lives: 2,
-        won: 0,
-        position: null,
-        isMe: false,
-      },
-    ],
-    playedCards: [
-      {
-        playerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
-        card: "coppe10",
-      },
-      {
-        playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
-        card: "spade7",
-      },
-      {
-        playerId: "3f8b1a45-12d4-4e90-8c22-94b150c77a83",
-        card: "bastoni4",
-      },
-    ],
-    highestPlay: {
-      playerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
-      card: "coppe10",
-      value: 310,
-    },
-    currentPlayer: "marco",
-    currentPlayerId: "3f8b1a45-12d4-4e90-8c22-94b150c77a83",
-    myUsername: "ale",
-    myPlayerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
-    hand: ["coppe9", "denari10"],
-    isMyTurn: false,
-    lastPlayer: true,
-  };
-
-  const testBiddingGame = {
-    turnPhase: "bidding",
-    totalBids: 2,
-    showdown: false,
-    players: [
-      {
-        playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
-        connected: true,
-        username: "test",
-        bid: 2,
-        lives: 3,
-        won: 0,
-        position: null,
-        isMe: true,
-      },
-      {
-        playerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
-        connected: true,
-        username: "ale",
-        bid: -1,
-        lives: 3,
-        won: 0,
-        position: null,
-        isMe: false,
-      },
-      {
-        playerId: "3f8b1a45-12d4-4e90-8c22-94b150c77a83",
-        connected: true,
-        username: "marco",
-        bid: -1,
-        lives: 2,
-        won: 0,
-        position: null,
-        isMe: false,
-      },
-      {
-        playerId: "e19c0011-8842-4f10-9124-aabbccddeeff",
-        connected: true,
-        username: "luca",
-        bid: -1,
-        lives: 0,
-        won: 0,
-        position: 4,
-        isMe: false,
-      },
-      {
-        playerId: "e19c0011-8842-4f10-9124-iuashdiuashh",
-        connected: false,
-        username: "biggus",
-        bid: -1,
-        lives: 0,
-        won: 0,
-        position: 5,
-        isMe: false,
-      },
-    ],
-    playedCards: [],
-    currentPlayer: "ale",
-    currentPlayerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
-    myUsername: "test",
-    myPlayerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
-    hand: ["denari10", "coppe9", "bastoni3"],
-    isMyTurn: false,
-    lastPlayer: false,
-  };
-
-  // renderGameState(testGame);
-  renderGameState(testBiddingGame);
+  window.location.replace("/lobbies.html");
 });
 
 socket.on("game:state", (game) => {
@@ -230,26 +97,34 @@ socket.on("game:state", (game) => {
 
 socket.on("game:state:sync", (game) => {
   console.log("Game state sync from another device:", game);
+
   renderGameState(game);
 });
 
-function handleGameFinishedUI(winnerUsername) {
-  document.getElementById("gameStatus").textContent =
-    `Partita terminata! Il vincitore è ${winnerUsername}!`;
+function handleGameFinishedUI(isWinner, position) {
+  closePopup();
 
-  document.getElementById("bidButtonsContainer").innerHTML = "";
-  document.getElementById("myCardsContainer").innerHTML = "";
-  document.getElementById("livesContainer").innerHTML = "";
+  const esito = isWinner ? "hai vinto!" : "hai perso.";
+  const posText = position ? ` (${position}° posto)` : "";
+  const testo = `Partita terminata, ${esito}${posText}`;
+
+  const statusEl =
+    document.getElementById("gameStatus") ||
+    document.querySelector(".statusBar") ||
+    document.querySelector("footer p") ||
+    document.querySelector(".statusText");
+
+  if (statusEl) {
+    statusEl.textContent = testo;
+  }
 }
 
-socket.on("game:finished", ({ winnerId, winnerUsername }) => {
-  console.log("Partita terminata. Vincitore:", winnerId);
-  handleGameFinishedUI(winnerUsername);
+socket.on("game:finished", ({ isWinner, position }) => {
+  handleGameFinishedUI(isWinner, position);
 });
 
-socket.on("game:finished:sync", ({ winnerId, winnerUsername }) => {
-  console.log("Game finished sync from another device:", winnerId);
-  handleGameFinishedUI(winnerUsername);
+socket.on("game:finished:sync", ({ isWinner, position }) => {
+  handleGameFinishedUI(isWinner, position);
 });
 
 socket.on("lobbies:update:sync", (data) => {
@@ -271,6 +146,20 @@ document.addEventListener("visibilitychange", () => {
 // Game UI functions
 
 const loader = document.getElementById("loadingCover");
+const backdrop = document.getElementById("backdrop");
+const bidsContainer = document.getElementById("bidsContainer");
+
+function openPopup() {
+  if (backdrop) {
+    backdrop.classList.remove("hidden");
+  }
+}
+
+function closePopup() {
+  if (backdrop) {
+    backdrop.classList.add("hidden");
+  }
+}
 
 function renderGameState(game) {
   if (game.turnPhase === "finished") {
@@ -296,21 +185,21 @@ function renderGameState(game) {
     game.currentPlayerId,
   );
 
-  // createOpponents(
-  //   table,
-  //   [...game.players, ...game.players, game.players[0]],
-  //   game.currentPlayerId,
-  // );
-
   createPlayedCards(game.playedCards, game.highestPlay);
 
-  createCards(game.hand, "myCards", false);
+  const canPlay = game.turnPhase === "play" && game.isMyTurn && !game.showdown;
+  createCards(game.hand, "myCards", canPlay);
 
   if (game.turnPhase === "bidding" && game.isMyTurn) {
     createBidButtons(game);
+    openPopup();
+  } else {
+    closePopup();
   }
 
-  loader.classList.add("hidden");
+  if (loader) {
+    loader.classList.add("hidden");
+  }
 }
 
 function createMySeat(table, myData, currentPlayerId) {
@@ -347,7 +236,6 @@ function createOpponents(table, turnPhase, opponents, currentPlayerId) {
   let currentAngle = -90;
 
   for (const opponent of opponents) {
-    console.log(opponent);
     const isCurrentPlayer = opponent.playerId === currentPlayerId;
     currentAngle += anglePhase;
 
@@ -416,7 +304,6 @@ function createOpponents(table, turnPhase, opponents, currentPlayerId) {
     }
 
     opponentInfo.appendChild(username);
-
     opponentInfo.appendChild(stats);
 
     tableSeat.appendChild(opponentInfo);
@@ -425,20 +312,24 @@ function createOpponents(table, turnPhase, opponents, currentPlayerId) {
 }
 
 function createPlayedCards(cards, highestPlay) {
+  if (!Array.isArray(cards)) return;
+
   for (const card of cards) {
+    if (!card || !card.card) continue;
+
     const cardElement = createSingleCard(card.card, false);
     cardElement.classList.add("playedCard");
 
     const playerSeat = document.getElementById(card.playerId);
-    playerSeat.appendChild(cardElement);
+    if (playerSeat) {
+      playerSeat.appendChild(cardElement);
 
-    if (card.playerId === highestPlay.playerId) {
-      playerSeat.classList.add("highestPlay");
+      if (highestPlay && card.playerId === highestPlay.playerId) {
+        playerSeat.classList.add("highestPlay");
+      }
     }
   }
 }
-
-const bidsContainer = document.getElementById("bidsContainer");
 
 function createBidButtons(game) {
   bidsContainer.innerHTML = "";
@@ -465,15 +356,11 @@ function createBidButtons(game) {
 
     bidButton.addEventListener("click", () => {
       socket.emit("game:place-bid", bid);
-      closeBidPopup();
+      closePopup();
     });
 
     bidsContainer.appendChild(bidButton);
   }
-}
-
-function closeBidPopup() {
-  console.log("GESTIRE closeBidPopup");
 }
 
 function createShowdownButtons(container) {
@@ -485,12 +372,12 @@ function createShowdownButtons(container) {
   for (const { label, bid } of options) {
     const bidButton = document.createElement("button");
 
-    bidButton.innerHTML = label;
-    bidButton.classList.add("bidButton");
+    bidButton.innerHTML = `<p>${label}</p>`;
+    bidButton.classList.add("bidButton", "primaryButton");
 
     bidButton.addEventListener("click", () => {
       socket.emit("game:place-bid", bid);
-      document.getElementById("bidButtonsContainer").innerHTML = "";
+      closePopup();
     });
 
     container.appendChild(bidButton);

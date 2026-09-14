@@ -309,7 +309,11 @@
 
   #bidsContainer {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(max(150px, calc(25% - 10px)), 1fr)
+    );
+    row-gap: 1em;
     overflow-y: auto;
   }
 

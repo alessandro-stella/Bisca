@@ -113,17 +113,26 @@ function getPlayerGameState(game, playerId) {
   );
 
   if (game.showdown) {
-    playedCards = playedCards.filter(
-      (playedCard) => playedCard.playerId !== playerId,
-    );
+    if (game.playedCards.size > 0) {
+      playedCards = Array.from(game.playedCards.entries()).map(
+        ([pId, cardData]) => ({
+          playerId: pId,
+          card: cardData.card,
+        }),
+      );
+    } else {
+      playedCards = Array.from(game.hands.entries())
+        .filter(
+          ([oppId, oppHand]) =>
+            oppId !== playerId && oppHand && oppHand.length > 0 && oppHand[0],
+        )
+        .map(([oppId, oppHand]) => ({
+          playerId: oppId,
+          card: oppHand[0],
+        }));
+    }
 
-    hand = Array.from(game.hands.entries())
-      .filter(([opponentId]) => opponentId !== playerId)
-      .map(([opponentId, opponentHand]) => ({
-        card: opponentHand[0],
-        opponentId,
-        opponentUsername: game.players.get(opponentId)?.username || "Unknown",
-      }));
+    hand = [];
   }
 
   return {
@@ -149,6 +158,8 @@ function getPlayerGameState(game, playerId) {
 
     isMyTurn: game.currentPlayer === playerId,
     lastPlayer: game.lastPlayer === playerId,
+
+    highestPlay: game.highestPlay,
   };
 }
 
@@ -280,7 +291,7 @@ function placeBid(game, playerId, bid) {
   return true;
 }
 
-async function playCard(game, playerId, card) {
+async function playCard(game, playerId, card, onResolving) {
   if (game.turnPhase !== "play") {
     return;
   }
@@ -331,10 +342,12 @@ async function playCard(game, playerId, card) {
     };
   }
 
+  console.log(game.highestPlay);
+
   const alivePlayers = getAlivePlayers(game);
 
   if (game.playedCards.size === alivePlayers.length) {
-    return await updateScore(game);
+    return await updateScore(game, onResolving);
   }
 
   nextPlayer(game, playerId);
@@ -371,7 +384,7 @@ function getCardValue(card) {
   }
 }
 
-async function updateScore(game) {
+async function updateScore(game, onResolving) {
   const playedCards = Array.from(game.playedCards.entries());
 
   if (playedCards.length === 0) {
@@ -390,6 +403,10 @@ async function updateScore(game) {
 
   game.turnPhase = "resolving";
 
+  if (typeof onResolving === "function") {
+    onResolving();
+  }
+
   await new Promise((resolve) => setTimeout(resolve, TURN_DELAY_MS));
 
   if (game.turnPhase !== "resolving") {
@@ -399,6 +416,8 @@ async function updateScore(game) {
   game.turnPhase = "play";
 
   game.playedCards.clear();
+  game.highestPlay = null;
+
   game.currentPlayer = winnerId;
 
   const winnerValues = game.players.get(winnerId);
@@ -414,6 +433,8 @@ async function updateScore(game) {
   if (game.playedHands >= cardsThisTurn) {
     return endTurn(game);
   }
+
+  return { finished: false };
 }
 
 function endTurn(game) {
@@ -521,7 +542,7 @@ function assignPlayersPosition(game, playerIds) {
   game.nextPosition -= players.length;
 }
 
-async function resolveShowdown(game) {
+async function resolveShowdown(game, onResolving) {
   if (!game.showdown || game.turnPhase !== "play") {
     return null;
   }
@@ -537,7 +558,7 @@ async function resolveShowdown(game) {
     }
 
     const card = hand[0];
-    const stepResult = await playCard(game, playerId, card);
+    const stepResult = await playCard(game, playerId, card, onResolving);
 
     if (stepResult) {
       result = stepResult;
