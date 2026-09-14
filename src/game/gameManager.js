@@ -101,7 +101,22 @@ function deleteGame(lobbyId) {
 function getPlayerGameState(game, playerId) {
   let hand = game.hands.get(playerId);
 
+  if (!game.showdown && hand) {
+    hand = Array.from(hand).sort((a, b) => getCardValue(b) - getCardValue(a));
+  }
+
+  let playedCards = Array.from(game.playedCards.entries()).map(
+    ([pId, cardData]) => ({
+      playerId: pId,
+      card: cardData.card,
+    }),
+  );
+
   if (game.showdown) {
+    playedCards = playedCards.filter(
+      (playedCard) => playedCard.playerId !== playerId,
+    );
+
     hand = Array.from(game.hands.entries())
       .filter(([opponentId]) => opponentId !== playerId)
       .map(([opponentId, opponentHand]) => ({
@@ -122,12 +137,7 @@ function getPlayerGameState(game, playerId) {
       isMe: pId === playerId,
     })),
 
-    playedCards: Array.from(game.playedCards.entries()).map(
-      ([pId, cardData]) => ({
-        playerId: pId,
-        card: cardData.card,
-      }),
-    ),
+    playedCards,
 
     currentPlayer: game.players.get(game.currentPlayer)?.username || "",
     currentPlayerId: game.currentPlayer,
@@ -304,13 +314,22 @@ async function playCard(game, playerId, card) {
   }
 
   const newHand = hand.filter((handCard) => handCard !== physicalCard);
-
   game.hands.set(playerId, newHand);
+
+  const cardValue = getCardValue(card);
 
   game.playedCards.set(playerId, {
     card,
-    value: getCardValue(card),
+    value: cardValue,
   });
+
+  if (!game.highestPlay || cardValue > game.highestPlay.value) {
+    game.highestPlay = {
+      playerId,
+      card,
+      value: cardValue,
+    };
+  }
 
   const alivePlayers = getAlivePlayers(game);
 

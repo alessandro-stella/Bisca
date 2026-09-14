@@ -1,3 +1,47 @@
+#loadingCover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100dvw;
+  height: 100dvh;
+  z-index: 10;
+
+  display: grid;
+  place-content: center;
+  font-size: 10em;
+
+  color: var(--brand-green);
+  background-color: var(--bg-page);
+
+  opacity: 1;
+  transition: all 0.2s ease-in-out;
+}
+
+#loadingCover.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100dvw;
+  height: 100dvh;
+  z-index: 10;
+
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(0.5em);
+
+  opacity: 1;
+  transition: all 0.2s ease-in-out;
+}
+
+#backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 #baseContainer {
   height: 100dvh;
   background-color: red;
@@ -7,7 +51,7 @@
 }
 
 #tableContainer,
-#myHand {
+#mySeat {
   width: 65em;
   max-width: 90%;
   margin: 0 auto;
@@ -21,6 +65,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#topButtons {
+  background-color: cyan;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  padding: 1em;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#openChat,
+#quitLobby {
+  font-size: 1.2em;
+  padding: 0.5em;
+  aspect-ratio: 1/1;
+  height: 100%;
+  display: grid;
+  place-content: center;
+  border-radius: 0.5em;
+}
+
+#quitLobby:hover {
+  color: green;
 }
 
 #table {
@@ -60,26 +134,33 @@
 
 #table .tableSeat {
   position: absolute;
-
-  width: 120%;
-
   top: 50%;
   left: 50%;
+
+  width: 110%;
+  height: 0;
+
   transform: translate(-50%, -50%) rotate(var(--angle));
+  transform-origin: center center;
 
   z-index: 1;
 
   display: flex;
   align-items: center;
-  gap: 2.5em;
+
+  font-size: 0.8em;
 }
 
 #table .tableSeat .opponentInfo {
-  transform: rotate(calc(-1 * var(--angle)));
-}
+  position: absolute;
+  left: 0%;
+  top: 50%;
+  right: auto;
 
-#table .tableSeat .playedCard {
-  transform: rotate(90deg);
+  width: max-content;
+  white-space: nowrap;
+
+  transform: translate(-50%, -50%) rotate(calc(-1 * var(--angle)));
 }
 
 .opponentInfo {
@@ -93,22 +174,12 @@
   height: fit-content;
 }
 
-.opponentInfo .avatar {
-  width: 60%;
-  aspect-ratio: 1/1;
-  background-color: pink;
-
-  margin: 0 auto;
-
-  display: grid;
-  place-content: center;
-
-  border-radius: 50%;
-  border: 2px solid red;
+.opponentInfo.disconnected {
+  filter: saturate(0);
 }
 
-.opponentInfo.currentPlayer .avatar {
-  border-color: var(--brand-green) !important;
+.currentPlayer {
+  border: 2px solid var(--brand-green) !important;
 }
 
 .opponentInfo .username {
@@ -136,16 +207,16 @@
   background-color: magenta;
 }
 
-.opponentInfo .bidsIcon {
+.bidsIcon {
   content: "";
-  height: 0.8lh;
+  height: 0.75lh;
   aspect-ratio: 1/1.6;
   background-color: blue;
 
   border-radius: 0.125em;
 }
 
-#myHand {
+#mySeat {
   background-color: green;
 
   flex: 1;
@@ -156,11 +227,17 @@
 
 #myCards {
   background-color: violet;
+
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5em;
+
   min-height: 0;
+
+  overflow-x: auto;
+  max-width: 100%;
+
+  padding-top: 1em;
 }
 
 #myCards .card {
@@ -188,16 +265,70 @@
 
 .playedCard {
   height: 15vh;
+  transform: rotate(90deg);
+}
+
+.highestPlay .playedCard {
+  border: 2px solid red;
 }
 
 .opponentSeat .playedCard {
   height: 10vh;
+  margin-left: 5vw;
+}
+
+#bidPopup {
+  background-color: var(--bg-card);
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
 }
 
 /* Properties for mobile */
 @media (max-width: 768px) {
+  #bidPopup {
+    width: 90%;
+    height: fit-content;
+    max-height: 90%;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 1em;
+    border-radius: 0.5em;
+  }
+
+  #bidPopup .title {
+    font-size: 1.5em;
+    color: var(--text-primary);
+    font-weight: bold;
+  }
+
+  #bidsContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow-y: auto;
+  }
+
+  #bidsContainer .bidButton {
+    width: 50%;
+    margin: 0 auto;
+    aspect-ratio: 1/1;
+    font-size: 1.5em;
+    border-radius: 0.5em;
+  }
+
+  #bidPopup .secondaryButton {
+    font-size: 1.2em;
+    padding: 0.5em 0;
+    border-radius: 0.5em;
+  }
+
   #tableContainer,
-  #myHand {
+  #mySeat {
     width: 100%;
     max-width: 100%;
     margin: 0;
@@ -207,22 +338,59 @@
     height: 70%;
   }
 
-  #table .tableSeat {
-    width: 125%;
+  .opponentSeat .playedCard {
+    margin-left: 10vw;
   }
 
-  #myHand {
+  #mySeat {
+    padding-top: 0;
     background-color: green;
-    flex: 2;
+    flex: 2.5;
     flex-direction: column;
+    gap: 1em;
   }
 
   #myCards {
     flex: 1;
     width: 100%;
     justify-content: center;
-    align-items: flex-end;
-    padding-bottom: 1em;
-    position: relative;
+  }
+
+  #myStats {
+    background-color: red;
+    display: flex;
+    gap: 1em;
+  }
+
+  #myStats #myUsername,
+  #myStats #myLives,
+  #myStats #myBids {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+    border: 1px solid teal;
+    font-size: 1.5em;
+  }
+
+  #myStats #myUsername {
+    flex: 1;
+    text-overflow: ellipsis;
+    background-color: yellow;
+  }
+
+  #bottomButton {
+    font-size: 1.5em;
+
+    padding: 0.5em 0;
+    border-radius: 0.25em;
+  }
+
+  #bottomButton.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  #bottomButtons .dangerButton:hover {
+    color: green;
   }
 }

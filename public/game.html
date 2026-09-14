@@ -48,20 +48,50 @@
 
   <body>
     <div id="baseContainer">
+      <div id="loadingCover">
+        <i class="fa-solid fa-spinner"></i>
+      </div>
+
+      <div id="backdrop" class="">
+        <div id="bidPopup">
+          <div class="title">Quante mani vincerai?</div>
+          <div id="bidsContainer"></div>
+          <button id="closePopup" class="secondaryButton">
+            <p>Indietro</p>
+          </button>
+        </div>
+      </div>
+
       <div id="tableContainer">
+        <div id="topButtons">
+          <button id="openChat" class="primaryButton">
+            <i class="fa-solid fa-comments"></i>
+          </button>
+
+          <button id="quitLobby" class="dangerButton">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
         <div id="table"></div>
       </div>
 
-      <div id="myHand">
+      <div id="mySeat">
         <div id="myCards"></div>
         <div id="myStats">
-          <div id="myUsername">Sup3r_</div>
-          <div id="myLives">2</div>
+          <div id="myUsername"></div>
+          <div id="myLives">
+            <i class="fa-solid fa-heart"></i>
+            <div class="value"></div>
+          </div>
           <div id="myBids">
-            <div id="myWon">1</div>
-            <div id="myTotal">3</div>
+            <div class="bidsIcon"></div>
+            <div class="value"></div>
           </div>
         </div>
+
+        <button id="bottomButton" class="secondaryButton disabled">
+          <p>Attendi il tuo turno</p>
+        </button>
       </div>
     </div>
   </body>
