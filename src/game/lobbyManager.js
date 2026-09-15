@@ -1,4 +1,4 @@
-const { getGame, saveGameData } = require("./gameManager");
+const { getGame } = require("./gameManager");
 
 const lobbies = new Map();
 const LOBBY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
@@ -78,31 +78,6 @@ function getLobbies() {
 }
 
 async function deleteLobby(lobbyId) {
-  const game = getGame(lobbyId);
-
-  if (game) {
-    const playersArray = Array.from(game.players.entries()).map(
-      ([userId, player]) => ({
-        userId: userId,
-        placement: player.placement,
-        leftEarly: player.leftEarly || false,
-      }),
-    );
-
-    const dataToSave = {
-      id: game.lobbyId,
-      duration: game.turn,
-      players: playersArray,
-      winner: game.winnerId || null,
-    };
-
-    try {
-      await saveGameData(dataToSave);
-    } catch (e) {
-      console.log("Error while saving game data: ", e);
-    }
-  }
-
   return lobbies.delete(lobbyId);
 }
 

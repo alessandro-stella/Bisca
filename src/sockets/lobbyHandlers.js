@@ -18,7 +18,7 @@ const {
   removePlayerFromGame,
 } = require("../game/gameManager");
 
-const { broadcastGameState } = require("./gameHandlers");
+const { broadcastGameState, emitGameResult } = require("./gameHandlers");
 
 const BCRYPT_SALT_ROUNDS = 10;
 
@@ -161,7 +161,7 @@ async function joinLobby(lobbyId, socket, io, password) {
   }
 }
 
-function leaveLobby(socket, io, reconnectTimers) {
+async function leaveLobby(socket, io, reconnectTimers) {
   clearReconnectTimer(socket.user.id, reconnectTimers);
 
   const lobby = getLobbyByPlayer(socket.user.id);
@@ -179,10 +179,13 @@ function leaveLobby(socket, io, reconnectTimers) {
     const result = removePlayerFromGame(game, socket.user.id);
 
     if (result.action === "finished") {
-      game.turnPhase = "finished";
+      await emitGameResult(io, lobby.id, game, {
+        finished: true,
+        winnerId: result.winnerId,
+      });
+    } else {
+      broadcastGameState(io, lobby.id);
     }
-
-    broadcastGameState(io, lobby.id);
   }
 
   if (lobby.players.size === 0) {

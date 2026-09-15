@@ -13,6 +13,7 @@ const {
   placeBid,
   playCard,
   resolveShowdown,
+  saveGameData,
 } = require("../game/gameManager");
 
 const db = require("../db");
@@ -147,7 +148,7 @@ async function startGame(socket, io) {
   io.to(room).emit("game:started");
 }
 
-function emitGameResult(io, lobbyId, game, result) {
+async function emitGameResult(io, lobbyId, game, result) {
   if (!result?.finished) {
     broadcastGameState(io, lobbyId);
     return;
@@ -158,6 +159,31 @@ function emitGameResult(io, lobbyId, game, result) {
 
   setLobbyStarted(lobbyId, false);
   setLobbyClosed(lobbyId, true);
+
+  if (!game.saved) {
+    game.saved = true;
+
+    const playersArray = Array.from(game.players.entries()).map(
+      ([userId, player]) => ({
+        userId,
+        placement: player.placement,
+        leftEarly: player.leftEarly || false,
+      }),
+    );
+
+    const dataToSave = {
+      id: lobbyId,
+      duration: game.turn,
+      players: playersArray,
+      winner: game.winnerId || result.winnerId || null,
+    };
+
+    try {
+      await saveGameData(dataToSave);
+    } catch (error) {
+      console.error("Errore salvataggio partita ed ELO a fine match:", error);
+    }
+  }
 }
 
 async function handlePlaceBid(io, socket, bid) {
@@ -194,7 +220,7 @@ async function handlePlaceBid(io, socket, bid) {
 
     const result = await resolveShowdown(game, onResolving);
 
-    emitGameResult(io, lobby.id, game, result);
+    await emitGameResult(io, lobby.id, game, result);
     return;
   }
 
@@ -265,7 +291,7 @@ async function handlePlayCard(io, socket, card) {
 
   const result = await playCard(game, playerId, card, onResolving);
 
-  emitGameResult(io, lobby.id, game, result);
+  await emitGameResult(io, lobby.id, game, result);
 }
 
 function checkCurrentGame(socket) {
@@ -285,4 +311,5 @@ module.exports = {
   handlePlaceBid,
   handlePlayCard,
   checkCurrentGame,
+  emitGameResult,
 };

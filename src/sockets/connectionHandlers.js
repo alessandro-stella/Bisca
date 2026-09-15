@@ -11,7 +11,7 @@ const {
   removePlayerFromGame,
 } = require("../game/gameManager");
 
-const { broadcastGameState } = require("./gameHandlers");
+const { broadcastGameState, emitGameResult } = require("./gameHandlers");
 
 const RECONNECT_TIMEOUT = 60 * 1000;
 
@@ -93,7 +93,7 @@ function createConnectionHandlers() {
     }
 
     const key = `${userId}_${deviceId}`;
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       const currentLobby = getLobbyByPlayer(userId);
 
       if (!currentLobby) {
@@ -125,10 +125,13 @@ function createConnectionHandlers() {
         const result = removePlayerFromGame(game, userId);
 
         if (result.action === "finished") {
-          game.turnPhase = "finished";
+          await emitGameResult(io, currentLobby.id, game, {
+            finished: true,
+            winnerId: result.winnerId,
+          });
+        } else {
+          broadcastGameState(io, currentLobby.id);
         }
-
-        broadcastGameState(io, currentLobby.id);
       }
 
       removePlayer(currentLobby.id, userId);

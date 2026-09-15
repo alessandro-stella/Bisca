@@ -120,6 +120,9 @@ document.addEventListener("visibilitychange", () => {
 
 // Game UI functions
 
+const chatButton = document.getElementById("openChat");
+chatButton.addEventListener("click", () => alert("Coming soon! (Spero)"));
+
 const loader = document.getElementById("loadingCover");
 
 function resetBottomActions() {
@@ -136,7 +139,7 @@ function resetBottomActions() {
 
 function renderGameState(game) {
   if (game.turnPhase === "finished") {
-    showScoreboard([game.me, ...game.opponents], game.me.playerId);
+    showScoreboard([game.me, ...game.opponents]);
     return;
   }
 
@@ -162,7 +165,7 @@ function renderGameState(game) {
   createPlayedCards(game.playedCards, game.highestPlay);
 
   const canPlay = game.turnPhase === "play" && game.isMyTurn && !game.showdown;
-  createCards(game.hand, "myCards", canPlay);
+  createCards(game.hand, "myCards", canPlay, game.turnPhase, game.showdown);
 
   if (game.turnPhase === "bidding" && game.isMyTurn) {
     createBidButtons(game);
@@ -514,9 +517,29 @@ function createSingleCard(card, eventListener = false) {
   return cardElement;
 }
 
-function createCards(cards, containerId, eventListener = false) {
+function createCards(
+  cards,
+  containerId,
+  eventListener = false,
+  turnPhase,
+  isShowdown = false,
+) {
   const cardsContainer = document.getElementById(containerId);
   cardsContainer.innerHTML = "";
+
+  if (isShowdown && turnPhase !== "resolving") {
+    const format = supportsWebP() ? "webp" : "jpg";
+
+    const backCard = document.createElement("img");
+    backCard.setAttribute("src", `media/${format}/retro.${format}`);
+    backCard.setAttribute("alt", `retro`);
+    backCard.setAttribute("title", `Carta misteriosa`);
+    backCard.classList.add("card");
+
+    cardsContainer.appendChild(backCard);
+
+    return;
+  }
 
   for (const card of cards) {
     const cardElement = createSingleCard(card, eventListener);
