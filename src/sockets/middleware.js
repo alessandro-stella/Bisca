@@ -237,8 +237,6 @@ const validators = {
   },
 
   validateLobbyUpdateParams(lives, cards, maxPlayers) {
-    console.log("Valori di validateLobbyParams:", { lives, cards, maxPlayers });
-
     let errors = [];
 
     if (!Number.isInteger(lives) || lives < 1) {

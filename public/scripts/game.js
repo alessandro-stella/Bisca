@@ -101,30 +101,18 @@ socket.on("game:state:sync", (game) => {
   renderGameState(game);
 });
 
-function handleGameFinishedUI(isWinner, position) {
-  closePopup();
+function handleGameFinishedUI(players) {
+  console.log("Game finished! handling UI");
 
-  const esito = isWinner ? "hai vinto!" : "hai perso.";
-  const posText = position ? ` (${position}° posto)` : "";
-  const testo = `Partita terminata, ${esito}${posText}`;
-
-  const statusEl =
-    document.getElementById("gameStatus") ||
-    document.querySelector(".statusBar") ||
-    document.querySelector("footer p") ||
-    document.querySelector(".statusText");
-
-  if (statusEl) {
-    statusEl.textContent = testo;
-  }
+  console.log(players);
 }
 
-socket.on("game:finished", ({ isWinner, position }) => {
-  handleGameFinishedUI(isWinner, position);
+socket.on("game:finished", (players) => {
+  handleGameFinishedUI(players);
 });
 
-socket.on("game:finished:sync", ({ isWinner, position }) => {
-  handleGameFinishedUI(isWinner, position);
+socket.on("game:finished:sync", (players) => {
+  handleGameFinishedUI(players);
 });
 
 socket.on("lobbies:update:sync", (data) => {
@@ -146,24 +134,22 @@ document.addEventListener("visibilitychange", () => {
 // Game UI functions
 
 const loader = document.getElementById("loadingCover");
-const backdrop = document.getElementById("backdrop");
-const bidsContainer = document.getElementById("bidsContainer");
 
-function openPopup() {
-  if (backdrop) {
-    backdrop.classList.remove("hidden");
+function resetBottomActions() {
+  const bidsWrapper = document.getElementById("bidsContainer");
+  if (bidsWrapper) {
+    bidsWrapper.remove();
   }
-}
 
-function closePopup() {
-  if (backdrop) {
-    backdrop.classList.add("hidden");
+  const bottomButton = document.getElementById("bottomButton");
+  if (bottomButton) {
+    bottomButton.removeAttribute("hidden");
   }
 }
 
 function renderGameState(game) {
   if (game.turnPhase === "finished") {
-    console.log("Partita terminata");
+    handleGameFinishedUI(game.players);
     return;
   }
 
@@ -174,15 +160,18 @@ function renderGameState(game) {
 
   createMySeat(
     table,
-    game.players.find((player) => player.playerId === game.myPlayerId),
+    game.me,
     game.currentPlayerId,
+    game.turnPhase,
+    game.showdown,
   );
 
   createOpponents(
     table,
     game.turnPhase,
-    game.players.filter((player) => player.playerId !== game.myPlayerId),
+    game.opponents || [],
     game.currentPlayerId,
+    game.showdown,
   );
 
   createPlayedCards(game.playedCards, game.highestPlay);
@@ -192,9 +181,8 @@ function renderGameState(game) {
 
   if (game.turnPhase === "bidding" && game.isMyTurn) {
     createBidButtons(game);
-    openPopup();
   } else {
-    closePopup();
+    resetBottomActions();
   }
 
   if (loader) {
@@ -202,7 +190,15 @@ function renderGameState(game) {
   }
 }
 
-function createMySeat(table, myData, currentPlayerId) {
+function createMySeat(
+  table,
+  myData,
+  currentPlayerId,
+  turnPhase,
+  isShowdown = false,
+) {
+  if (!myData) return;
+
   const mySeat = document.createElement("div");
   mySeat.id = myData.playerId;
   mySeat.classList.add("tableSeat");
@@ -214,30 +210,76 @@ function createMySeat(table, myData, currentPlayerId) {
   const livesDiv = document
     .getElementById("myLives")
     .getElementsByClassName("value")[0];
-  const bidsDiv = document
-    .getElementById("myBids")
-    .getElementsByClassName("value")[0];
+  const myBidsContainer = document.getElementById("myBids");
+  const bidsDiv = myBidsContainer.getElementsByClassName("value")[0];
+  const bottomButton = document.getElementById("bottomButton");
 
-  usernameDiv.innerHTML = myData.username;
   livesDiv.innerHTML = myData.lives;
-  bidsDiv.innerHTML = `${myData.won}/${myData.bid}`;
+
+  const isMyTurn = myData.playerId === currentPlayerId;
+  const hasBid =
+    myData.bid !== -1 && myData.bid !== null && myData.bid !== undefined;
+
+  if (isShowdown) {
+    myBidsContainer.style.display = "none";
+
+    if (turnPhase === "bidding" && !hasBid) {
+      usernameDiv.innerHTML = "Showdown";
+      if (!isMyTurn && bottomButton) {
+        bottomButton.removeAttribute("hidden");
+        bottomButton.textContent = "Attendi il tuo turno";
+        bottomButton.disabled = true;
+      }
+    } else {
+      usernameDiv.innerHTML = myData.username;
+      if (bottomButton) {
+        bottomButton.removeAttribute("hidden");
+        bottomButton.textContent = "Attendi il tuo turno";
+        bottomButton.disabled = true;
+      }
+    }
+  } else if (turnPhase === "bidding" && !hasBid) {
+    usernameDiv.innerHTML = "Quanto scommetti?";
+    myBidsContainer.style.display = "none";
+
+    if (!isMyTurn && bottomButton) {
+      bottomButton.removeAttribute("hidden");
+      bottomButton.textContent = "Attendi il tuo turno";
+      bottomButton.disabled = true;
+    }
+  } else {
+    usernameDiv.innerHTML = myData.username;
+    myBidsContainer.style.display = "";
+    bidsDiv.innerHTML = `${myData.won}/${myData.bid}`;
+
+    if (bottomButton) {
+      bottomButton.removeAttribute("hidden");
+      bottomButton.textContent = "Attendi il tuo turno";
+      bottomButton.disabled = true;
+    }
+  }
 
   const cards = document.getElementById("myCards");
-
-  if (myData.playerId === currentPlayerId) {
+  if (isMyTurn) {
     cards.classList.add("currentPlayer");
   } else {
     cards.classList.remove("currentPlayer");
   }
 }
 
-function createOpponents(table, turnPhase, opponents, currentPlayerId) {
+function createOpponents(
+  table,
+  turnPhase,
+  opponents,
+  currentPlayerId,
+  isShowdown = false,
+) {
   const anglePhase = 360 / (opponents.length + 1);
   let currentAngle = -90;
 
   for (const opponent of opponents) {
     const isCurrentPlayer = opponent.playerId === currentPlayerId;
-    currentAngle += anglePhase;
+    currentAngle -= anglePhase;
 
     const tableSeat = document.createElement("div");
     tableSeat.id = opponent.playerId;
@@ -286,7 +328,18 @@ function createOpponents(table, turnPhase, opponents, currentPlayerId) {
 
       const bidsText = document.createElement("p");
 
-      if (turnPhase === "bidding") {
+      // Visualizzazione testo per le puntate/showdown
+      if (isShowdown) {
+        if (turnPhase === "bidding" && isCurrentPlayer) {
+          bidsText.innerHTML = '<i class="fa-solid fa-spinner"></i>';
+        } else if (opponent.bid === 1) {
+          bidsText.textContent = "Vince";
+        } else if (opponent.bid === 0) {
+          bidsText.textContent = "Perde";
+        } else {
+          bidsText.textContent = "In attesa";
+        }
+      } else if (turnPhase === "bidding") {
         if (isCurrentPlayer) {
           bidsText.innerHTML = '<i class="fa-solid fa-spinner"></i>';
         } else {
@@ -332,34 +385,53 @@ function createPlayedCards(cards, highestPlay) {
 }
 
 function createBidButtons(game) {
-  bidsContainer.innerHTML = "";
+  const bottomContainer = document.getElementById("bottom");
+  const bottomButton = document.getElementById("bottomButton");
+
+  if (!bottomContainer) return;
+
+  if (bottomButton) {
+    bottomButton.setAttribute("hidden", "true");
+  }
+
+  let bidsWrapper = document.getElementById("bidsContainer");
+  if (!bidsWrapper) {
+    bidsWrapper = document.createElement("div");
+    bidsWrapper.id = "bidsContainer";
+    bottomContainer.appendChild(bidsWrapper);
+  }
+  bidsWrapper.innerHTML = "";
 
   if (game.showdown) {
-    createShowdownButtons(bidsContainer);
+    createShowdownButtons(bidsWrapper);
     return;
   }
 
-  let possibleBids = Array.from({ length: game.hand.length + 1 }).map(
+  const possibleBids = Array.from({ length: game.hand.length + 1 }).map(
     (_, i) => i,
   );
 
-  if (game.lastPlayer) {
-    const deniedBid = game.hand.length - game.totalBids;
-    possibleBids.splice(deniedBid, 1);
-  }
+  const deniedBid = game.lastPlayer ? game.hand.length - game.totalBids : null;
 
   for (const bid of possibleBids) {
     const bidButton = document.createElement("button");
-
     bidButton.innerHTML = `<p>${bid}</p>`;
-    bidButton.classList.add("bidButton", "primaryButton");
+    bidButton.classList.add("bidButton");
 
-    bidButton.addEventListener("click", () => {
-      socket.emit("game:place-bid", bid);
-      closePopup();
-    });
+    const isDenied = game.lastPlayer && bid === deniedBid;
 
-    bidsContainer.appendChild(bidButton);
+    if (isDenied) {
+      bidButton.classList.add("secondaryButton", "disabled");
+      bidButton.disabled = true;
+    } else {
+      bidButton.classList.add("primaryButton");
+      bidButton.addEventListener("click", () => {
+        socket.emit("game:place-bid", bid);
+        resetBottomActions();
+      });
+    }
+
+    bidsWrapper.appendChild(bidButton);
   }
 }
 
@@ -377,7 +449,7 @@ function createShowdownButtons(container) {
 
     bidButton.addEventListener("click", () => {
       socket.emit("game:place-bid", bid);
-      closePopup();
+      resetBottomActions();
     });
 
     container.appendChild(bidButton);

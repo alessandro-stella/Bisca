@@ -162,13 +162,7 @@ function emitGameResult(io, lobbyId, game, result) {
       continue;
     }
 
-    const playerId = socket.user.id;
-    const isWinner = playerId === result.winnerId;
-
-    socket.emit("game:finished", {
-      isWinner,
-      position: game.players.get(playerId)?.position || (isWinner ? 1 : null),
-    });
+    socket.emit("game:finished", game.players);
   }
 
   setLobbyStarted(lobbyId, false);

@@ -22,26 +22,6 @@
   pointer-events: none;
 }
 
-#backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100dvw;
-  height: 100dvh;
-  z-index: 10;
-
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(0.5em);
-
-  opacity: 1;
-  transition: all 0.2s ease-in-out;
-}
-
-#backdrop.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
 #baseContainer {
   height: 100dvh;
   background-color: red;
@@ -287,50 +267,6 @@
 
 /* Properties for mobile */
 @media (max-width: 768px) {
-  #bidPopup {
-    width: 90%;
-    height: fit-content;
-    max-height: 90%;
-
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    padding: 1em;
-    border-radius: 0.5em;
-  }
-
-  #bidPopup .title {
-    font-size: 1.5em;
-    color: var(--text-primary);
-    font-weight: bold;
-  }
-
-  #bidsContainer {
-    display: grid;
-    grid-template-columns: repeat(
-      auto-fit,
-      minmax(max(150px, calc(25% - 10px)), 1fr)
-    );
-    row-gap: 1em;
-    overflow-y: auto;
-  }
-
-  #bidsContainer .bidButton {
-    width: 50%;
-    margin: 0 auto;
-    aspect-ratio: 1/1;
-    font-size: 1.5em;
-    border-radius: 0.5em;
-  }
-
-  #bidPopup .secondaryButton {
-    font-size: 1.2em;
-    padding: 0.5em 0;
-    border-radius: 0.5em;
-  }
-
   #tableContainer,
   #mySeat {
     width: 100%;
@@ -355,12 +291,13 @@
   }
 
   #myCards {
-    flex: 1;
+    flex: 4;
     width: 100%;
     justify-content: center;
   }
 
   #myStats {
+    flex: 1;
     background-color: red;
     display: flex;
     gap: 1em;
@@ -382,13 +319,43 @@
     background-color: yellow;
   }
 
-  #bottomButton {
-    font-size: 1.5em;
+  #bottom {
+    flex: 1.5;
+    min-height: 0;
+  }
 
-    padding: 0.5em 0;
+  #bidsContainer {
+    --gap: 0.5rem;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 100%;
+    width: 100%;
+    gap: var(--gap);
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  #bidsContainer .bidButton {
+    flex: 1 0 calc(25% - (var(--gap) * 0.75));
+    height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+
+    font-size: 1.5em;
+    border-radius: 0.5em;
+  }
+
+  #bottomButton {
+    width: 100%;
+    height: 100%;
+
+    font-size: 1.5em;
     border-radius: 0.25em;
   }
 
+  .bidButton.disabled,
   #bottomButton.disabled {
     pointer-events: none;
     opacity: 0.6;

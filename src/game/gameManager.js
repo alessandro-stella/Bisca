@@ -98,7 +98,36 @@ function deleteGame(lobbyId) {
   return games.delete(lobbyId);
 }
 
+function rotateOpponents(playersMap, myPlayerId) {
+  const entries = Array.from(playersMap.entries());
+  const myIndex = entries.findIndex(([id]) => id === myPlayerId);
+
+  if (myIndex === -1) {
+    return {
+      me: null,
+      opponents: entries.map(([id, data]) => ({ playerId: id, ...data })),
+    };
+  }
+
+  const [myId, myData] = entries[myIndex];
+  const me = { playerId: myId, ...myData };
+
+  const beforeMe = entries.slice(0, myIndex).reverse();
+  const afterMe = entries.slice(myIndex + 1).reverse();
+
+  const orderedEntries = [...beforeMe, ...afterMe];
+
+  const opponents = orderedEntries.map(([id, data]) => ({
+    playerId: id,
+    ...data,
+  }));
+
+  return { me, opponents };
+}
+
 function getPlayerGameState(game, playerId) {
+  const { me, opponents } = rotateOpponents(game.players, playerId);
+
   let hand = game.hands.get(playerId);
 
   if (!game.showdown && hand) {
@@ -140,19 +169,12 @@ function getPlayerGameState(game, playerId) {
     totalBids: game.totalBids,
     showdown: game.showdown,
 
-    players: Array.from(game.players.entries()).map(([pId, playerData]) => ({
-      playerId: pId,
-      ...playerData,
-      isMe: pId === playerId,
-    })),
+    me,
+    opponents,
 
     playedCards,
 
-    currentPlayer: game.players.get(game.currentPlayer)?.username || "",
     currentPlayerId: game.currentPlayer,
-
-    myUsername: game.players.get(playerId).username,
-    myPlayerId: playerId,
 
     hand,
 
@@ -341,8 +363,6 @@ async function playCard(game, playerId, card, onResolving) {
       value: cardValue,
     };
   }
-
-  console.log(game.highestPlay);
 
   const alivePlayers = getAlivePlayers(game);
 

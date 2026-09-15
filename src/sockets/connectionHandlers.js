@@ -128,11 +128,7 @@ function createConnectionHandlers() {
           game.turnPhase = "finished";
           broadcastGameState(io, currentLobby.id);
 
-          const winner = game.players.get(result.winnerId);
-          io.to(`lobby:${currentLobby.id}`).emit("game:finished", {
-            winnerId: result.winnerId,
-            winnerUsername: winner?.username,
-          });
+          io.to(`lobby:${currentLobby.id}`).emit("game:finished", game.players);
         } else {
           broadcastGameState(io, currentLobby.id);
         }

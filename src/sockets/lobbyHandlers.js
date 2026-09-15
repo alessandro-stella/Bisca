@@ -182,11 +182,7 @@ function leaveLobby(socket, io, reconnectTimers) {
       game.turnPhase = "finished";
       broadcastGameState(io, lobby.id);
 
-      const winner = game.players.get(result.winnerId);
-      io.to(`lobby:${lobby.id}`).emit("game:finished", {
-        winnerId: result.winnerId,
-        winnerUsername: winner?.username,
-      });
+      io.to(`lobby:${lobby.id}`).emit("game:finished", game.players);
     } else {
       broadcastGameState(io, lobby.id);
     }

@@ -52,13 +52,10 @@
         <i class="fa-solid fa-spinner"></i>
       </div>
 
-      <div id="backdrop" class="hidden">
-        <div id="bidPopup">
-          <div class="title">Quante mani vincerai?</div>
-          <div id="bidsContainer"></div>
-          <button id="closePopup" class="secondaryButton">
-            <p>Indietro</p>
-          </button>
+      <div id="endGameBackdrop">
+        <div id="endGamePopup">
+          <div id="endGameTitle"></div>
+          <div id="scoreboard"></div>
         </div>
       </div>
 
@@ -89,9 +86,11 @@
           </div>
         </div>
 
-        <button id="bottomButton" class="secondaryButton disabled">
-          <p>Attendi il tuo turno</p>
-        </button>
+        <div id="bottom">
+          <button id="bottomButton" class="secondaryButton disabled" hidden>
+            <p>Attendi il tuo turno</p>
+          </button>
+        </div>
       </div>
     </div>
   </body>
