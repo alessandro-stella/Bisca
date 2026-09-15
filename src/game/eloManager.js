@@ -50,12 +50,12 @@ function getAverageExpectedScore(player, opponents) {
   return totalExpected / opponents.length;
 }
 
-function getActualScore(position, totalPlayers) {
+function getActualScore(placement, totalPlayers) {
   if (totalPlayers <= 1) {
     return 1.0;
   }
 
-  return (totalPlayers - position) / (totalPlayers - 1);
+  return (totalPlayers - placement) / (totalPlayers - 1);
 }
 
 async function getPlayersEloData(client, playerIds) {
@@ -120,7 +120,7 @@ function calculateEloChanges(players, eloData) {
       opponents,
     );
 
-    const actualScore = getActualScore(player.position, totalPlayers);
+    const actualScore = getActualScore(player.placement, totalPlayers);
 
     const kBase = getPlayerKBase(playerData.matchesPlayed, playerElo);
 
@@ -134,7 +134,7 @@ function calculateEloChanges(players, eloData) {
 
     return {
       id: player.id,
-      position: player.position,
+      placement: player.placement,
       oldElo: playerElo,
       newElo,
       change: eloChange,
@@ -154,12 +154,12 @@ async function calculateAndUpdateElo(gameId, players) {
     throw new Error("players must be a non-empty array");
   }
 
-  const positions = players.map((player) => player.position);
+  const placements = players.map((player) => player.placement);
 
-  const uniquePositions = new Set(positions);
+  const uniquePlacements = new Set(placements);
 
-  if (uniquePositions.size !== positions.length) {
-    throw new Error("Player positions must be unique");
+  if (uniquePlacements.size !== placements.length) {
+    throw new Error("Player placements must be unique");
   }
 
   const client = await db.connect();
@@ -191,7 +191,7 @@ async function calculateAndUpdateElo(gameId, players) {
             old_elo,
             elo_change,
             new_elo,
-            position
+            placement
           )
           VALUES (
             $1, $2, $3, $4, $5, $6
@@ -203,7 +203,7 @@ async function calculateAndUpdateElo(gameId, players) {
           player.oldElo,
           player.change,
           player.newElo,
-          player.position,
+          player.placement,
         ],
       );
     }

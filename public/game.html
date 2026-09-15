@@ -48,14 +48,29 @@
 
   <body>
     <div id="baseContainer">
-      <div id="loadingCover">
+      <div id="loadingCover" hidden>
         <i class="fa-solid fa-spinner"></i>
       </div>
 
-      <div id="endGameBackdrop">
+      <div id="endGameBackdrop" hidden>
         <div id="endGamePopup">
-          <div id="endGameTitle"></div>
+          <div class="title"></div>
+
           <div id="scoreboard"></div>
+
+          <div id="buttons">
+            <a href="lobbies.html">
+              <button id="backToLobbies" class="primaryButton">
+                <p>Torna ai tavoli</p>
+              </button>
+            </a>
+
+            <a href="profile.html">
+              <button id="profile" class="primaryButton">
+                <p>Il tuo profilo</p>
+              </button>
+            </a>
+          </div>
         </div>
       </div>
 

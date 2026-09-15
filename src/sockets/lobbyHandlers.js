@@ -180,12 +180,9 @@ function leaveLobby(socket, io, reconnectTimers) {
 
     if (result.action === "finished") {
       game.turnPhase = "finished";
-      broadcastGameState(io, lobby.id);
-
-      io.to(`lobby:${lobby.id}`).emit("game:finished", game.players);
-    } else {
-      broadcastGameState(io, lobby.id);
     }
+
+    broadcastGameState(io, lobby.id);
   }
 
   if (lobby.players.size === 0) {

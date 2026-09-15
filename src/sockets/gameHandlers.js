@@ -115,17 +115,17 @@ async function startGame(socket, io) {
       [lobby.id, lobby.players.size, 0],
     );
 
-    let positionTracker = 1;
+    let placementTracker = 1;
     for (const playerId of lobby.players.keys()) {
       await client.query(
         `
-          INSERT INTO game_players (game_id, user_id, position, left_early) 
+          INSERT INTO game_players (game_id, user_id, placement, left_early) 
           VALUES ($1, $2, $3, FALSE)
           ON CONFLICT (game_id, user_id) DO NOTHING
         `,
-        [lobby.id, playerId, positionTracker],
+        [lobby.id, playerId, placementTracker],
       );
-      positionTracker++;
+      placementTracker++;
     }
 
     await client.query("COMMIT");
@@ -154,16 +154,7 @@ function emitGameResult(io, lobbyId, game, result) {
   }
 
   game.turnPhase = "finished";
-
   broadcastGameState(io, lobbyId);
-
-  for (const socket of io.sockets.sockets.values()) {
-    if (!socket.rooms.has(`lobby:${lobbyId}`)) {
-      continue;
-    }
-
-    socket.emit("game:finished", game.players);
-  }
 
   setLobbyStarted(lobbyId, false);
   setLobbyClosed(lobbyId, true);

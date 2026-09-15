@@ -42,7 +42,7 @@ async function init() {
     CREATE TABLE game_players (
       game_id UUID REFERENCES games(id) ON DELETE CASCADE,
       user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-      position INT NOT NULL,
+      placement INT NOT NULL,
       left_early BOOLEAN DEFAULT FALSE,
 
       PRIMARY KEY (game_id, user_id)
@@ -55,7 +55,7 @@ async function init() {
       old_elo INTEGER NOT NULL,
       elo_change INTEGER NOT NULL,
       new_elo INTEGER NOT NULL,
-      position INTEGER NOT NULL,
+      placement INTEGER NOT NULL,
 
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

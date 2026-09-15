@@ -84,7 +84,7 @@ async function deleteLobby(lobbyId) {
     const playersArray = Array.from(game.players.entries()).map(
       ([userId, player]) => ({
         userId: userId,
-        position: player.position,
+        placement: player.placement,
         leftEarly: player.leftEarly || false,
       }),
     );

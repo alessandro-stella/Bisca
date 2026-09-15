@@ -55,6 +55,7 @@ socket.on("connect", () => {
 
 socket.on("connect_error", (error) => {
   console.error("Socket connection error:", error.message);
+
   const statusEl = document.getElementById("gameStatus");
   if (statusEl) {
     statusEl.textContent = "Errore di connessione... Riprovo...";
@@ -101,20 +102,6 @@ socket.on("game:state:sync", (game) => {
   renderGameState(game);
 });
 
-function handleGameFinishedUI(players) {
-  console.log("Game finished! handling UI");
-
-  console.log(players);
-}
-
-socket.on("game:finished", (players) => {
-  handleGameFinishedUI(players);
-});
-
-socket.on("game:finished:sync", (players) => {
-  handleGameFinishedUI(players);
-});
-
 socket.on("lobbies:update:sync", (data) => {
   console.log("Lobby action from another device:", data);
   socket.emit("game:get-state");
@@ -149,11 +136,9 @@ function resetBottomActions() {
 
 function renderGameState(game) {
   if (game.turnPhase === "finished") {
-    handleGameFinishedUI(game.players);
+    showScoreboard([game.me, ...game.opponents], game.me.playerId);
     return;
   }
-
-  console.log(game);
 
   const table = document.getElementById("table");
   table.innerHTML = "";
@@ -305,8 +290,8 @@ function createOpponents(
       opponentInfo.classList.add("disconnected");
     }
 
-    if (opponent.position !== null) {
-      stats.innerHTML = `Posto: ${opponent.position}°`;
+    if (opponent.placement !== null) {
+      stats.innerHTML = `Posto: ${opponent.placement}°`;
     } else {
       const lives = document.createElement("div");
       lives.classList.add("lives");
@@ -328,7 +313,6 @@ function createOpponents(
 
       const bidsText = document.createElement("p");
 
-      // Visualizzazione testo per le puntate/showdown
       if (isShowdown) {
         if (turnPhase === "bidding" && isCurrentPlayer) {
           bidsText.innerHTML = '<i class="fa-solid fa-spinner"></i>';
@@ -538,4 +522,40 @@ function createCards(cards, containerId, eventListener = false) {
     const cardElement = createSingleCard(card, eventListener);
     cardsContainer.appendChild(cardElement);
   }
+}
+
+function showScoreboard(players) {
+  const placements = players
+    .map((player) => ({
+      username: player.username,
+      placement: player.placement,
+    }))
+    .sort((a, b) => a.placement - b.placement);
+
+  const scoreboardContainer = document.getElementById("scoreboard");
+
+  for (const player of placements) {
+    const row = document.createElement("div");
+    row.classList.add("row");
+
+    const placementContainer = document.createElement("div");
+    placementContainer.classList.add("placement");
+    placementContainer.innerHTML = `${player.placement}°`;
+
+    const playerContainer = document.createElement("div");
+    playerContainer.classList.add("player");
+    playerContainer.innerHTML = player.username;
+
+    row.appendChild(placementContainer);
+    row.appendChild(playerContainer);
+
+    scoreboardContainer.appendChild(row);
+  }
+
+  const endGameBackdrop = document.getElementById("endGameBackdrop");
+  const titleElement = document.querySelector("#endGamePopup .title");
+
+  endGameBackdrop.hidden = false;
+  titleElement.innerHTML =
+    players[0].placement === 1 ? "Hai vinto!" : "Partita terminata";
 }

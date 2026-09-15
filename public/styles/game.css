@@ -265,6 +265,156 @@
   gap: 1.5em;
 }
 
+/* ============== */
+/* End game popup */
+/* ============== */
+
+#endGameBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(0.5em);
+  -webkit-backdrop-filter: blur(0.5em);
+  z-index: 10;
+}
+
+#endGamePopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 11;
+
+  min-width: 50%;
+  max-width: 75%;
+  max-height: 85vh;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 2rem;
+  border-radius: 1em;
+
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+#endGamePopup .title {
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+}
+
+#scoreboard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+#scoreboard .row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.75em;
+  background: var(--bg-card);
+  border: 1px solid var(--border-inactive);
+}
+
+#scoreboard .placement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  font-weight: bold;
+  border-radius: 0.5em;
+  background: var(--btn-secondary-bg);
+  color: var(--text-active);
+
+  padding-left: 0.25em;
+}
+
+#scoreboard .player {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+}
+
+#scoreboard .row:nth-child(1) {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.12),
+    rgba(255, 215, 0, 0.02)
+  );
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+#scoreboard .row:nth-child(1) .placement {
+  background: rgba(255, 215, 0, 0.25);
+  color: #ffd700;
+}
+
+#scoreboard .row:nth-child(2) {
+  background: linear-gradient(
+    90deg,
+    rgba(192, 192, 192, 0.1),
+    rgba(192, 192, 192, 0.02)
+  );
+  border-color: rgba(192, 192, 192, 0.25);
+}
+
+#scoreboard .row:nth-child(2) .placement {
+  background: rgba(192, 192, 192, 0.2);
+  color: #e0e0e0;
+}
+
+#scoreboard .row:nth-child(3) {
+  background: linear-gradient(
+    90deg,
+    rgba(205, 127, 50, 0.1),
+    rgba(205, 127, 50, 0.02)
+  );
+  border-color: rgba(205, 127, 50, 0.25);
+}
+
+#scoreboard .row:nth-child(3) .placement {
+  background: rgba(205, 127, 50, 0.2);
+  color: #cd7f32;
+}
+
+#endGamePopup #scoreboard .row .player {
+  font-size: 1.2em;
+  text-overflow: ellipsis;
+}
+
+#endGamePopup #buttons {
+  font-size: 1.2em;
+  width: 100%;
+
+  display: flex;
+  gap: 1em;
+}
+
+#endGamePopup #buttons > * {
+  flex: 1;
+}
+
+#endGamePopup #buttons button {
+  width: 100%;
+  border-radius: 0.5em;
+
+  padding: 0.25em 0;
+}
+
 /* Properties for mobile */
 @media (max-width: 768px) {
   #tableContainer,
@@ -363,5 +513,11 @@
 
   #bottomButtons .dangerButton:hover {
     color: green;
+  }
+
+  #endGamePopup {
+    width: 90%;
+    max-width: 100%;
+    padding: 1em;
   }
 }

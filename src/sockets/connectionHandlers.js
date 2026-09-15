@@ -126,12 +126,9 @@ function createConnectionHandlers() {
 
         if (result.action === "finished") {
           game.turnPhase = "finished";
-          broadcastGameState(io, currentLobby.id);
-
-          io.to(`lobby:${currentLobby.id}`).emit("game:finished", game.players);
-        } else {
-          broadcastGameState(io, currentLobby.id);
         }
+
+        broadcastGameState(io, currentLobby.id);
       }
 
       removePlayer(currentLobby.id, userId);

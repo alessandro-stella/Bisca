@@ -265,7 +265,7 @@ router.get("/:userId/games", async (req, res) => {
         g.id,
         g.duration,
         g.created_at,
-        gp.position,
+        gp.placement,
         gp.left_early,
         eh.old_elo,
         eh.elo_change,

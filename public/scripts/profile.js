@@ -71,7 +71,7 @@ function showMatchHistory(gamesHistory) {
   tbody.innerHTML = "";
 
   for (const game of gamesHistory) {
-    if (game.position === 1) won++;
+    if (game.placement === 1) won++;
 
     const tr = document.createElement("tr");
 
@@ -87,7 +87,7 @@ function showMatchHistory(gamesHistory) {
 
     tr.innerHTML = `
       <td>${formatDate(game.created_at)}</td>
-      <td>${game.position}° ${badge}</td>
+      <td>${game.placement}° ${badge}</td>
       <td style="color: ${eloColor}; font-weight: bold;">${eloSign}${game.elo_change}</td>
       <td>${game.opponents_count}</td>
       <td>${game.duration}</td>

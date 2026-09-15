@@ -43,7 +43,7 @@ function initGameState(lobbyId, players, lives, initialCards) {
       bid: -1,
       lives: lives,
       won: 0,
-      position: null,
+      placement: null,
     };
 
     gamePlayers.set(playerId, newPlayerState);
@@ -63,7 +63,7 @@ function initGameState(lobbyId, players, lives, initialCards) {
 
     players: gamePlayers,
     playedCards: new Map(),
-    nextPosition: gamePlayers.size,
+    nextPlacement: gamePlayers.size,
 
     turnStarter: firstPlayer,
     currentPlayer: firstPlayer,
@@ -493,7 +493,7 @@ function endTurn(game) {
     }
 
     if (deadThisTurn.length > 0) {
-      assignPlayersPosition(game, deadThisTurn);
+      assignPlayersPlacement(game, deadThisTurn);
     }
   }
 
@@ -503,7 +503,7 @@ function endTurn(game) {
     game.status = "finished";
     game.winnerId = winnerId;
 
-    game.players.get(winnerId).position = 1;
+    game.players.get(winnerId).placement = 1;
 
     return {
       finished: true,
@@ -546,20 +546,20 @@ function endTurn(game) {
   };
 }
 
-function assignPlayersPosition(game, playerIds) {
+function assignPlayersPlacement(game, playerIds) {
   const players = playerIds
     .map((playerId) => game.players.get(playerId))
-    .filter((player) => player && player.position == null);
+    .filter((player) => player && player.placement == null);
 
   if (players.length === 0) {
     return;
   }
 
   for (const player of players) {
-    player.position = game.nextPosition;
+    player.placement = game.nextPlacement;
   }
 
-  game.nextPosition -= players.length;
+  game.nextPlacement -= players.length;
 }
 
 async function resolveShowdown(game, onResolving) {
@@ -634,7 +634,7 @@ function removePlayerFromGame(game, playerId) {
     playerState.connected = false;
   }
 
-  assignPlayersPosition(game, [playerId]);
+  assignPlayersPlacement(game, [playerId]);
 
   const alivePlayers = Array.from(game.players.entries()).filter(
     ([, p]) => p.lives > 0,
@@ -645,7 +645,7 @@ function removePlayerFromGame(game, playerId) {
       const winnerId = alivePlayers[0][0];
       game.status = "finished";
       game.winnerId = winnerId;
-      game.players.get(winnerId).position = 1;
+      game.players.get(winnerId).placement = 1;
       return { action: "finished", winnerId };
     } else {
       game.status = "finished";
@@ -682,10 +682,10 @@ async function saveGameData(game) {
       await dbClient.query(
         `
           UPDATE game_players 
-          SET position = $1, left_early = $2
+          SET placement = $1, left_early = $2
           WHERE game_id = $3 AND user_id = $4
         `,
-        [p.position, p.leftEarly || false, gameId, p.userId],
+        [p.placement, p.leftEarly || false, gameId, p.userId],
       );
     }
 
@@ -693,7 +693,7 @@ async function saveGameData(game) {
 
     const playersForElo = game.players.map((p) => ({
       id: p.userId,
-      position: p.position,
+      placement: p.placement,
     }));
 
     await calculateAndUpdateElo(gameId, playersForElo);
@@ -717,7 +717,7 @@ module.exports = {
   placeBid,
   playCard,
   resolveShowdown,
-  assignPlayersPosition,
+  assignPlayersPlacement: assignPlayersPlacement,
   removePlayerFromGame,
   saveGameData,
 };
