@@ -200,7 +200,8 @@
   background-color: green;
 
   flex: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 
   padding: 1em;
 }
@@ -228,10 +229,15 @@
   transition: all 0.2s ease-in-out;
 }
 
-#myCards .card:hover {
+#myCards .card:hover,
+#myCards .card.selected {
   transform: translateY(-1em);
   box-shadow: var(--shadow-large);
   cursor: pointer;
+}
+
+#myCards .card.selected {
+  border: 2px solid blue;
 }
 
 /* ============================ */
@@ -422,6 +428,8 @@
     width: 100%;
     max-width: 100%;
     margin: 0;
+
+    display: flex;
   }
 
   #table {

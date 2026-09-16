@@ -87,7 +87,41 @@ socket.on("game:reconnect", () => {
 
 socket.on("game:not-found", () => {
   console.log("Game not found");
-  window.location.replace("/lobbies.html");
+  // window.location.replace("/lobbies.html");
+
+  const testGame = {
+    turnPhase: "bidding",
+    totalBids: 0,
+    showdown: false,
+    me: {
+      playerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
+      connected: true,
+      username: "ale",
+      bid: -1,
+      lives: 2,
+      won: 0,
+      placement: null,
+    },
+    opponents: [
+      {
+        playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
+        connected: true,
+        username: "test",
+        bid: -1,
+        lives: 3,
+        won: 0,
+        placement: null,
+      },
+    ],
+    playedCards: [],
+    currentPlayerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
+    hand: ["spade4", "bastoni5"],
+    isMyTurn: true,
+    lastPlayer: false,
+    highestPlay: null,
+  };
+
+  renderGameState(testGame);
 });
 
 socket.on("game:state", (game) => {
@@ -121,46 +155,171 @@ document.addEventListener("visibilitychange", () => {
 // Game UI functions
 
 const chatButton = document.getElementById("openChat");
-chatButton.addEventListener("click", () => alert("Coming soon! (Spero)"));
+if (chatButton) {
+  chatButton.addEventListener("click", () => alert("Coming soon! (Spero)"));
+}
 
 const loader = document.getElementById("loadingCover");
 
-function resetBottomActions() {
+function clearBottomCustomActions() {
   const bidsWrapper = document.getElementById("bidsContainer");
   if (bidsWrapper) {
     bidsWrapper.remove();
   }
 
-  const bottomButton = document.getElementById("bottomButton");
-  if (bottomButton) {
-    bottomButton.removeAttribute("hidden");
+  const aceActions = document.getElementById("acePlayActions");
+  if (aceActions) {
+    aceActions.remove();
   }
 }
 
+function resetBottomActions() {
+  clearBottomCustomActions();
+
+  const bottomButton = /** @type {HTMLButtonElement} */ (
+    document.getElementById("bottomButton")
+  );
+  if (bottomButton) {
+    bottomButton.hidden = false;
+  }
+}
+
+let selectedCardData = null;
+
+function resetBottomButton() {
+  selectedCardData = null;
+
+  document.querySelectorAll(".card.selected").forEach((el) => {
+    el.classList.remove("selected");
+  });
+
+  clearBottomCustomActions();
+
+  const btn = /** @type {HTMLButtonElement} */ (
+    document.getElementById("bottomButton")
+  );
+  if (!btn) return;
+
+  btn.hidden = false;
+  btn.disabled = true;
+  btn.className = "secondaryButton disabled";
+
+  const label = btn.querySelector("p");
+  const text =
+    currentTurnPhase === "play"
+      ? "Seleziona una carta"
+      : "Attendi il tuo turno";
+
+  if (label) {
+    label.textContent = text;
+  } else {
+    btn.textContent = text;
+  }
+}
+
+const mainPlayBtn = /** @type {HTMLButtonElement} */ (
+  document.getElementById("bottomButton")
+);
+if (mainPlayBtn) {
+  mainPlayBtn.addEventListener("click", () => {
+    if (!selectedCardData) return;
+    socket.emit("game:play-card", selectedCardData.card);
+    resetBottomButton();
+  });
+}
+
+function updateBottomButton(card, cardElement) {
+  const bottomContainer = document.getElementById("bottom");
+  const btn = /** @type {HTMLButtonElement} */ (
+    document.getElementById("bottomButton")
+  );
+  if (!bottomContainer || !btn) return;
+
+  if (selectedCardData && selectedCardData.card === card) {
+    resetBottomButton();
+    return;
+  }
+
+  document.querySelectorAll(".card.selected").forEach((el) => {
+    el.classList.remove("selected");
+  });
+
+  clearBottomCustomActions();
+
+  cardElement.classList.add("selected");
+  selectedCardData = { card, element: cardElement };
+
+  if (card === "denari1") {
+    btn.hidden = true;
+
+    const aceActions = document.createElement("div");
+    aceActions.id = "acePlayActions";
+    aceActions.className = "bidsWrapper";
+
+    const btnHigher = document.createElement("button");
+    btnHigher.className = "bidButton primaryButton";
+    btnHigher.innerHTML = "<p>Alto</p>";
+    btnHigher.addEventListener("click", () => {
+      socket.emit("game:play-card", "asso-prende");
+      resetBottomButton();
+    });
+
+    const btnLower = document.createElement("button");
+    btnLower.className = "bidButton primaryButton";
+    btnLower.innerHTML = "<p>Basso</p>";
+    btnLower.addEventListener("click", () => {
+      socket.emit("game:play-card", "asso-lascia");
+      resetBottomButton();
+    });
+
+    aceActions.appendChild(btnHigher);
+    aceActions.appendChild(btnLower);
+    bottomContainer.appendChild(aceActions);
+  } else {
+    btn.hidden = false;
+    btn.disabled = false;
+    btn.className = "primaryButton";
+
+    const label = btn.querySelector("p");
+    if (label) {
+      label.textContent = "Gioca carta";
+    } else {
+      btn.textContent = "Gioca carta";
+    }
+  }
+}
+
+let currentTurnPhase = null;
+
 function renderGameState(game) {
+  currentTurnPhase = game.turnPhase;
   if (game.turnPhase === "finished") {
     showScoreboard([game.me, ...game.opponents]);
     return;
   }
 
+  selectedCardData = null;
+
   const table = document.getElementById("table");
-  table.innerHTML = "";
+  if (table) {
+    table.innerHTML = "";
 
-  createMySeat(
-    table,
-    game.me,
-    game.currentPlayerId,
-    game.turnPhase,
-    game.showdown,
-  );
+    createMySeat(
+      table,
+      game.me,
+      game.currentPlayerId,
+      game.turnPhase,
+      game.showdown,
+    );
 
-  createOpponents(
-    table,
-    game.turnPhase,
-    game.opponents || [],
-    game.currentPlayerId,
-    game.showdown,
-  );
+    createOpponents(
+      table,
+      game.turnPhase,
+      game.opponents || [],
+      game.currentPlayerId,
+      game.showdown,
+    );
+  }
 
   createPlayedCards(game.playedCards, game.highestPlay);
 
@@ -195,63 +354,85 @@ function createMySeat(
   table.appendChild(mySeat);
 
   const usernameDiv = document.getElementById("myUsername");
-  const livesDiv = document
-    .getElementById("myLives")
-    .getElementsByClassName("value")[0];
+  const livesContainer = document.getElementById("myLives");
+  const livesDiv = livesContainer
+    ? livesContainer.getElementsByClassName("value")[0]
+    : null;
   const myBidsContainer = document.getElementById("myBids");
-  const bidsDiv = myBidsContainer.getElementsByClassName("value")[0];
-  const bottomButton = document.getElementById("bottomButton");
+  const bidsDiv = myBidsContainer
+    ? myBidsContainer.getElementsByClassName("value")[0]
+    : null;
+  const bottomButton = /** @type {HTMLButtonElement} */ (
+    document.getElementById("bottomButton")
+  );
 
-  livesDiv.innerHTML = myData.lives;
+  if (livesDiv) {
+    livesDiv.innerHTML = myData.lives;
+  }
 
   const isMyTurn = myData.playerId === currentPlayerId;
   const hasBid =
     myData.bid !== -1 && myData.bid !== null && myData.bid !== undefined;
 
+  const updateBottomButtonDefault = () => {
+    console.log(
+      "updateBottomButtonDefault - isMyTurn:",
+      isMyTurn,
+      "turnPhase:",
+      turnPhase,
+    );
+    if (!bottomButton) return;
+    bottomButton.hidden = false;
+    bottomButton.disabled = true;
+    bottomButton.className = "secondaryButton disabled";
+
+    const label = bottomButton.querySelector("p");
+    const text =
+      isMyTurn && turnPhase === "play"
+        ? "Seleziona una carta"
+        : "Attendi il tuo turno";
+
+    if (label) {
+      label.textContent = text;
+    } else {
+      bottomButton.textContent = text;
+    }
+  };
+
   if (isShowdown) {
-    myBidsContainer.style.display = "none";
+    if (myBidsContainer) myBidsContainer.style.display = "none";
 
     if (turnPhase === "bidding" && !hasBid) {
-      usernameDiv.innerHTML = "Showdown";
-      if (!isMyTurn && bottomButton) {
-        bottomButton.removeAttribute("hidden");
-        bottomButton.textContent = "Attendi il tuo turno";
-        bottomButton.disabled = true;
+      if (usernameDiv) usernameDiv.innerHTML = "Showdown";
+      if (!isMyTurn) {
+        updateBottomButtonDefault();
       }
     } else {
-      usernameDiv.innerHTML = myData.username;
-      if (bottomButton) {
-        bottomButton.removeAttribute("hidden");
-        bottomButton.textContent = "Attendi il tuo turno";
-        bottomButton.disabled = true;
-      }
+      if (usernameDiv) usernameDiv.innerHTML = myData.username;
+      updateBottomButtonDefault();
     }
   } else if (turnPhase === "bidding" && !hasBid) {
-    usernameDiv.innerHTML = "Quanto scommetti?";
-    myBidsContainer.style.display = "none";
+    if (usernameDiv) usernameDiv.innerHTML = "Quanto scommetti?";
+    if (myBidsContainer) myBidsContainer.style.display = "none";
 
-    if (!isMyTurn && bottomButton) {
-      bottomButton.removeAttribute("hidden");
-      bottomButton.textContent = "Attendi il tuo turno";
-      bottomButton.disabled = true;
+    if (!isMyTurn) {
+      updateBottomButtonDefault();
     }
   } else {
-    usernameDiv.innerHTML = myData.username;
-    myBidsContainer.style.display = "";
-    bidsDiv.innerHTML = `${myData.won}/${myData.bid}`;
+    if (usernameDiv) usernameDiv.innerHTML = myData.username;
+    if (myBidsContainer) myBidsContainer.style.display = "";
+    if (bidsDiv) bidsDiv.innerHTML = `${myData.won}/${myData.bid}`;
 
-    if (bottomButton) {
-      bottomButton.removeAttribute("hidden");
-      bottomButton.textContent = "Attendi il tuo turno";
-      bottomButton.disabled = true;
-    }
+    updateBottomButtonDefault();
   }
 
   const cards = document.getElementById("myCards");
-  if (isMyTurn) {
-    cards.classList.add("currentPlayer");
-  } else {
-    cards.classList.remove("currentPlayer");
+  if (cards) {
+    if (isMyTurn) {
+      cards.classList.add("currentPlayer");
+    } else {
+      cards.classList.remove("currentPlayer");
+    }
   }
 }
 
@@ -373,12 +554,14 @@ function createPlayedCards(cards, highestPlay) {
 
 function createBidButtons(game) {
   const bottomContainer = document.getElementById("bottom");
-  const bottomButton = document.getElementById("bottomButton");
+  const bottomButton = /** @type {HTMLButtonElement} */ (
+    document.getElementById("bottomButton")
+  );
 
   if (!bottomContainer) return;
 
   if (bottomButton) {
-    bottomButton.setAttribute("hidden", "true");
+    bottomButton.hidden = true;
   }
 
   let bidsWrapper = document.getElementById("bidsContainer");
@@ -401,6 +584,7 @@ function createBidButtons(game) {
   const deniedBid = game.lastPlayer ? game.hand.length - game.totalBids : null;
 
   for (const bid of possibleBids) {
+    /** @type {HTMLButtonElement} */
     const bidButton = document.createElement("button");
     bidButton.innerHTML = `<p>${bid}</p>`;
     bidButton.classList.add("bidButton");
@@ -412,6 +596,7 @@ function createBidButtons(game) {
       bidButton.disabled = true;
     } else {
       bidButton.classList.add("primaryButton");
+      bidButton.disabled = false;
       bidButton.addEventListener("click", () => {
         socket.emit("game:place-bid", bid);
         resetBottomActions();
@@ -429,10 +614,12 @@ function createShowdownButtons(container) {
   ];
 
   for (const { label, bid } of options) {
+    /** @type {HTMLButtonElement} */
     const bidButton = document.createElement("button");
 
     bidButton.innerHTML = `<p>${label}</p>`;
     bidButton.classList.add("bidButton", "primaryButton");
+    bidButton.disabled = false;
 
     bidButton.addEventListener("click", () => {
       socket.emit("game:place-bid", bid);
@@ -475,43 +662,9 @@ function createSingleCard(card, eventListener = false) {
   cardElement.classList.add("card");
 
   if (eventListener) {
-    if (card !== "denari1") {
-      cardElement.addEventListener("click", () => {
-        socket.emit("game:play-card", card);
-      });
-    } else {
-      cardElement.addEventListener("click", () => {
-        const existingPopup = document.getElementById("acePopup");
-        if (existingPopup) existingPopup.remove();
-
-        const popup = document.createElement("div");
-        popup.id = "acePopup";
-
-        const title = document.createElement("div");
-        title.innerHTML =
-          "Scegli se sarà la carta più alta o più bassa della mano:";
-
-        const higher = document.createElement("button");
-        higher.innerHTML = "Più alta";
-        higher.addEventListener("click", () => {
-          socket.emit("game:play-card", "asso-prende");
-          popup.remove();
-        });
-
-        const lower = document.createElement("button");
-        lower.innerHTML = "Più bassa";
-        lower.addEventListener("click", () => {
-          socket.emit("game:play-card", "asso-lascia");
-          popup.remove();
-        });
-
-        popup.appendChild(title);
-        popup.appendChild(higher);
-        popup.appendChild(lower);
-
-        document.body.appendChild(popup);
-      });
-    }
+    cardElement.addEventListener("click", () => {
+      updateBottomButton(card, cardElement);
+    });
   }
 
   return cardElement;
@@ -525,6 +678,7 @@ function createCards(
   isShowdown = false,
 ) {
   const cardsContainer = document.getElementById(containerId);
+  if (!cardsContainer) return;
   cardsContainer.innerHTML = "";
 
   if (isShowdown && turnPhase !== "resolving") {
@@ -537,7 +691,6 @@ function createCards(
     backCard.classList.add("card");
 
     cardsContainer.appendChild(backCard);
-
     return;
   }
 
@@ -548,14 +701,14 @@ function createCards(
 }
 
 function showScoreboard(players) {
-  const placements = players
-    .map((player) => ({
-      username: player.username,
-      placement: player.placement,
-    }))
-    .sort((a, b) => a.placement - b.placement);
-
   const scoreboardContainer = document.getElementById("scoreboard");
+  if (scoreboardContainer) {
+    scoreboardContainer.innerHTML = "";
+  }
+
+  const placements = [...players].sort(
+    (a, b) => (a.placement ?? 99) - (b.placement ?? 99),
+  );
 
   for (const player of placements) {
     const row = document.createElement("div");
@@ -563,22 +716,30 @@ function showScoreboard(players) {
 
     const placementContainer = document.createElement("div");
     placementContainer.classList.add("placement");
-    placementContainer.innerHTML = `${player.placement}°`;
+    placementContainer.textContent = `${player.placement}°`;
 
     const playerContainer = document.createElement("div");
     playerContainer.classList.add("player");
-    playerContainer.innerHTML = player.username;
+    playerContainer.textContent = player.username;
 
     row.appendChild(placementContainer);
     row.appendChild(playerContainer);
 
-    scoreboardContainer.appendChild(row);
+    if (scoreboardContainer) {
+      scoreboardContainer.appendChild(row);
+    }
   }
 
   const endGameBackdrop = document.getElementById("endGameBackdrop");
   const titleElement = document.querySelector("#endGamePopup .title");
 
-  endGameBackdrop.hidden = false;
-  titleElement.innerHTML =
-    players[0].placement === 1 ? "Hai vinto!" : "Partita terminata";
+  if (endGameBackdrop) {
+    endGameBackdrop.hidden = false;
+  }
+
+  if (titleElement) {
+    const myData = players[0];
+    titleElement.textContent =
+      myData && myData.placement === 1 ? "Hai vinto!" : "Partita terminata";
+  }
 }
