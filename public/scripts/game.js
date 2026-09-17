@@ -143,8 +143,41 @@ document.addEventListener("visibilitychange", () => {
 
 // Game UI functions
 
+const sendMessageButton = document.getElementById("sendMessage");
+const messageContentInput =
+  /** @type {HTMLInputElement} */
+  (document.getElementById("messageContent"));
 const chatButton = document.getElementById("openChat");
 const expandChatButton = document.getElementById("expandChat");
+
+function sendChatMessage() {
+  const text = messageContentInput.value.trim();
+  if (!text) return;
+
+  socket.emit("game:chat-message", text);
+
+  messageContentInput.value = "";
+}
+
+sendMessageButton.addEventListener("click", sendChatMessage);
+
+messageContentInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    sendChatMessage();
+  }
+});
+
+const messagesContainer = document.getElementById("oldMessages");
+
+socket.on("game:chat-message", (data) => {
+  const newMessage = document.createElement("div");
+
+  newMessage.classList.add("message");
+  newMessage.innerHTML = `<strong>${data.senderUsername}</strong>: ${data.text}`;
+
+  messagesContainer.appendChild(newMessage);
+});
+
 chatButton.addEventListener("click", () => alert("Coming soon! (Spero)"));
 expandChatButton.addEventListener("click", () => alert("Coming soon! (Spero)"));
 

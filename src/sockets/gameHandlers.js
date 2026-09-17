@@ -304,6 +304,32 @@ function checkCurrentGame(socket) {
   socket.emit("game:reconnect");
 }
 
+// Aggiungi questa funzione in gameHandlers.js e ricordati di esportarla
+
+async function handleChatMessage(io, socket, text) {
+  const lobby = getLobbyByPlayer(socket.user.id);
+
+  if (!lobby) {
+    socket.emit("error", { message: "Non sei in una lobby" });
+    return;
+  }
+
+  if (!text || typeof text !== "string" || text.trim() === "") {
+    return;
+  }
+
+  const sanitizedText = text.trim().slice(0, 250);
+
+  const room = `lobby:${lobby.id}`;
+
+  io.to(room).emit("game:chat-message", {
+    senderId: socket.user.id,
+    senderUsername: socket.user.username,
+    text: sanitizedText,
+    timestamp: Date.now(),
+  });
+}
+
 module.exports = {
   broadcastGameState,
   sendGameState,
@@ -312,4 +338,5 @@ module.exports = {
   handlePlayCard,
   checkCurrentGame,
   emitGameResult,
+  handleChatMessage,
 };

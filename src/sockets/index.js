@@ -27,6 +27,7 @@ const {
   handlePlaceBid,
   handlePlayCard,
   checkCurrentGame,
+  handleChatMessage,
 } = require("./gameHandlers");
 
 const createConnectionHandlers = require("./connectionHandlers");
@@ -186,6 +187,12 @@ function setupSockets(io) {
 
     socket.on("lobbies:check", () => {
       checkCurrentGame(socket);
+    });
+
+    socket.on("game:chat-message", (text) => {
+      if (runMiddleware(requireActiveGame, socket)) {
+        handleChatMessage(io, socket, text);
+      }
     });
 
     // =============================================
