@@ -175,7 +175,11 @@ socket.on("game:chat-message", (data) => {
   newMessage.classList.add("message");
   newMessage.innerHTML = `<strong>${data.senderUsername}</strong>: ${data.text}`;
 
-  messagesContainer.appendChild(newMessage);
+  if (data.isMe) {
+    newMessage.classList.add("isMe");
+  }
+
+  messagesContainer.prepend(newMessage);
 });
 
 chatButton.addEventListener("click", () => alert("Coming soon! (Spero)"));

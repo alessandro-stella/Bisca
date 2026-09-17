@@ -191,7 +191,7 @@ function setupSockets(io) {
 
     socket.on("game:chat-message", (text) => {
       if (runMiddleware(requireActiveGame, socket)) {
-        handleChatMessage(io, socket, text);
+        handleChatMessage(socket, text);
       }
     });
 

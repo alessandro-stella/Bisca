@@ -304,9 +304,7 @@ function checkCurrentGame(socket) {
   socket.emit("game:reconnect");
 }
 
-// Aggiungi questa funzione in gameHandlers.js e ricordati di esportarla
-
-async function handleChatMessage(io, socket, text) {
+async function handleChatMessage(socket, text) {
   const lobby = getLobbyByPlayer(socket.user.id);
 
   if (!lobby) {
@@ -319,14 +317,23 @@ async function handleChatMessage(io, socket, text) {
   }
 
   const sanitizedText = text.trim().slice(0, 250);
-
   const room = `lobby:${lobby.id}`;
 
-  io.to(room).emit("game:chat-message", {
+  const payload = {
     senderId: socket.user.id,
     senderUsername: socket.user.username,
     text: sanitizedText,
     timestamp: Date.now(),
+  };
+
+  socket.broadcast.to(room).emit("game:chat-message", {
+    ...payload,
+    isMe: false,
+  });
+
+  socket.emit("game:chat-message", {
+    ...payload,
+    isMe: true,
   });
 }
 
