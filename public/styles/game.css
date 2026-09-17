@@ -201,6 +201,7 @@
 }
 
 #mySeat {
+  position: relative;
   background-color: green;
 
   flex: 1;
@@ -422,6 +423,37 @@
   padding-right: 2px;
 }
 
+#chatContainer.open {
+  padding-top: 0;
+  z-index: 10;
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
+  width: calc((100% - 4em) / 3.5);
+  height: calc(100dvh - 2em);
+}
+
+#chatContainer.open #expandChat {
+  opacity: 1;
+  margin-top: 0.5em;
+}
+
+#chatContainer #expandChat .fa-xmark,
+#chatContainer.open #expandChat .fa-xmark {
+  display: none;
+}
+
+#chatContainer.open #expandChat > * {
+  transform: rotate(180deg);
+}
+
+#chatContainer.open .message {
+  background-color: teal;
+  text-overflow: unset;
+  overflow: unset;
+  white-space: unset;
+}
+
 /* ============================ */
 /* General properties for cards */
 /* ============================ */
@@ -610,7 +642,21 @@
   }
 
   #topButtons #openChat {
+    position: relative;
     display: grid;
+  }
+
+  #topButtons #openChat.newMessage::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+
+    position: absolute;
+    top: -0.2em;
+    right: -0.2em;
+
+    border-radius: 50%;
+    background-color: var(--accent-red);
   }
 
   #tableContainer,
@@ -632,6 +678,7 @@
 
   #mySeat {
     background-color: green;
+
     flex: 2.5;
     flex-direction: column-reverse;
     gap: 1em;
@@ -662,8 +709,54 @@
     flex: 1;
   }
 
+  /* =========== */
+  /* Chat design */
+  /* =========== */
+
   #chatContainer {
     display: none;
+  }
+
+  #chatContainer.open #expandChat {
+    right: 1.5em;
+    top: 1.5em;
+    left: initial;
+  }
+
+  #chatContainer.open #expandChat .fa-xmark {
+    display: initial;
+  }
+
+  #chatContainer.open #expandChat .fa-angle-up {
+    display: none;
+  }
+
+  #chatContainer.open {
+    display: flex;
+    gap: 1em;
+
+    position: absolute;
+    width: 100dvw;
+    height: 100dvh;
+    bottom: 0;
+    right: 0;
+
+    padding: 1em;
+
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(0.5em);
+  }
+
+  #oldMessages {
+    gap: 1em;
+  }
+
+  #chatContainer .message {
+    max-width: 60%;
+  }
+
+  #chatContainer .message.isMe {
+    align-self: end;
   }
 
   #endGamePopup {

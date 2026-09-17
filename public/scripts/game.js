@@ -103,6 +103,42 @@ socket.on("game:not-found", () => {
         won: 0,
         placement: null,
       },
+      {
+        playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
+        connected: true,
+        username: "test",
+        bid: -1,
+        lives: 3,
+        won: 0,
+        placement: null,
+      },
+      {
+        playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
+        connected: true,
+        username: "test",
+        bid: -1,
+        lives: 3,
+        won: 0,
+        placement: null,
+      },
+      {
+        playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
+        connected: true,
+        username: "test",
+        bid: -1,
+        lives: 3,
+        won: 0,
+        placement: null,
+      },
+      {
+        playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
+        connected: true,
+        username: "test",
+        bid: -1,
+        lives: 3,
+        won: 0,
+        placement: null,
+      },
     ],
     playedCards: [],
     currentPlayerId: "ce9c65a7-4318-4c81-b519-7299b5124e22",
@@ -180,10 +216,21 @@ socket.on("game:chat-message", (data) => {
   }
 
   messagesContainer.prepend(newMessage);
+
+  chatButton.classList.add("newMessage");
 });
 
-chatButton.addEventListener("click", () => alert("Coming soon! (Spero)"));
-expandChatButton.addEventListener("click", () => alert("Coming soon! (Spero)"));
+const chatContainer = document.getElementById("chatContainer");
+
+chatButton.addEventListener("click", () => {
+  chatContainer.classList.toggle("open");
+  chatButton.classList.remove("newMessage");
+});
+
+expandChatButton.addEventListener("click", () => {
+  chatContainer.classList.toggle("open");
+  chatButton.classList.remove("newMessage");
+});
 
 const loader = document.getElementById("loadingCover");
 
