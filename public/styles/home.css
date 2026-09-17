@@ -28,7 +28,7 @@ ul {
 .container {
   width: 65em;
   max-width: 90%;
-  min-height: 100dvh;
+  min-height: 100svh;
 
   padding: 1em;
   margin: 1em auto;

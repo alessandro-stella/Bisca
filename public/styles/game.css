@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 100dvw;
-  height: 100dvh;
+  height: 100svh;
   z-index: 10;
 
   display: grid;
@@ -23,7 +23,7 @@
 }
 
 #baseContainer {
-  height: 100dvh;
+  height: 100svh;
   background-color: red;
   display: flex;
   flex-direction: column;
@@ -430,7 +430,7 @@
   bottom: 1em;
   right: 1em;
   width: calc((100% - 4em) / 3.5);
-  height: calc(100dvh - 2em);
+  height: calc(100svh - 2em);
 }
 
 #chatContainer.open #expandChat {
@@ -464,7 +464,7 @@
 }
 
 .playedCard {
-  height: 15vh;
+  height: 15svh;
   transform: rotate(90deg);
 }
 
@@ -473,7 +473,7 @@
 }
 
 .opponentSeat .playedCard {
-  height: 10vh;
+  height: 10svh;
   margin-left: 5vw;
 }
 
@@ -494,7 +494,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100svh;
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(0.5em);
   -webkit-backdrop-filter: blur(0.5em);
@@ -510,7 +510,7 @@
 
   min-width: 50%;
   max-width: 75%;
-  max-height: 85vh;
+  max-height: 85svh;
 
   display: flex;
   flex-direction: column;
@@ -737,7 +737,7 @@
 
     position: absolute;
     width: 100dvw;
-    height: 100dvh;
+    height: 100svh;
     bottom: 0;
     right: 0;
 
