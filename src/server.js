@@ -9,6 +9,7 @@ const fs = require("fs");
 const { Server } = require("socket.io");
 
 const db = require("./db");
+const authRouter = require("./routes/authRouter");
 const userRouter = require("./routes/userRouter");
 const { router: sessionRouter } = require("./routes/sessionRouter");
 
@@ -36,6 +37,7 @@ app.use(cors(corsOptions));
 
 const SERVER_START_TIME = Date.now().toString();
 
+app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/session", sessionRouter);
 

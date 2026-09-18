@@ -64,11 +64,14 @@ const DOM = {
   createLobbyPopupButton: document.getElementById("createLobbyPopupButton"),
   filterLobbyPopupButton: document.getElementById("filterLobbiesPopupButton"),
   startLobbyButton: document.getElementById("startLobbyButton"),
+  startLobbyButtonDesktop: document.getElementById("startLobbyButtonDesktop"),
   updateLobbyButton: document.getElementById("updateLobbyButton"),
   deleteLobbyButton: document.getElementById("deleteLobbyButton"),
+  modifyLobbyButton: document.getElementById("modifyLobbyButton"),
   applyFiltersButton: document.getElementById("applyFilters"),
   quitLobbyDesktop: document.getElementById("quitButtonDesktop"),
   quitLobbyMobile: document.getElementById("quitButtonMobile"),
+  ownerButtonsDesktop: document.getElementById("ownerButtonsDesktop"),
 
   lobbiesGrid: document.getElementById("lobbiesGrid"),
   createLobbyContainer: document.getElementById("createLobbyContainer"),
@@ -147,6 +150,12 @@ function setupSocket() {
   DOM.startLobbyButton.addEventListener("click", () =>
     socket.emit("game:start"),
   );
+
+  DOM.startLobbyButtonDesktop.addEventListener("click", () =>
+    socket.emit("game:start"),
+  );
+
+  DOM.modifyLobbyButton.addEventListener("click", openModifyPopup);
 
   DOM.updateLobbyButton.addEventListener("click", () => {
     resetErrors();
@@ -438,11 +447,13 @@ function renderLobbies(lobbies) {
 
 function showQuitButton() {
   DOM.createLobbyPopupButton.hidden = true;
+  DOM.ownerButtonsDesktop.hidden = true;
   DOM.quitLobbyMobile.hidden = false;
 }
 
 function hideQuitButton() {
   DOM.createLobbyPopupButton.hidden = false;
+  DOM.ownerButtonsDesktop.hidden = true;
   DOM.quitLobbyMobile.hidden = true;
 }
 
@@ -475,6 +486,10 @@ function switchLobbySettings(lobbyCreated) {
 
   DOM.createLobbyButton.hidden = lobbyCreated;
   DOM.ownerButtonsContainer.hidden = !lobbyCreated;
+
+  // Show/hide desktop owner buttons
+  DOM.createLobbyPopupButton.hidden = lobbyCreated;
+  DOM.ownerButtonsDesktop.hidden = !lobbyCreated;
 
   DOM.nameInput.parentElement.parentElement.hidden = lobbyCreated;
   DOM.playersInput.parentElement.parentElement.hidden = lobbyCreated;
@@ -568,6 +583,13 @@ if (DOM.joinPasswordInput) {
 }
 
 function openCreatePopup() {
+  openPopup();
+
+  DOM.filterLobbiesSection.classList.add("hidden");
+  DOM.createLobbyContainer.classList.remove("hidden");
+}
+
+function openModifyPopup() {
   openPopup();
 
   DOM.filterLobbiesSection.classList.add("hidden");

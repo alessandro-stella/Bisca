@@ -28,10 +28,10 @@ async function authenticateSocket(socket, next) {
     const cookies = parseCookies(socket.handshake.headers.cookie);
     const sessionId = cookies.sessionId;
 
-    const user = await getUserFromSession(sessionId);
+    const user = await getUserFromSession(sessionId, undefined, true);
 
     if (!user) {
-      return next(new Error("Not authenticated"));
+      return next(new Error("Not authenticated or email not verified"));
     }
 
     socket.user = user;

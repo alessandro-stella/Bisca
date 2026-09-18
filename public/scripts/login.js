@@ -72,7 +72,7 @@ form.addEventListener("submit", async (event) => {
   const password = passwordInput.value;
 
   try {
-    const res = await fetch("/api/user/login", {
+    const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

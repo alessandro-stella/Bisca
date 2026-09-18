@@ -18,7 +18,14 @@ async function init() {
       email VARCHAR(255) UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       elo INT NOT NULL DEFAULT 1000,
-      created_at TIMESTAMP DEFAULT NOW()
+      created_at TIMESTAMP DEFAULT NOW(),
+      
+      email_verified BOOLEAN DEFAULT FALSE,
+      email_verification_token VARCHAR(255) UNIQUE,
+      email_verification_expires_at TIMESTAMP,
+      
+      password_reset_token VARCHAR(255) UNIQUE,
+      password_reset_expires_at TIMESTAMP
     );
 
     CREATE TABLE sessions (
@@ -61,6 +68,10 @@ async function init() {
 
       PRIMARY KEY (game_id, user_id)
     );
+
+    CREATE INDEX idx_email_verification_token ON users(email_verification_token);
+    CREATE INDEX idx_password_reset_token ON users(password_reset_token);
+    CREATE INDEX idx_email_verified ON users(email_verified);
   `);
 
   console.log("Database initialized");

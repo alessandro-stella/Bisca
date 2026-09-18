@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+      .email-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #302e2b;
+        padding: 30px;
+        text-align: center;
+        color: white;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 30px;
+        color: #333;
+        line-height: 1.6;
+      }
+      .content h2 {
+        color: #302e2b;
+        margin-top: 0;
+      }
+      .cta-button {
+        display: inline-block;
+        background-color: #4caf50;
+        color: white;
+        padding: 12px 30px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      .cta-button:hover {
+        background-color: #45a049;
+      }
+      .warning {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .footer {
+        background-color: #f9f9f9;
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+        border-top: 1px solid #eee;
+      }
+      .footer p {
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="header">
+        <h1>Benvenuto su BISCA!</h1>
+      </div>
+
+      <div class="content">
+        <h2>Ciao {{username}},</h2>
+
+        <p>
+          Grazie per esserti registrato! Per completare la registrazione,
+          verifica il tuo indirizzo email cliccando il pulsante sottostante.
+        </p>
+
+        <div style="text-align: center">
+          <a href="{{verificationLink}}" class="cta-button">
+            Verifica la tua email
+          </a>
+        </div>
+
+        <p>
+          In alternativa, puoi copiare e incollare questo link nel tuo browser:
+        </p>
+        <p style="word-break: break-all; font-size: 12px; color: #666">
+          {{verificationLink}}
+        </p>
+
+        <div class="warning">
+          <strong>Tempo limitato:</strong> Questo link scade tra
+          {{expirationMinutes}} minuti. Se non verifichi il tuo account entro
+          questo tempo, dovrai registrarti di nuovo.
+        </div>
+
+        <p>
+          <strong>Non hai creato questo account?</strong><br />
+          Se non sei stato tu, puoi ignorare tranquillamente questo messaggio.
+          L'account sarà eliminato automaticamente se non verificato.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

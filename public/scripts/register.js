@@ -142,6 +142,9 @@ function resetErrors() {
   });
 
   missingData.hidden = true;
+
+  const successDiv = document.getElementById("registerSuccess");
+  if (successDiv) successDiv.hidden = true;
 }
 
 const emailFormatRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -155,7 +158,7 @@ async function checkAvailability() {
   }
 
   try {
-    const res = await fetch("/api/user/checkUser", {
+    const res = await fetch("/api/auth/checkUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -245,7 +248,7 @@ form.addEventListener("submit", async (event) => {
 
 async function registerUser(username, email, password) {
   try {
-    const res = await fetch("/api/user/register", {
+    const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -267,7 +270,12 @@ async function registerUser(username, email, password) {
     if (!res.ok) {
       addErrors(registrationResponse && registrationResponse.errors);
     } else {
-      window.location.replace("lobbies.html");
+      const successDiv = document.getElementById("registerSuccess");
+      successDiv.innerText = registrationResponse.message;
+      successDiv.hidden = false;
+
+      registerButton.hidden = true;
+      form.reset();
     }
   } catch (error) {
     console.log("Internal server error: ", error);

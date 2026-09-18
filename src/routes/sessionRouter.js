@@ -25,7 +25,11 @@ async function handleSession(userId, client = db) {
   };
 }
 
-async function getUserFromSession(sessionId, client = db) {
+async function getUserFromSession(
+  sessionId,
+  client = db,
+  requireVerified = true,
+) {
   if (!sessionId) {
     return null;
   }
@@ -47,7 +51,7 @@ async function getUserFromSession(sessionId, client = db) {
 
   const userResult = await client.query(
     `
-        SELECT id, username, email, elo
+        SELECT id, username, email, elo, email_verified
         FROM users
         WHERE id = $1
         `,
@@ -58,15 +62,22 @@ async function getUserFromSession(sessionId, client = db) {
     return null;
   }
 
-  return userResult.rows[0];
+  const user = userResult.rows[0];
+
+  if (requireVerified && !user.email_verified) {
+    return null;
+  }
+
+  const { email_verified, ...userWithoutVerified } = user;
+  return userWithoutVerified;
 }
 
-// Get the currently authenticated user.
+// Get the currently authenticated user
 router.get("/me", async (req, res) => {
   const sessionId = req.cookies?.sessionId;
 
   try {
-    const user = await getUserFromSession(sessionId);
+    const user = await getUserFromSession(sessionId, db, true);
 
     if (!user) {
       if (sessionId) {
@@ -97,7 +108,7 @@ router.get("/me", async (req, res) => {
   }
 });
 
-// Logout the current user by deleting the current session.
+// Logout the current user by deleting the current session
 router.post("/logout", async (req, res) => {
   const sessionId = req.cookies?.sessionId;
 

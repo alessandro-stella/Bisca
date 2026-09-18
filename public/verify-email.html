@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="icon" type="image/x-icon" href="./media/favicon.svg" />
+
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#302e2b" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) =>
+              console.log("Service Worker registered successfully!", reg),
+            )
+            .catch((err) =>
+              console.error("Error during Service Worker registration:", err),
+            );
+        });
+      }
+    </script>
+
+    <title>BISCA | Verifica Email</title>
+
+    <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles/login_register.css" />
+    <link rel="stylesheet" href="styles/verify-email.css" />
+
+    <script
+      src="https://kit.fontawesome.com/df57a58519.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      async function checkSession() {
+        const response = await fetch("/api/session/me", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          window.location.replace("/lobbies.html");
+        } else {
+          console.log("No session or expired");
+        }
+      }
+
+      checkSession();
+    </script>
+  </head>
+  <body>
+    <div id="baseContainer">
+      <a id="registerTitle" href="index.html">
+        <img src="./media/logo.svg" alt="STELLA'S" />
+        <p>BISCA</p>
+      </a>
+
+      <div id="verificationContainer">
+        <h2>Verifica il tuo account</h2>
+
+        <div id="loadingState" class="verificationState">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <p>Verifica in corso...</p>
+        </div>
+
+        <div id="successState" class="verificationState" hidden>
+          <i class="fa-solid fa-check-circle" style="color: #4caf50"></i>
+          <p>Email verificata con successo! 🎉</p>
+          <p style="font-size: 0.9rem; color: #999">
+            Verrai reindirizzato a breve...
+          </p>
+        </div>
+
+        <div id="errorState" class="verificationState" hidden>
+          <i class="fa-solid fa-times-circle" style="color: #ff6b6b"></i>
+          <p id="errorMessage">Si è verificato un errore</p>
+          <div style="margin-top: 20px; display: flex; gap: 10px">
+            <a href="register.html" class="primaryButton" style="flex: 1">
+              Registrati di nuovo
+            </a>
+            <a href="login.html" class="primaryButton" style="flex: 1">
+              Accedi
+            </a>
+          </div>
+        </div>
+
+        <div id="invalidTokenState" class="verificationState" hidden>
+          <i class="fa-solid fa-exclamation-circle" style="color: #ffc107"></i>
+          <p>Link di verifica non valido o scaduto</p>
+          <p style="font-size: 0.9rem; color: #999">
+            I link di verifica scadono dopo 5 minuti
+          </p>
+          <div style="margin-top: 20px">
+            <a href="register.html" class="primaryButton">
+              Registrati di nuovo
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="scripts/verify-email.js"></script>
+  </body>
+</html>

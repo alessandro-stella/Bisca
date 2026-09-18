@@ -74,10 +74,11 @@
               <input
                 id="usernameInput"
                 type="text"
-                required
                 minlength="3"
                 maxlength="30"
                 placeholder="Username"
+                required
+                autocomplete="username"
               />
             </div>
             <div id="usernameInputError" class="inputError" hidden></div>
@@ -89,8 +90,9 @@
               <input
                 id="emailInput"
                 type="email"
-                required
                 placeholder="Email"
+                required
+                autocomplete="email"
               />
             </div>
             <div id="emailInputError" class="inputError" hidden></div>
@@ -105,8 +107,9 @@
               <input
                 id="passwordInput"
                 type="password"
-                required
                 placeholder="Password"
+                required
+                autocomplete="new-password"
               />
               <div id="showPassword" class="iconContainer">
                 <i class="icon fa-solid fa-eye-slash"></i>
@@ -124,8 +127,9 @@
               <input
                 id="repeatedPasswordInput"
                 type="password"
-                required
                 placeholder="Repeat password"
+                required
+                autocomplete="new-password"
               />
               <div id="showPasswordRepeat" class="iconContainer">
                 <i class="icon fa-solid fa-eye-slash"></i>
@@ -141,6 +145,20 @@
           <button id="registerButton" class="primaryButton" type="submit">
             Registrati
           </button>
+
+          <div
+            id="registerSuccess"
+            style="
+              color: #4caf50;
+              background: rgba(76, 175, 80, 0.1);
+              padding: 15px;
+              border-radius: 5px;
+              text-align: center;
+              margin-top: 15px;
+              line-height: 1.4;
+            "
+            hidden
+          ></div>
 
           <div id="missingData" class="inputError" hidden>
             Compilare l'intero questionario
