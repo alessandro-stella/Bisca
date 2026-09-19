@@ -958,10 +958,8 @@
   }
 
   #oldMessages {
-    gap: 1em;
-
+    gap: 0.25em;
     padding: 1em;
-
     justify-content: flex-start;
   }
 
@@ -985,6 +983,10 @@
 
   #chatContainer .message.isMe strong {
     display: none;
+  }
+
+  #chatContainer .message.firstInGroup {
+    margin-top: 0.5em;
   }
 
   #chatContainer .message.firstInGroup.isMe {
