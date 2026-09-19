@@ -24,7 +24,6 @@
 
 #baseContainer {
   height: 100svh;
-  background-color: red;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -32,6 +31,7 @@
 
 #tableContainer,
 #mySeat {
+  position: relative;
   width: 70em;
   max-width: 90%;
   margin: 0 auto;
@@ -39,7 +39,7 @@
 }
 
 #tableContainer {
-  background-color: blue;
+  background-color: var(--bg-card);
   flex: 4;
 
   display: flex;
@@ -48,12 +48,10 @@
 }
 
 #topButtons {
-  background-color: cyan;
-
+  width: 100%;
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
 
   padding: 1em;
 
@@ -78,18 +76,17 @@
 }
 
 #quitLobby:hover {
-  color: green;
+  color: var(--bg-card);
 }
 
 #table {
   height: 80%;
   aspect-ratio: 1/1;
-  background-color: yellow;
 
   position: relative;
   border-radius: 50%;
 
-  border: 0.25em solid var(--bg-dark);
+  border: 0.5em solid var(--bg-dark);
 }
 
 #table::before {
@@ -112,8 +109,7 @@
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 
-  background-color: var(--bg-page);
-  filter: brightness(1.1);
+  background-color: var(--bg-dark);
 }
 
 #table .tableSeat {
@@ -162,10 +158,6 @@
   filter: saturate(0);
 }
 
-.currentPlayer {
-  border: 2px solid var(--brand-green) !important;
-}
-
 .opponentInfo .username {
   background-color: palevioletred;
   text-align: center;
@@ -202,7 +194,7 @@
 
 #mySeat {
   position: relative;
-  background-color: green;
+  background-color: var(--bg-dark);
 
   flex: 1;
   display: grid;
@@ -213,11 +205,10 @@
   padding-top: 0;
 }
 
-#mySeat > * {
-  padding-top: 1em;
-}
-
 #myCards {
+  --card-displacement: 5px;
+
+  padding-top: var(--card-displacement);
   background-color: violet;
 
   display: flex;
@@ -241,7 +232,7 @@
 
 #myCards .card:hover,
 #myCards .card.selected {
-  transform: translateY(-1em);
+  transform: translateY(calc(-1 * var(--card-displacement)));
   box-shadow: var(--shadow-large);
   cursor: pointer;
 }
@@ -255,7 +246,9 @@
 /* ================= */
 
 #middleContainer {
-  background-color: cyan;
+  margin-top: 0.5em;
+  background-color: var(--bg-card);
+  padding: 0.5em;
 
   display: flex;
   flex-direction: column;
@@ -333,8 +326,10 @@
 /* ============ */
 
 #chatContainer {
+  margin-top: 0.5em;
+
   position: relative;
-  background-color: orange;
+  background-color: var(--bg-card);
 
   display: flex;
   flex-direction: column;
@@ -343,7 +338,6 @@
   min-height: 0;
   min-width: 0;
   width: 100%;
-  height: 100%;
 }
 
 #expandChat {
