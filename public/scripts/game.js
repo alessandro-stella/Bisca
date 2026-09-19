@@ -503,6 +503,7 @@ function createMySeat(
   if (isShowdown) {
     if (turnPhase === "bidding" && !hasBid) {
       usernameDiv.innerHTML = "Showdown";
+      bidsDiv.innerHTML = "Vincerai o perderai?";
       if (!isMyTurn) updateBottomButtonDefault();
     } else {
       usernameDiv.innerHTML = myData.username;
@@ -539,7 +540,7 @@ function createOpponents(
 
   for (const opponent of opponents) {
     const isCurrentPlayer = opponent.playerId === currentPlayerId;
-    currentAngle -= anglePhase;
+    currentAngle += anglePhase;
 
     const tableSeat = document.createElement("div");
     tableSeat.id = opponent.playerId;
@@ -567,6 +568,8 @@ function createOpponents(
 
     if (opponent.placement !== null) {
       stats.innerHTML = `Posto: ${opponent.placement}°`;
+    } else if (!opponent.connected) {
+      stats.innerHTML = "Disconnesso...";
     } else {
       const lives = document.createElement("div");
       lives.classList.add("lives");

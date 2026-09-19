@@ -374,7 +374,7 @@
 
 #myStats #myUsername {
   display: block;
-  font-size: 1.5em;
+  font-size: 1.2em;
 
   width: 100%;
   color: var(--text-primary);
@@ -863,7 +863,7 @@
   }
 
   .opponentInfo {
-    font-size: 1em;
+    font-size: 1em !important;
   }
 
   .opponentSeat .playedCard {
@@ -912,9 +912,12 @@
   }
 
   #chatContainer.open #expandChat {
-    right: 1em;
-    top: 1em;
-    left: initial;
+    left: 0.5em;
+    top: 0.5em;
+
+    z-index: 10;
+
+    font-size: 1.5em;
   }
 
   #chatContainer.open #expandChat .fa-xmark {
@@ -959,76 +962,65 @@
 
     padding: 1em;
 
-    flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
 
   #chatContainer .message {
     width: max-content;
     max-width: 80%;
-
     white-space: pre-wrap;
     word-break: break-word;
     overflow: visible;
     text-overflow: clip;
-
     border: 1px solid var(--border-inactive);
     background-color: var(--bg-card);
     border-radius: 0.5em;
-
     padding: 0.5em;
-
     position: relative;
-  }
-
-  #chatContainer .message.firstInGroup:not(.isMe) {
-    border-top-left-radius: 0;
-  }
-
-  #chatContainer .message.firstInGroup:not(.isMe)::before {
-    content: "";
-    width: 10px;
-    height: 10px;
-
-    position: absolute;
-    top: -1px;
-    left: -10px;
-
-    background-color: var(--bg-card);
-    border-bottom-left-radius: 100%;
-
-    border: 1px solid var(--border-inactive);
-    border-right: none;
   }
 
   #chatContainer .message.isMe {
     align-self: end;
   }
 
-  #chatContainer .message.firstInGroup.isMe {
-    border-top-right-radius: 0;
-  }
-
-  #chatContainer .message.firstInGroup.isMe::before {
-    content: "";
-    width: 10px;
-    height: 10px;
-
-    position: absolute;
-    top: -1px;
-    right: -10px;
-
-    background-color: var(--bg-card);
-    border-bottom-right-radius: 100%;
-
-    border: 1px solid var(--border-inactive);
-    border-left: none;
-  }
-
   #chatContainer .message.isMe strong {
     display: none;
   }
 
+  #chatContainer .message.firstInGroup.isMe {
+    border-top-right-radius: 0;
+  }
+
+  #chatContainer .message.firstInGroup:not(.isMe) {
+    border-top-left-radius: 0;
+  }
+
+  #chatContainer .message.firstInGroup::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    top: -1px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-inactive);
+    border-bottom-left-radius: 100%;
+    border-bottom-right-radius: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  #chatContainer .message.firstInGroup:not(.isMe)::before {
+    left: -8px;
+    border-right: none;
+    border-bottom-right-radius: 0;
+  }
+
+  #chatContainer .message.firstInGroup.isMe::before {
+    right: -8px;
+    border-left: none;
+    border-bottom-left-radius: 0;
+  }
   #endGamePopup {
     width: 90%;
     max-width: 100%;
