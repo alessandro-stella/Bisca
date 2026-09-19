@@ -344,7 +344,7 @@
   justify-content: safe center;
   gap: 0.5em;
 
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 .card {
@@ -420,6 +420,11 @@
   color: var(--text-secondary);
 }
 
+#myLives.showdown,
+#myLives.gameEnded {
+  grid-column: span 2;
+}
+
 #myLives svg {
   color: var(--accent-red);
   font-size: 1.1em;
@@ -427,6 +432,19 @@
 
 .reached .bidsIcon {
   background-color: var(--brand-green);
+}
+
+#acePlayActions {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--grid-spacing);
+}
+
+#acePlayActions .bidButton {
+  flex: 1;
 }
 
 /* ============== */
@@ -579,7 +597,7 @@
   padding-right: 2px;
 }
 
-.open {
+#chatContainer.open {
   padding-top: 0;
   z-index: 10;
   position: absolute;
@@ -589,7 +607,7 @@
   height: calc(100svh - calc(2 * var(--grid-spacing)));
 }
 
-.open #expandChat {
+#chatContainer.open #expandChat {
   opacity: 1;
   margin-top: 0.5em;
 }
@@ -598,15 +616,15 @@
   display: none;
 }
 
-.open #expandChat .fa-xmark {
+#chatContainer.open #expandChat .fa-xmark {
   display: none;
 }
 
-.open #expandChat > * {
+#chatContainer.open #expandChat > * {
   transform: rotate(180deg);
 }
 
-.open .message {
+#chatContainer.open .message {
   text-overflow: unset;
   overflow: unset;
   white-space: unset;
@@ -914,8 +932,11 @@
     flex-direction: column-reverse;
   }
 
-  #myCards {
+  #myCardsContainer {
     flex: 4;
+  }
+
+  #myCards {
     width: 100%;
   }
 
@@ -949,7 +970,7 @@
     display: none;
   }
 
-  .open #expandChat {
+  #chatContainer.open #expandChat {
     left: 0.5em;
     top: 0.5em;
 
@@ -958,15 +979,15 @@
     font-size: 1.5em;
   }
 
-  .open #expandChat .fa-xmark {
+  #chatContainer.open #expandChat .fa-xmark {
     display: initial;
   }
 
-  .open #expandChat .fa-angle-up {
+  #chatContainer.open #expandChat .fa-angle-up {
     display: none;
   }
 
-  .open {
+  #chatContainer.open {
     display: flex;
     gap: 1em;
 

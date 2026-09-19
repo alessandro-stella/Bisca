@@ -45,22 +45,16 @@ function stopHeartbeat() {
 }
 
 socket.on("connect", () => {
-  console.log("Connected to game:", socket.id);
   socket.emit("game:get-state");
   startHeartbeat();
 });
 
 socket.on("connect_error", (error) => {
   console.error("Socket connection error:", error.message);
-  document.getElementById("gameStatus").textContent =
-    "Errore di connessione... Riprovo...";
 });
 
 socket.on("disconnect", (reason) => {
-  console.log("Disconnected from game:", reason);
   stopHeartbeat();
-  document.getElementById("gameStatus").textContent =
-    "Connessione persa... Riconnessione in corso...";
 
   if (reason === "io server disconnect") {
     socket.connect();
@@ -72,27 +66,22 @@ socket.on("pong", () => {
 });
 
 socket.on("game:reconnect", () => {
-  console.log("Game reconnect signal received");
   socket.emit("game:get-state");
 });
 
 socket.on("game:not-found", () => {
-  console.log("Game not found");
   window.location.replace("/lobbies.html");
 });
 
 socket.on("game:state", (game) => {
-  console.log("Game state:", game);
   renderGameState(game);
 });
 
 socket.on("game:state:sync", (game) => {
-  console.log("Game state sync from another device:", game);
   renderGameState(game);
 });
 
-socket.on("lobbies:update:sync", (data) => {
-  console.log("Lobby action from another device:", data);
+socket.on("lobbies:update:sync", () => {
   socket.emit("game:get-state");
 });
 
@@ -102,12 +91,13 @@ socket.on("lobby:deleted", () => {
 
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden && socket.connected) {
-    console.log("App tornata in primo piano, richiedo stato");
     socket.emit("game:get-state");
   }
 });
 
+// =================
 // Game UI functions
+// =================
 
 const sendMessageButton = document.getElementById("sendMessage");
 const messageContentInput =
@@ -143,6 +133,8 @@ socket.on("game:chat-message", (data) => {
 
   if (data.isMe) {
     newMessage.classList.add("isMe");
+  } else {
+    chatButton.classList.add("newMessage");
   }
 
   const previousMessage = messagesContainer.firstElementChild;
@@ -160,8 +152,6 @@ socket.on("game:chat-message", (data) => {
   }
 
   messagesContainer.prepend(newMessage);
-
-  chatButton.classList.add("newMessage");
 });
 
 const chatContainer = document.getElementById("chatContainer");
@@ -324,7 +314,7 @@ function renderGameState(game) {
   createPlayedCards(game.playedCards, game.highestPlay);
 
   const canPlay = game.turnPhase === "play" && game.isMyTurn && !game.showdown;
-  createCards(game.hand, "myCards", canPlay, game.turnPhase, game.showdown);
+  createMyCards(game.hand, "myCards", canPlay, game.turnPhase, game.showdown);
 
   if (game.turnPhase === "bidding" && game.isMyTurn) {
     createBidButtons(game);
@@ -350,36 +340,47 @@ function createMySeat(
   mySeat.style.setProperty("--angle", "-90deg");
   table.appendChild(mySeat);
 
+  const isEliminated = myData.placement !== null;
+
+  const myLivesContainer = document.getElementById("myLives");
+
+  if (isEliminated && myLivesContainer.classList.contains("gameEnded")) return;
+
   const usernameDiv = document.getElementById("myUsername");
-  const livesDiv = document.getElementById("myLives").querySelector(".value");
+  const livesDiv = myLivesContainer.querySelector(".value");
   const myBidsContainer = document.getElementById("myBids");
   const bidsDiv = myBidsContainer.querySelector(".value");
   const bottomButton = /** @type {HTMLButtonElement} */ (
     document.getElementById("bottomButton")
   );
 
-  livesDiv.innerHTML = myData.lives;
+  if (isEliminated) {
+    myLivesContainer.classList.add("gameEnded");
+    myLivesContainer.innerHTML = `Piazzamento: ${myData.placement}°`;
+    myBidsContainer.remove();
+  } else {
+    livesDiv.innerHTML = myData.lives;
+  }
 
   const isMyTurn = myData.playerId === currentPlayerId;
   const hasBid =
     myData.bid !== -1 && myData.bid !== null && myData.bid !== undefined;
 
   const updateBottomButtonDefault = () => {
-    console.log(
-      "updateBottomButtonDefault - isMyTurn:",
-      isMyTurn,
-      "turnPhase:",
-      turnPhase,
-    );
     bottomButton.hidden = false;
     bottomButton.disabled = true;
     bottomButton.className = "secondaryButton disabled";
 
     const label = bottomButton.querySelector("p");
-    const text =
-      isMyTurn && turnPhase === "play"
-        ? "Seleziona una carta"
-        : "Attendi il tuo turno";
+    let text;
+
+    if (isEliminated) {
+      text = "Stai assistendo";
+    } else if (isMyTurn && turnPhase === "play") {
+      text = "Seleziona una carta";
+    } else {
+      text = "Attendi il tuo turno";
+    }
 
     if (label) {
       label.textContent = text;
@@ -388,10 +389,16 @@ function createMySeat(
     }
   };
 
+  if (turnPhase !== "resolving") {
+    myBidsContainer.hidden = false;
+  }
+
   if (isShowdown) {
     if (turnPhase === "bidding" && !hasBid) {
       usernameDiv.innerHTML = "Showdown";
-      bidsDiv.innerHTML = "Vincerai o perderai?";
+      livesDiv.innerHTML += " - Come andrà?";
+      myLivesContainer.classList.add("showdown");
+      myBidsContainer.hidden = true;
       if (!isMyTurn) updateBottomButtonDefault();
     } else {
       usernameDiv.innerHTML = myData.username;
@@ -404,18 +411,20 @@ function createMySeat(
     if (!isMyTurn) updateBottomButtonDefault();
   } else {
     usernameDiv.innerHTML = myData.username;
-    bidsDiv.innerHTML = `${myData.won}/${myData.bid}`;
 
-    if (myData.won === myData.bid) {
-      myBidsContainer.classList.add("reached");
-    } else {
-      myBidsContainer.classList.remove("reached");
+    if (!isEliminated) {
+      bidsDiv.innerHTML = `${myData.won}/${myData.bid}`;
+
+      if (turnPhase === "play" && myData.won === myData.bid) {
+        myBidsContainer.classList.add("reached");
+      } else {
+        myBidsContainer.classList.remove("reached");
+      }
     }
 
     updateBottomButtonDefault();
   }
 }
-
 function createOpponents(
   table,
   turnPhase,
@@ -450,7 +459,6 @@ function createOpponents(
     stats.classList.add("stats");
 
     if (!opponent.connected) {
-      console.log("Adding disconnected to ", opponent.username);
       opponentInfo.classList.add("disconnected");
     }
 
@@ -652,7 +660,7 @@ function createSingleCard(card, eventListener = false) {
   return cardElement;
 }
 
-function createCards(
+function createMyCards(
   cards,
   containerId,
   eventListener = false,
@@ -674,6 +682,8 @@ function createCards(
     cardsContainer.appendChild(backCard);
     return;
   }
+
+  if (!cards || cards.length === 0) return;
 
   for (const card of cards) {
     const cardElement = createSingleCard(card, eventListener);
