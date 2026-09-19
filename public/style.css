@@ -8,6 +8,19 @@
   --shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   --shadow-large: 0 8px 12px rgba(0, 0, 0, 0.2);
 
+  /* Table color */
+  --wood: #5c3a21;
+  --cloth-color: #35654d;
+  --table-center-light: radial-gradient(
+    circle at 50% 50%,
+    transparent 20%,
+    rgba(0, 0, 0, 0.5) 120%
+  );
+
+  /* Highest card border */
+  --highest-light: #ffffff;
+  --highest-dark: #ffc400;
+
   /* Primary buttons */
   --brand-green: #81b64c;
   --brand-green-hover: #96c85f;

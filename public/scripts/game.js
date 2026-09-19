@@ -80,7 +80,7 @@ socket.on("game:not-found", () => {
   console.log("Game not found");
   // window.location.replace("/lobbies.html");
 
-  const testGame = {
+  const testGameBid = {
     turnPhase: "bidding",
     totalBids: 0,
     showdown: false,
@@ -106,7 +106,7 @@ socket.on("game:not-found", () => {
       {
         playerId: "06e688b2-9ce7-4798-a519-261336e1b8d1",
         connected: true,
-        username: "test",
+        username: "testasudhasiudhaiudhasiudhasiudasiuh",
         bid: -1,
         lives: 3,
         won: 0,
@@ -148,7 +148,49 @@ socket.on("game:not-found", () => {
     highestPlay: null,
   };
 
-  renderGameState(testGame);
+  const testGamePlay = {
+    turnPhase: "play",
+    totalBids: 3,
+    showdown: false,
+    me: {
+      playerId: "caaae1b4-58fc-49be-9bb3-59e0f778d39d",
+      connected: true,
+      username: "Sup3r_",
+      bid: 1,
+      lives: 2,
+      won: 0,
+      placement: null,
+    },
+    opponents: [
+      {
+        playerId: "6af2957e-d66a-4b98-a8ce-78b61ddb8ba0",
+        connected: true,
+        username: "Nuthe",
+        bid: 2,
+        lives: 2,
+        won: 0,
+        placement: null,
+      },
+    ],
+    playedCards: [
+      {
+        playerId: "caaae1b4-58fc-49be-9bb3-59e0f778d39d",
+        card: "denari4",
+      },
+    ],
+    currentPlayerId: "6af2957e-d66a-4b98-a8ce-78b61ddb8ba0",
+    hand: ["coppe7"],
+    isMyTurn: false,
+    lastPlayer: false,
+    highestPlay: {
+      playerId: "caaae1b4-58fc-49be-9bb3-59e0f778d39d",
+      card: "denari4",
+      value: 404,
+    },
+  };
+
+  // renderGameState(testGameBid);
+  renderGameState(testGamePlay);
 });
 
 socket.on("game:state", (game) => {
@@ -445,8 +487,6 @@ function createMySeat(
   };
 
   if (isShowdown) {
-    myBidsContainer.style.display = "none";
-
     if (turnPhase === "bidding" && !hasBid) {
       usernameDiv.innerHTML = "Showdown";
       if (!isMyTurn) updateBottomButtonDefault();
@@ -456,19 +496,21 @@ function createMySeat(
     }
   } else if (turnPhase === "bidding" && !hasBid) {
     usernameDiv.innerHTML = "Quanto scommetti?";
-    myBidsContainer.style.display = "none";
+    bidsDiv.innerHTML = "Scegli";
 
     if (!isMyTurn) updateBottomButtonDefault();
   } else {
     usernameDiv.innerHTML = myData.username;
-    myBidsContainer.style.display = "";
     bidsDiv.innerHTML = `${myData.won}/${myData.bid}`;
+
+    if (myData.won === myData.bid) {
+      myBidsContainer.classList.add("reached");
+    } else {
+      myBidsContainer.classList.remove("reached");
+    }
 
     updateBottomButtonDefault();
   }
-
-  const cards = document.getElementById("myCards");
-  cards.classList.toggle("currentPlayer", isMyTurn);
 }
 
 function createOpponents(
@@ -534,7 +576,7 @@ function createOpponents(
 
       if (isShowdown) {
         if (turnPhase === "bidding" && isCurrentPlayer) {
-          bidsText.innerHTML = '<i class="fa-solid fa-spinner"></i>';
+          bidsText.innerHTML = "Pensa...";
         } else if (opponent.bid === 1) {
           bidsText.textContent = "Vince";
         } else if (opponent.bid === 0) {
@@ -544,7 +586,7 @@ function createOpponents(
         }
       } else if (turnPhase === "bidding") {
         if (isCurrentPlayer) {
-          bidsText.innerHTML = '<i class="fa-solid fa-spinner"></i>';
+          bidsText.innerHTML = "Pensa...";
         } else {
           bidsText.innerHTML = opponent.bid === -1 ? "In attesa" : opponent.bid;
         }
@@ -574,10 +616,16 @@ function createPlayedCards(cards, highestPlay) {
     if (!card || !card.card) continue;
 
     const cardElement = createSingleCard(card.card, false);
-    cardElement.classList.add("playedCard");
+
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("cardWrapper");
+
+    wrapper.classList.add("playedCard");
+
+    wrapper.appendChild(cardElement);
 
     const playerSeat = document.getElementById(card.playerId);
-    playerSeat?.appendChild(cardElement);
+    playerSeat?.appendChild(wrapper);
 
     if (highestPlay && card.playerId === highestPlay.playerId) {
       playerSeat?.classList.add("highestPlay");

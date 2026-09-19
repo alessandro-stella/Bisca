@@ -57,7 +57,7 @@
 
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: space-between;
 }
 
 #openChat,
@@ -79,22 +79,46 @@
   color: var(--bg-card);
 }
 
-#table {
+#table-rim {
   height: 80%;
   aspect-ratio: 1/1;
-
   position: relative;
   border-radius: 50%;
 
-  border: 0.5em solid var(--bg-dark);
+  padding: 0.5em;
+
+  background-color: var(--wood);
+
+  box-shadow:
+    inset 0 0px 3px rgba(255, 255, 255, 0.25),
+    0 15px 30px rgba(0, 0, 0, 0.6),
+    0px 0px 8px var(--border-inactive);
+
+  z-index: 1;
+}
+
+#table {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: inherit;
+
+  border: none;
+
+  box-shadow:
+    inset 0 0 25px -5px rgba(0, 0, 0, 0.8),
+    inset 0 0 15px rgba(0, 0, 0, 0.9);
+
+  background-color: var(--cloth-color);
+  background-image: var(--table-center-light);
 }
 
 #table::before {
   content: "";
   position: absolute;
 
-  height: 80%;
-  width: 80%;
+  height: 70%;
+  width: 70%;
 
   top: 50%;
   left: 50%;
@@ -109,7 +133,10 @@
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 
-  background-color: var(--bg-dark);
+  background-color: var(--cloth-color);
+  filter: brightness(0.7);
+
+  z-index: 2;
 }
 
 #table .tableSeat {
@@ -123,7 +150,7 @@
   transform: translate(-50%, -50%) rotate(var(--angle));
   transform-origin: center center;
 
-  z-index: 1;
+  z-index: 3;
 
   display: flex;
   align-items: center;
@@ -141,10 +168,13 @@
   white-space: nowrap;
 
   transform: translate(-50%, -50%) rotate(calc(-1 * var(--angle)));
-}
 
-.opponentInfo {
-  background-color: blueviolet;
+  font-size: 1.2em;
+
+  max-width: 15ch;
+  background-color: var(--bg-page);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-active);
 
   display: flex;
   flex-direction: column;
@@ -152,6 +182,12 @@
   border-radius: 0.25em;
 
   height: fit-content;
+
+  z-index: 2;
+}
+
+.opponentInfo.currentPlayer {
+  box-shadow: 0px 0px 5px var(--brand-green);
 }
 
 .opponentInfo.disconnected {
@@ -159,13 +195,25 @@
 }
 
 .opponentInfo .username {
-  background-color: palevioletred;
+  font-weight: bold;
   text-align: center;
+
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  border-bottom: 1px solid var(--border-inactive);
+}
+
+.opponentInfo.currentPlayer .username {
+  color: var(--text-primary);
 }
 
 .opponentInfo .stats {
   display: flex;
-  gap: 0.5em;
+  gap: 0.75em;
+  width: 100%;
 }
 
 .opponentInfo .lives,
@@ -173,43 +221,49 @@
   display: flex;
   align-items: center;
   gap: 0.25em;
-}
-
-.opponentInfo .lives {
-  background-color: yellowgreen;
-}
-
-.opponentInfo .bids {
-  background-color: magenta;
+  flex: 1;
+  letter-spacing: -1px;
 }
 
 .bidsIcon {
   content: "";
-  height: 0.75lh;
+  height: 0.65lh;
   aspect-ratio: 1/1.6;
-  background-color: blue;
+  background-color: var(--text-secondary);
 
   border-radius: 0.125em;
 }
 
+/* ========= */
+/* User info */
+/* ========= */
+
 #mySeat {
+  --grid-spacing: 0.5em;
+
   position: relative;
   background-color: var(--bg-dark);
 
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1.5fr 1fr;
-  gap: 1em;
+  gap: var(--grid-spacing);
 
-  padding: 1em;
+  padding: var(--grid-spacing);
   padding-top: 0;
+
+  box-shadow: 0px -1em 1em -0.5em var(--bg-page);
 }
 
 #myCards {
-  --card-displacement: 5px;
+  --card-displacement: 1em;
+  --border-size: 0.3em;
 
-  padding-top: var(--card-displacement);
-  background-color: violet;
+  padding: calc(var(--grid-spacing) + var(--border-size)) 0.5em
+    var(--border-size) 0.5em;
+
+  position: relative;
+  z-index: 1;
 
   display: flex;
   align-items: center;
@@ -217,13 +271,51 @@
   gap: 0.5em;
 
   min-height: 0;
-
   overflow-x: auto;
   max-width: 100%;
 }
 
+#myCards::before {
+  content: "";
+  position: absolute;
+
+  top: var(--grid-spacing);
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  background-color: var(--wood);
+  border-radius: 0.5em;
+
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.15),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.4),
+    0 8px 12px -4px rgba(0, 0, 0, 0.5);
+
+  z-index: -2;
+}
+
+#myCards::after {
+  content: "";
+  position: absolute;
+
+  top: calc(var(--grid-spacing) + var(--border-size));
+  right: var(--border-size);
+  bottom: var(--border-size);
+  left: var(--border-size);
+
+  border-radius: 0.25em;
+  z-index: -1;
+
+  background-color: var(--cloth-color);
+
+  box-shadow: inset 0 8px 15px -4px rgba(0, 0, 0, 0.85);
+
+  pointer-events: none;
+}
+
 #myCards .card {
-  height: 100%;
+  height: 90%;
   width: auto;
   object-fit: contain;
 
@@ -237,17 +329,21 @@
   cursor: pointer;
 }
 
-#myCards .card.selected {
-  border: 2px solid blue;
+#myCards .card:first-child {
+  margin-left: 0.5em;
 }
 
-/* ================= */
-/* User data section */
-/* ================= */
+#myCards .card:last-child {
+  margin-right: 0.5em;
+}
 
 #middleContainer {
-  margin-top: 0.5em;
-  background-color: var(--bg-card);
+  background-color: var(--bg-page);
+
+  border: 1px solid var(--border-inactive);
+  border-radius: 0.5em;
+
+  margin-top: var(--grid-spacing);
   padding: 0.5em;
 
   display: flex;
@@ -267,21 +363,41 @@
   flex: 1;
 }
 
-#myStats #myUsername {
-  text-overflow: ellipsis;
-  background-color: yellow;
-
-  grid-column: span 2;
-}
-
 #myStats #myUsername,
 #myStats #myLives,
 #myStats #myBids {
   display: flex;
   align-items: center;
   gap: 0.25em;
-  border: 1px solid teal;
   font-size: 1.25em;
+}
+
+#myStats #myUsername {
+  display: block;
+  font-size: 1.5em;
+
+  width: 100%;
+  color: var(--text-primary);
+  font-weight: bold;
+  grid-column: span 2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#myStats #myLives,
+#myStats #myBids {
+  color: var(--text-secondary);
+}
+
+#myStats #myLives svg {
+  color: var(--accent-red);
+  font-size: 1.1em;
+}
+
+#myBids.reached .bidsIcon {
+  background-color: var(--brand-green);
 }
 
 #bidsContainer {
@@ -326,7 +442,7 @@
 /* ============ */
 
 #chatContainer {
-  margin-top: 0.5em;
+  margin-top: var(--grid-spacing);
 
   position: relative;
   background-color: var(--bg-card);
@@ -452,31 +568,94 @@
 /* General properties for cards */
 /* ============================ */
 
+.card,
+.cardWrapper {
+  --border-size: 3px;
+  --border-radius: 5%;
+}
+
 .card {
-  border-radius: 5%;
-  box-shadow: var(--shadow);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--text-active);
+  position: relative;
 }
 
 .playedCard {
   height: 15svh;
   transform: rotate(90deg);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: calc(var(--border-radius) + var(--border-size));
+
+  background-color: transparent;
+  padding: var(--border-size);
+
+  transition: all 0.2s ease-in-out;
+
+  position: relative;
+}
+
+.playedCard img,
+.playedCard .card {
+  height: 100%;
+  width: auto;
+  display: block;
+  border-radius: inherit;
+}
+
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
 .highestPlay .playedCard {
-  border: 2px solid red;
+  box-shadow: 0px 0px 4px var(--highest-dark);
+  overflow: hidden;
+}
+
+.highestPlay .playedCard::before {
+  width: 100%;
+  height: 100%;
+
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  z-index: -1;
+
+  background: conic-gradient(
+    from var(--gradient-angle),
+    var(--highest-dark) 0deg 20deg,
+    var(--highest-light) 20deg 40deg,
+    var(--highest-dark) 40deg 200deg,
+    var(--highest-light) 200deg 220deg,
+    var(--highest-dark) 220deg 0deg
+  );
+
+  animation: animate-border 5s linear infinite;
+  filter: blur(0.25em);
+}
+
+@keyframes animate-border {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+.opponentSeat .cardWrapper {
+  --border-size: 2px !important;
 }
 
 .opponentSeat .playedCard {
   height: 10svh;
   margin-left: 5vw;
-}
-
-#bidPopup {
-  background-color: var(--bg-card);
-
-  display: flex;
-  flex-direction: column;
-  gap: 1.5em;
+  z-index: 1;
 }
 
 /* ============== */
@@ -631,8 +810,8 @@
 
 /* Properties for mobile */
 @media (max-width: 768px) {
-  #topButtons {
-    justify-content: space-between;
+  #logo {
+    display: none;
   }
 
   #topButtons #openChat {
@@ -662,8 +841,16 @@
     display: flex;
   }
 
-  #table {
+  #table-rim {
     height: 70%;
+  }
+
+  #table {
+    height: 100%;
+  }
+
+  .opponentInfo {
+    font-size: 1em;
   }
 
   .opponentSeat .playedCard {
@@ -671,11 +858,9 @@
   }
 
   #mySeat {
-    background-color: green;
-
+    --grid-spacing: 1em;
     flex: 2.5;
     flex-direction: column-reverse;
-    gap: 1em;
   }
 
   #myCards {
@@ -684,23 +869,25 @@
   }
 
   #middleContainer {
-    background-color: blue;
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 0.5em;
     flex: 1;
-    padding-top: 0;
+    margin-top: 0;
   }
 
   #myStats {
     flex: 1;
-    background-color: red;
     display: flex;
     gap: 1em;
   }
 
   #myUsername {
     flex: 1;
+  }
+
+  #bottomButton {
+    font-size: 1.5em;
   }
 
   /* =========== */

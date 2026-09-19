@@ -555,6 +555,7 @@ body {
   #quitButtonMobile,
   #createLobbyPopupButton {
     margin: 0.65em;
+    font-size: 1.25em;
   }
 
   #ownerButtonsDesktop {
