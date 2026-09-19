@@ -251,10 +251,24 @@ socket.on("game:chat-message", (data) => {
   const newMessage = document.createElement("div");
 
   newMessage.classList.add("message");
-  newMessage.innerHTML = `<strong>${data.senderUsername}</strong>: ${data.text}`;
+  newMessage.innerHTML = `<strong>${data.senderUsername}: </strong>${data.text}`;
 
   if (data.isMe) {
     newMessage.classList.add("isMe");
+  }
+
+  const previousMessage = messagesContainer.firstElementChild;
+
+  let previousSender = null;
+  if (previousMessage) {
+    const strongTag = previousMessage.querySelector("strong");
+    if (strongTag) {
+      previousSender = strongTag.textContent.replace(":", "").trim();
+    }
+  }
+
+  if (data.senderUsername !== previousSender) {
+    newMessage.classList.add("firstInGroup");
   }
 
   messagesContainer.prepend(newMessage);
