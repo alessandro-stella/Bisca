@@ -1,3 +1,7 @@
+/* ============== */
+/* Loading cover  */
+/* ============== */
+
 #loadingCover {
   position: absolute;
   top: 0;
@@ -17,10 +21,14 @@
   transition: all 0.2s ease-in-out;
 }
 
-#loadingCover.hidden {
+.hidden {
   opacity: 0;
   pointer-events: none;
 }
+
+/* ============== */
+/* Base container */
+/* ============== */
 
 #baseContainer {
   height: 100svh;
@@ -47,6 +55,10 @@
   justify-content: center;
 }
 
+/* ============== */
+/* Top buttons    */
+/* ============== */
+
 #topButtons {
   width: 100%;
   position: absolute;
@@ -71,13 +83,17 @@
   border-radius: 0.5em;
 }
 
-#topButtons #openChat {
+#openChat {
   display: none;
 }
 
 #quitLobby:hover {
   color: var(--bg-card);
 }
+
+/* ============== */
+/* Table styling  */
+/* ============== */
 
 #table-rim {
   height: 80%;
@@ -139,7 +155,11 @@
   z-index: 2;
 }
 
-#table .tableSeat {
+/* ============== */
+/* Table seats    */
+/* ============== */
+
+.tableSeat {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -158,7 +178,7 @@
   font-size: 0.8em;
 }
 
-#table .tableSeat .opponentInfo {
+.opponentInfo {
   position: absolute;
   left: 0%;
   top: 50%;
@@ -187,14 +207,20 @@
 }
 
 .opponentInfo.currentPlayer {
+  border-color: transparent;
   box-shadow: 0px 0px 5px var(--brand-green);
 }
 
-.opponentInfo.disconnected {
-  filter: saturate(0);
+.currentPlayer .username {
+  color: var(--text-primary);
 }
 
-.opponentInfo .username {
+.disconnected {
+  filter: saturate(0);
+  opacity: 0.8;
+}
+
+.username {
   font-weight: bold;
   text-align: center;
 
@@ -206,18 +232,14 @@
   border-bottom: 1px solid var(--border-inactive);
 }
 
-.opponentInfo.currentPlayer .username {
-  color: var(--text-primary);
-}
-
-.opponentInfo .stats {
+.stats {
   display: flex;
   gap: 0.75em;
   width: 100%;
 }
 
-.opponentInfo .lives,
-.opponentInfo .bids {
+.lives,
+.bids {
   display: flex;
   align-items: center;
   gap: 0.25em;
@@ -255,27 +277,25 @@
   box-shadow: 0px -1em 1em -0.5em var(--bg-page);
 }
 
-#myCards {
+/* ============== */
+/* Cards section  */
+/* ============== */
+
+#myCardsContainer {
   --card-displacement: 1em;
   --border-size: 0.3em;
 
-  padding: calc(var(--grid-spacing) + var(--border-size)) 0.5em
-    var(--border-size) 0.5em;
+  padding: var(--border-size);
+  padding-top: calc(var(--grid-spacing) + var(--border-size));
 
   position: relative;
   z-index: 1;
 
-  display: flex;
-  align-items: center;
-  justify-content: safe center;
-  gap: 0.5em;
-
   min-height: 0;
-  overflow-x: auto;
   max-width: 100%;
 }
 
-#myCards::before {
+#myCardsContainer::before {
   content: "";
   position: absolute;
 
@@ -295,7 +315,7 @@
   z-index: -2;
 }
 
-#myCards::after {
+#myCardsContainer::after {
   content: "";
   position: absolute;
 
@@ -314,7 +334,20 @@
   pointer-events: none;
 }
 
-#myCards .card {
+#myCards {
+  width: 100%;
+  height: 100%;
+  padding: 0 0.5em;
+
+  display: flex;
+  align-items: center;
+  justify-content: safe center;
+  gap: 0.5em;
+
+  overflow-x: scroll;
+}
+
+.card {
   height: 90%;
   width: auto;
   object-fit: contain;
@@ -322,20 +355,16 @@
   transition: all 0.2s ease-in-out;
 }
 
-#myCards .card:hover,
-#myCards .card.selected {
+.card:hover,
+.card.selected {
   transform: translateY(calc(-1 * var(--card-displacement)));
   box-shadow: var(--shadow-large);
   cursor: pointer;
 }
 
-#myCards .card:first-child {
-  margin-left: 0.5em;
-}
-
-#myCards .card:last-child {
-  margin-right: 0.5em;
-}
+/* ============== */
+/* Middle section */
+/* ============== */
 
 #middleContainer {
   background-color: var(--bg-page);
@@ -363,16 +392,16 @@
   flex: 1;
 }
 
-#myStats #myUsername,
-#myStats #myLives,
-#myStats #myBids {
+#myUsername,
+#myLives,
+#myBids {
   display: flex;
   align-items: center;
   gap: 0.25em;
   font-size: 1.25em;
 }
 
-#myStats #myUsername {
+#myUsername {
   display: block;
   font-size: 1.2em;
 
@@ -386,19 +415,23 @@
   text-overflow: ellipsis;
 }
 
-#myStats #myLives,
-#myStats #myBids {
+#myLives,
+#myBids {
   color: var(--text-secondary);
 }
 
-#myStats #myLives svg {
+#myLives svg {
   color: var(--accent-red);
   font-size: 1.1em;
 }
 
-#myBids.reached .bidsIcon {
+.reached .bidsIcon {
   background-color: var(--brand-green);
 }
+
+/* ============== */
+/* Bids section   */
+/* ============== */
 
 #bidsContainer {
   --gap: 0.5rem;
@@ -413,7 +446,7 @@
   box-sizing: border-box;
 }
 
-#bidsContainer .bidButton {
+.bidButton {
   flex: 1 0 calc(25% - (var(--gap) * 0.75));
   height: 100%;
   box-sizing: border-box;
@@ -431,15 +464,14 @@
   border-radius: 0.25em;
 }
 
-.bidButton.disabled,
-#bottomButton.disabled {
+.disabled {
   pointer-events: none;
   opacity: 0.6;
 }
 
-/* ============ */
+/* ============== */
 /* Chat section  */
-/* ============ */
+/* ============== */
 
 #chatContainer {
   margin-top: var(--grid-spacing);
@@ -498,7 +530,7 @@
   flex-direction: column-reverse;
 }
 
-#oldMessages .message {
+.message {
   padding: 0 1ch;
   min-width: 0;
   width: 100%;
@@ -511,7 +543,7 @@
   color: var(--text-primary);
 }
 
-#oldMessages .message.isMe strong {
+.message.isMe strong {
   text-decoration: underline;
 }
 
@@ -547,7 +579,7 @@
   padding-right: 2px;
 }
 
-#chatContainer.open {
+.open {
   padding-top: 0;
   z-index: 10;
   position: absolute;
@@ -557,28 +589,31 @@
   height: calc(100svh - calc(2 * var(--grid-spacing)));
 }
 
-#chatContainer.open #expandChat {
+.open #expandChat {
   opacity: 1;
   margin-top: 0.5em;
 }
 
-#chatContainer #expandChat .fa-xmark,
-#chatContainer.open #expandChat .fa-xmark {
+#expandChat .fa-xmark {
   display: none;
 }
 
-#chatContainer.open #expandChat > * {
+.open #expandChat .fa-xmark {
+  display: none;
+}
+
+.open #expandChat > * {
   transform: rotate(180deg);
 }
 
-#chatContainer.open .message {
+.open .message {
   text-overflow: unset;
   overflow: unset;
   white-space: unset;
 }
 
 /* ============================ */
-/* General properties for cards */
+/* Card styling                 */
 /* ============================ */
 
 .card,
@@ -708,7 +743,7 @@
   color: var(--text-primary);
 }
 
-#endGamePopup .title {
+.title {
   font-size: 2em;
   font-weight: bold;
   text-align: center;
@@ -723,7 +758,7 @@
   min-height: 0;
 }
 
-#scoreboard .row {
+.row {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -733,7 +768,7 @@
   border: 1px solid var(--border-inactive);
 }
 
-#scoreboard .placement {
+.placement {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -747,7 +782,7 @@
   padding-left: 0.25em;
 }
 
-#scoreboard .player {
+.player {
   font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
@@ -755,7 +790,7 @@
   flex-grow: 1;
 }
 
-#scoreboard .row:nth-child(1) {
+.row:nth-child(1) {
   background: linear-gradient(
     90deg,
     rgba(255, 215, 0, 0.12),
@@ -764,12 +799,12 @@
   border-color: rgba(255, 215, 0, 0.3);
 }
 
-#scoreboard .row:nth-child(1) .placement {
+.row:nth-child(1) .placement {
   background: rgba(255, 215, 0, 0.25);
   color: #ffd700;
 }
 
-#scoreboard .row:nth-child(2) {
+.row:nth-child(2) {
   background: linear-gradient(
     90deg,
     rgba(192, 192, 192, 0.1),
@@ -778,12 +813,12 @@
   border-color: rgba(192, 192, 192, 0.25);
 }
 
-#scoreboard .row:nth-child(2) .placement {
+.row:nth-child(2) .placement {
   background: rgba(192, 192, 192, 0.2);
   color: #e0e0e0;
 }
 
-#scoreboard .row:nth-child(3) {
+.row:nth-child(3) {
   background: linear-gradient(
     90deg,
     rgba(205, 127, 50, 0.1),
@@ -792,12 +827,12 @@
   border-color: rgba(205, 127, 50, 0.25);
 }
 
-#scoreboard .row:nth-child(3) .placement {
+.row:nth-child(3) .placement {
   background: rgba(205, 127, 50, 0.2);
   color: #cd7f32;
 }
 
-#endGamePopup #scoreboard .row .player {
+#scoreboard .player {
   font-size: 1.2em;
   text-overflow: ellipsis;
 }
@@ -821,18 +856,21 @@
   padding: 0.25em 0;
 }
 
-/* Properties for mobile */
+/* ========================== */
+/* Properties for mobile      */
+/* ========================== */
+
 @media (max-width: 768px) {
   #logo {
     display: none;
   }
 
-  #topButtons #openChat {
+  #openChat {
     position: relative;
     display: grid;
   }
 
-  #topButtons #openChat.newMessage::before {
+  #openChat.newMessage::before {
     content: "";
     width: 0.65em;
     height: 0.65em;
@@ -911,7 +949,7 @@
     display: none;
   }
 
-  #chatContainer.open #expandChat {
+  .open #expandChat {
     left: 0.5em;
     top: 0.5em;
 
@@ -920,15 +958,15 @@
     font-size: 1.5em;
   }
 
-  #chatContainer.open #expandChat .fa-xmark {
+  .open #expandChat .fa-xmark {
     display: initial;
   }
 
-  #chatContainer.open #expandChat .fa-angle-up {
+  .open #expandChat .fa-angle-up {
     display: none;
   }
 
-  #chatContainer.open {
+  .open {
     display: flex;
     gap: 1em;
 
@@ -963,7 +1001,7 @@
     justify-content: flex-start;
   }
 
-  #chatContainer .message {
+  .message {
     width: max-content;
     max-width: 80%;
     white-space: pre-wrap;
@@ -977,27 +1015,27 @@
     position: relative;
   }
 
-  #chatContainer .message.isMe {
+  .message.isMe {
     align-self: end;
   }
 
-  #chatContainer .message.isMe strong {
+  .message.isMe strong {
     display: none;
   }
 
-  #chatContainer .message.firstInGroup {
+  .message.firstInGroup {
     margin-top: 0.5em;
   }
 
-  #chatContainer .message.firstInGroup.isMe {
+  .message.firstInGroup.isMe {
     border-top-right-radius: 0;
   }
 
-  #chatContainer .message.firstInGroup:not(.isMe) {
+  .message.firstInGroup:not(.isMe) {
     border-top-left-radius: 0;
   }
 
-  #chatContainer .message.firstInGroup::before {
+  .message.firstInGroup::before {
     content: "";
     width: 8px;
     height: 8px;
@@ -1012,17 +1050,18 @@
     transform: translateZ(0);
   }
 
-  #chatContainer .message.firstInGroup:not(.isMe)::before {
+  .message.firstInGroup:not(.isMe)::before {
     left: -8px;
     border-right: none;
     border-bottom-right-radius: 0;
   }
 
-  #chatContainer .message.firstInGroup.isMe::before {
+  .message.firstInGroup.isMe::before {
     right: -8px;
     border-left: none;
     border-bottom-left-radius: 0;
   }
+
   #endGamePopup {
     width: 90%;
     max-width: 100%;
