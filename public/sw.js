@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 const CACHE_NAME = "app-cache-v-{{SERVER_VERSION}}";
 
 const urlsToCache = [
@@ -8,12 +10,12 @@ const urlsToCache = [
   "/login.html",
   "/profile.html",
   "/register.html",
-  "/reset.css",
-  "/style.css",
+  "/styles/reset.css",
+  "/styles/shared-style.css",
   "/styles/game.css",
   "/styles/home.css",
   "/styles/lobbies.css",
-  "/styles/login_register.css",
+  "/styles/login-register.css",
   "/styles/profile.css",
   "/scripts/game.js",
   "/scripts/lobbies.js",
@@ -33,13 +35,10 @@ self.addEventListener("install", (event) => {
       );
 
       return Promise.all(
-        urlsToCache.map((url) => {
-          return fetch(new Request(url, { cache: "reload" })).then(
-            (response) => {
-              if (!response.ok) throw new Error(`Can't download ${url}`);
-              return cache.put(url, response);
-            },
-          );
+        urlsToCache.map(async (url) => {
+          const response = await fetch(new Request(url, { cache: "reload" }));
+          if (!response.ok) throw new Error(`Can't download ${url}`);
+          return await cache.put(url, response);
         }),
       );
     }),
@@ -67,7 +66,10 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (
     event.request.url.includes("/api/") ||
-    event.request.url.includes("socket.io")
+    event.request.url.includes("socket.io") ||
+    event.request.url.includes("forgot-password") ||
+    event.request.url.includes("reset-password") ||
+    event.request.url.includes("verify-email")
   ) {
     return;
   }

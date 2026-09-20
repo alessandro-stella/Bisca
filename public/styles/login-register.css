@@ -75,6 +75,14 @@
   padding: 2em;
 }
 
+.title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--text-primary);
+
+  margin-bottom: 0.75em;
+}
+
 #loginForm,
 #registrationForm {
   display: flex;
@@ -83,7 +91,7 @@
 }
 
 #showPassword,
-#showPasswordRepeat {
+#showPasswordConfirm {
   width: 1.5em;
 
   display: flex;
@@ -94,7 +102,7 @@
 }
 
 #showPassword:hover .icon,
-#showPasswordRepeat:hover .icon {
+#showPasswordConfirm:hover .icon {
   color: var(--icon-active);
 }
 
