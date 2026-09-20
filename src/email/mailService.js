@@ -29,6 +29,7 @@ function loadTemplate(templateName, variables = {}) {
 
 async function sendEmail(to, subject, templateName, variables = {}) {
   console.log(`Trying to send email to ${to}...`);
+
   try {
     const htmlContent = loadTemplate(templateName, variables);
 

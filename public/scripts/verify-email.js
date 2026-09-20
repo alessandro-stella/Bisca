@@ -8,7 +8,6 @@ const invalidTokenState = document.getElementById("invalidTokenState");
 const errorMessage = document.getElementById("errorMessage");
 
 async function verifyEmail() {
-  // Valida il token
   if (!token || token.length < 20) {
     showState("invalid");
     return;
@@ -27,15 +26,12 @@ async function verifyEmail() {
     const data = await response.json();
 
     if (response.ok && data.authenticated) {
-      // Successo
       showState("success");
 
-      // Reindirizza dopo 3 secondi
       setTimeout(() => {
         window.location.replace("/lobbies.html");
       }, 3000);
     } else {
-      // Token non valido o scaduto
       const error = data.error || "Errore sconosciuto";
 
       if (
@@ -55,13 +51,11 @@ async function verifyEmail() {
 }
 
 function showState(state, message = "") {
-  // Nascondi tutti gli stati
   loadingState.hidden = true;
   successState.hidden = true;
   errorState.hidden = true;
   invalidTokenState.hidden = true;
 
-  // Mostra lo stato richiesto
   switch (state) {
     case "success":
       successState.hidden = false;
@@ -80,5 +74,4 @@ function showState(state, message = "") {
   }
 }
 
-// Avvia la verifica quando la pagina si carica
 verifyEmail();

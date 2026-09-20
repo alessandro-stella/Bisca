@@ -82,7 +82,8 @@ function showMatchHistory(gamesHistory) {
     const badge = game.left_early
       ? `<span class="quit-badge" title="Hai abbandonato">Abbandonata</span>`
       : "";
-    const eloColor = game.elo_change < 0 ? "#ff5555" : "var(--brand-green)";
+    const eloColor =
+      game.elo_change < 0 ? "var(--accent-red)" : "var(--brand-green)";
     const eloSign = game.elo_change > 0 ? "+" : "";
 
     tr.innerHTML = `

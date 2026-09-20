@@ -22,14 +22,14 @@ const passwordInputContainer = document.getElementById(
   "passwordInputContainer",
 );
 
-const repeatedPasswordInputContainer = document.getElementById(
-  "repeatedPasswordInputContainer",
+const confirmedPasswordInputContainer = document.getElementById(
+  "confirmedPasswordInputContainer",
 );
-const repeatedPasswordInput = /** @type {HTMLInputElement} */ (
-  document.getElementById("repeatedPasswordInput")
+const confirmedPasswordInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("confirmedPasswordInput")
 );
-const repeatedPasswordInputError = document.getElementById(
-  "repeatedPasswordInputError",
+const confirmedPasswordInputError = document.getElementById(
+  "confirmedPasswordInputError",
 );
 
 const missingData = document.getElementById("missingData");
@@ -45,7 +45,7 @@ for (const input of inputs) {
 }
 
 const showPassword = document.getElementById("showPassword");
-const showPasswordRepeat = document.getElementById("showPasswordRepeat");
+const showPasswordConfirm = document.getElementById("showPasswordConfirm");
 
 showPassword.addEventListener("click", () => {
   const icon = showPassword.getElementsByTagName("svg")[0];
@@ -54,12 +54,12 @@ showPassword.addEventListener("click", () => {
   passwordInput.type = passwordInput.type === "password" ? "text" : "password";
 });
 
-showPasswordRepeat.addEventListener("click", () => {
-  const icon = showPasswordRepeat.getElementsByTagName("svg")[0];
+showPasswordConfirm.addEventListener("click", () => {
+  const icon = showPasswordConfirm.getElementsByTagName("svg")[0];
   icon.classList.toggle("fa-eye-slash");
   icon.classList.toggle("fa-eye");
-  repeatedPasswordInput.type =
-    repeatedPasswordInput.type === "password" ? "text" : "password";
+  confirmedPasswordInput.type =
+    confirmedPasswordInput.type === "password" ? "text" : "password";
 });
 
 function setReadonly(blockInput) {
@@ -67,7 +67,7 @@ function setReadonly(blockInput) {
     usernameInput,
     emailInput,
     passwordInput,
-    repeatedPasswordInput,
+    confirmedPasswordInput,
   ];
 
   inputsList.forEach((input) => {
@@ -96,10 +96,10 @@ function addErrors(errors) {
     passwordInputContainer.classList.add("error");
   }
 
-  if (errors.repeatedPassword) {
-    repeatedPasswordInputError.hidden = false;
-    repeatedPasswordInputError.innerHTML = errors.repeatedPassword.msg;
-    repeatedPasswordInputContainer.classList.add("error");
+  if (errors.confirmedPassword) {
+    confirmedPasswordInputError.hidden = false;
+    confirmedPasswordInputError.innerHTML = errors.confirmedPassword.msg;
+    confirmedPasswordInputContainer.classList.add("error");
   }
 
   if (errors.missingData) {
@@ -110,7 +110,7 @@ function addErrors(errors) {
     "username",
     "email",
     "password",
-    "repeatedPassword",
+    "confirmedPassword",
     "missingData",
   ];
   const hasKnownError = knownKeys.some((key) => errors[key]);
@@ -128,7 +128,7 @@ function resetErrors() {
     usernameInputError,
     emailInputError,
     passwordInputError,
-    repeatedPasswordInputError,
+    confirmedPasswordInputError,
     registerGeneralError,
   ];
 
@@ -206,7 +206,7 @@ form.addEventListener("submit", async (event) => {
   const username = usernameInput.value.trim();
   const email = emailInput.value.trim();
   const password = passwordInput.value;
-  const repeatedPassword = repeatedPasswordInput.value;
+  const confirmedPassword = confirmedPasswordInput.value;
 
   let hasFrontendErrors = false;
   const errors = {};
@@ -229,8 +229,8 @@ form.addEventListener("submit", async (event) => {
     hasFrontendErrors = true;
   }
 
-  if (password && repeatedPassword && password !== repeatedPassword) {
-    errors.repeatedPassword = { msg: "Le password non coincidono" };
+  if (password && confirmedPassword && password !== confirmedPassword) {
+    errors.confirmedPassword = { msg: "Le password non coincidono" };
     hasFrontendErrors = true;
   }
 

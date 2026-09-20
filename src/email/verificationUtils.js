@@ -95,7 +95,7 @@ async function cleanupExpiredUnverifiedAccounts() {
   }
 }
 
-async function createPasswordResetToken(email, expirationMinutes = 15) {
+async function createPasswordResetToken(email, expirationMinutes = 5) {
   try {
     const token = generateVerificationToken();
     const expiresAt = new Date(Date.now() + expirationMinutes * 60 * 1000);
@@ -107,7 +107,7 @@ async function createPasswordResetToken(email, expirationMinutes = 15) {
           password_reset_token = $1,
           password_reset_expires_at = $2
         WHERE email = $3
-        RETURNING id
+        RETURNING id, username
       `,
       [token, expiresAt, email],
     );
@@ -116,6 +116,7 @@ async function createPasswordResetToken(email, expirationMinutes = 15) {
       return {
         success: false,
         token: null,
+        username: null,
         error: "Utente non trovato",
       };
     }
@@ -123,6 +124,7 @@ async function createPasswordResetToken(email, expirationMinutes = 15) {
     return {
       success: true,
       token,
+      username: result.rows[0].username,
       error: null,
     };
   } catch (error) {
@@ -130,6 +132,7 @@ async function createPasswordResetToken(email, expirationMinutes = 15) {
     return {
       success: false,
       token: null,
+      username: null,
       error: "Errore durante la creazione del token",
     };
   }
@@ -163,6 +166,7 @@ async function verifyPasswordResetToken(token) {
     };
   } catch (error) {
     console.error("Error verifying password reset token:", error);
+
     return {
       success: false,
       user: null,

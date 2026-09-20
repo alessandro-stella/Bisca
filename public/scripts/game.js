@@ -314,7 +314,7 @@ function renderGameState(game) {
   createPlayedCards(game.playedCards, game.highestPlay);
 
   const canPlay = game.turnPhase === "play" && game.isMyTurn && !game.showdown;
-  createMyCards(game.hand, "myCards", canPlay, game.turnPhase, game.showdown);
+  createMyCards(game.hand, canPlay, game.turnPhase, game.showdown);
 
   if (game.turnPhase === "bidding" && game.isMyTurn) {
     createBidButtons(game);
@@ -665,14 +665,21 @@ function createSingleCard(card, eventListener = false) {
   return cardElement;
 }
 
+const cardsContainer = document.getElementById("myCards");
+cardsContainer.addEventListener("click", (event) => {
+  const target = /** @type {HTMLElement} */ (event.target);
+
+  if (target.id === "myCards" && selectedCardData) {
+    resetBottomButton();
+  }
+});
+
 function createMyCards(
   cards,
-  containerId,
   eventListener = false,
   turnPhase,
   isShowdown = false,
 ) {
-  const cardsContainer = document.getElementById(containerId);
   cardsContainer.innerHTML = "";
 
   if (isShowdown && turnPhase !== "resolving") {

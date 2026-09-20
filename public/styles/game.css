@@ -282,7 +282,6 @@
 /* ============== */
 
 #myCardsContainer {
-  --card-displacement: 1em;
   --border-size: 0.3em;
 
   padding: var(--border-size);
@@ -355,11 +354,13 @@
   transition: all 0.2s ease-in-out;
 }
 
-.card:hover,
-.card.selected {
-  transform: translateY(calc(-1 * var(--card-displacement)));
-  box-shadow: var(--shadow-large);
+.card:hover {
   cursor: pointer;
+}
+
+.card.selected {
+  transform: translateY(-5%);
+  box-shadow: var(--shadow-large);
 }
 
 /* ============== */

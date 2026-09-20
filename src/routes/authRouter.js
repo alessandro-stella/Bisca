@@ -7,6 +7,8 @@ const {
   generateVerificationToken,
   verifyEmailToken,
   cleanupExpiredUnverifiedAccounts,
+  createPasswordResetToken,
+  verifyPasswordResetToken,
 } = require("../email/verificationUtils");
 
 const db = require("../db");
@@ -202,7 +204,6 @@ router.post("/verify-email", async (req, res) => {
   const user = verificationResult.user;
 
   try {
-    // Crea la sessione dopo la verifica (effettua il LOGIN)
     const session = await handleSession(user.id);
 
     res.cookie("sessionId", session.id, {
@@ -212,7 +213,6 @@ router.post("/verify-email", async (req, res) => {
       expires: session.expiresAt,
     });
 
-    // Invia email di benvenuto
     sendEmail(user.email, "Benvenuto su BISCA!", "welcome", {
       username: user.username,
     }).catch((error) => {
@@ -265,7 +265,6 @@ router.post("/login", async (req, res) => {
 
     const user = result.rows[0];
 
-    // BLOCCA se l'account non è verificato
     if (!user.email_verified) {
       return res.status(403).json({
         error: "Verifica il tuo account tramite il link ricevuto via email",
@@ -302,6 +301,146 @@ router.post("/login", async (req, res) => {
 
     res.status(500).json({
       error: "Internal server error",
+    });
+  }
+});
+
+// Forgot password handler
+router.post("/forgot-password", async (req, res) => {
+  const email = req.body.email?.trim().toLowerCase();
+
+  if (!email) {
+    return res.status(400).json({
+      error: "Email richiesta",
+    });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      error: "Formato email non valido",
+    });
+  }
+
+  try {
+    const tokenResult = await createPasswordResetToken(email, 5);
+
+    if (!tokenResult.success) {
+      return res.status(200).json({
+        success: true,
+        message: "Se l'email è registrata, riceverai un link di reset",
+      });
+    }
+
+    const baseUrl = process.env.CLIENT_URL;
+    const resetLink = `${baseUrl}/reset-password.html?token=${tokenResult.token}`;
+
+    sendEmail(email, "Reset Password BISCA", "reset_password", {
+      username: tokenResult.username,
+      resetLink,
+      expirationMinutes: 5,
+    }).catch((error) => {
+      console.error("Failed to send reset email:", error);
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Se l'email è registrata, riceverai un link di reset",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+
+    return res.status(500).json({
+      error: "Errore durante la richiesta. Riprova più tardi.",
+    });
+  }
+});
+
+// Verify password reset token
+router.post("/verify-password-reset-token", async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      error: "Token mancante",
+    });
+  }
+
+  const verificationResult = await verifyPasswordResetToken(token);
+
+  if (!verificationResult.success) {
+    return res.status(400).json({
+      success: false,
+      error: verificationResult.error,
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    user: {
+      id: verificationResult.user.id,
+      username: verificationResult.user.username,
+      email: verificationResult.user.email,
+    },
+  });
+});
+
+// Reset password handler
+router.post("/reset-password", async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    return res.status(400).json({
+      success: false,
+      error: "Token e password richiesti",
+    });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({
+      success: false,
+      error: "La password deve essere lunga almeno 8 caratteri",
+    });
+  }
+
+  try {
+    // Verifica il token
+    const verificationResult = await verifyPasswordResetToken(token);
+
+    if (!verificationResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: verificationResult.error,
+      });
+    }
+
+    const user = verificationResult.user;
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Aggiorna la password e cancella i token di reset
+    await db.query(
+      `
+        UPDATE users
+        SET 
+          password_hash = $1,
+          password_reset_token = NULL,
+          password_reset_expires_at = NULL
+        WHERE id = $2
+      `,
+      [passwordHash, user.id],
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Password aggiornata con successo",
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+
+    res.status(500).json({
+      success: false,
+      error: "Errore durante il reset della password. Riprova più tardi.",
     });
   }
 });

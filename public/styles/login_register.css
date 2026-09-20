@@ -123,6 +123,26 @@
   color: var(--text-link-hover);
 }
 
+#textUnderPassword {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+#forgotPasswordLink {
+  color: var(--text-link);
+  font-size: 0.85em;
+  text-decoration: none;
+  display: inline-block;
+  transition: color 200ms ease-in-out;
+  margin-left: auto;
+}
+
+#forgotPasswordLink:hover {
+  color: var(--text-link-hover);
+  text-decoration: underline;
+}
+
 /* Properties for mobile */
 @media (max-width: 768px) {
   #loginContainer,

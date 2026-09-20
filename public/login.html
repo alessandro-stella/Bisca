@@ -58,6 +58,8 @@
 
       checkSession();
     </script>
+
+    <script src="scripts/login.js" defer></script>
   </head>
   <body>
     <div id="baseContainer">
@@ -87,8 +89,18 @@
               </div>
             </div>
 
-            <div id="loginError" class="inputError" hidden>
-              Email o password non valida
+            <div id="textUnderPassword">
+              <div id="loginError" class="inputError" hidden>
+                Email o password non valida
+              </div>
+
+              <a
+                id="forgotPasswordLink"
+                href="forgot-password.html"
+                class="forgotPasswordLink"
+              >
+                Password dimenticata?
+              </a>
             </div>
           </div>
 
@@ -102,7 +114,5 @@
         >Nuovo giocatore? Registrati ora!</a
       >
     </div>
-
-    <script src="scripts/login.js"></script>
   </body>
 </html>
