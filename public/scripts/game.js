@@ -49,8 +49,8 @@ socket.on("connect", () => {
   startHeartbeat();
 });
 
-socket.on("connect_error", (error) => {
-  console.error("Socket connection error:", error.message);
+socket.on("connect_error", () => {
+  window.location.replace("/lobbies.html");
 });
 
 socket.on("disconnect", (reason) => {
@@ -322,7 +322,12 @@ function renderGameState(game) {
     resetBottomActions();
   }
 
-  loader.classList.add("hidden");
+  if (!loader.classList.contains("hidden")) {
+    loader.classList.add("hidden");
+    setTimeout(() => {
+      loader.hidden = true;
+    }, 2000);
+  }
 }
 
 function createMySeat(
