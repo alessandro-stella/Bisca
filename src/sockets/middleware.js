@@ -99,9 +99,11 @@ const validators = {
     if (!Number.isInteger(bid)) {
       return { valid: false, message: "Bid must be an integer" };
     }
+
     if (bid < 0 || bid > max) {
       return { valid: false, message: `Bid must be between 0 and ${max}` };
     }
+
     return { valid: true };
   },
 

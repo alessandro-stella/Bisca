@@ -130,8 +130,6 @@ function getPlayerGameState(game, playerId) {
 
   let hand = game.hands.get(playerId);
 
-  console.log(hand);
-
   if (!game.showdown && hand) {
     hand = Array.from(hand).sort(
       (a, b) =>

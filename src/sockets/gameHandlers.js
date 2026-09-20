@@ -181,7 +181,7 @@ async function emitGameResult(io, lobbyId, game, result) {
     try {
       await saveGameData(dataToSave);
     } catch (error) {
-      console.error("Errore salvataggio partita ed ELO a fine match:", error);
+      console.error("END GAME: Error while saving game data", error);
     }
   }
 }

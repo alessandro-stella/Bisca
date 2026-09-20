@@ -70,61 +70,7 @@ socket.on("game:reconnect", () => {
 });
 
 socket.on("game:not-found", () => {
-  // window.location.replace("/lobbies.html");
-
-  const testGame = {
-    turnPhase: "bidding",
-    totalBids: 0,
-    showdown: false,
-    me: {
-      playerId: "6af2957e-d66a-4b98-a8ce-78b61ddb8ba0",
-      connected: true,
-      username: "Nuthe",
-      bid: -1,
-      lives: 2,
-      won: 0,
-      placement: null,
-    },
-    opponents: [
-      {
-        playerId: "caaae1b4-58fc-49be-9bb3-59e0f778d39d",
-        connected: true,
-        username: "Sup3r_",
-        bid: -1,
-        lives: 2,
-        won: 0,
-        placement: null,
-      },
-    ],
-    playedCards: [],
-    currentPlayerId: "6af2957e-d66a-4b98-a8ce-78b61ddb8ba0",
-    hand: [
-      "denari10",
-      "denari8",
-      "denari6",
-      "denari5",
-      "denari3",
-      "denari2",
-      "denari1",
-      "coppe7",
-      "coppe6",
-      "coppe5",
-      "coppe3",
-      "coppe2",
-      "coppe1",
-      "spade9",
-      "spade6",
-      "spade5",
-      "spade4",
-      "bastoni8",
-      "bastoni6",
-      "bastoni3",
-    ],
-    isMyTurn: true,
-    lastPlayer: false,
-  };
-
-  renderGameState(testGame);
+  window.location.replace("/lobbies.html");
 });
 
 socket.on("game:state", (game) => {
@@ -335,15 +281,78 @@ function updateBottomButton(card, cardElement) {
   }
 }
 
+const centerPopup = document.getElementById("centerPopup");
+let popupTimeout;
+
+function showCenterPopup(text) {
+  if (popupTimeout) {
+    clearTimeout(popupTimeout);
+  }
+
+  centerPopup.classList.remove("hidden");
+  centerPopup.innerHTML = text;
+
+  popupTimeout = setTimeout(() => {
+    centerPopup.classList.add("hidden");
+  }, 2000);
+}
+
+let announcedBids = {};
 let currentTurnPhase = null;
+let isFirstLoad = true;
+
+function showBidPopup(game, allPlayers) {
+  if (isFirstLoad) {
+    allPlayers.forEach((p) => {
+      if (p.bid !== -1 && p.bid !== null && p.bid !== undefined) {
+        announcedBids[p.playerId] = p.bid;
+      }
+    });
+    isFirstLoad = false;
+  } else {
+    allPlayers.forEach((p) => {
+      if (p.bid !== -1 && p.bid !== null && p.bid !== undefined) {
+        if (announcedBids[p.playerId] !== p.bid) {
+          const isMe = p.playerId === game.me.playerId;
+          let popupText = "";
+
+          if (game.showdown) {
+            if (isMe) {
+              popupText = p.bid === 1 ? "Vincerò!" : "Perderò!";
+            } else {
+              popupText =
+                p.bid === 1
+                  ? `${p.username} vincerà...`
+                  : `${p.username} perderà...`;
+            }
+          } else {
+            const name = isMe ? "Hai" : p.username;
+            const verb = isMe ? "scommesso" : "scommette";
+            popupText = `${name} ${verb} ${p.bid} prese`;
+          }
+
+          showCenterPopup(popupText);
+          announcedBids[p.playerId] = p.bid;
+        }
+      } else {
+        delete announcedBids[p.playerId];
+      }
+    });
+  }
+}
 
 function renderGameState(game) {
-  console.log(game);
   currentTurnPhase = game.turnPhase;
-  if (game.turnPhase === "finished") {
+  if (currentTurnPhase === "finished") {
     showScoreboard([game.me, ...game.opponents]);
     return;
   }
+
+  if (currentTurnPhase === "resolving") acePlayed = false;
+
+  const allPlayers = [game.me, ...(game.opponents || [])];
+
+  showBidPopup(game, allPlayers);
 
   selectedCardData = null;
 
@@ -354,13 +363,13 @@ function renderGameState(game) {
     table,
     game.me,
     game.currentPlayerId,
-    game.turnPhase,
+    currentTurnPhase,
     game.showdown,
   );
 
   createOpponents(
     table,
-    game.turnPhase,
+    currentTurnPhase,
     game.opponents || [],
     game.currentPlayerId,
     game.showdown,
@@ -368,10 +377,11 @@ function renderGameState(game) {
 
   createPlayedCards(game.playedCards, game.highestPlay);
 
-  const canPlay = game.turnPhase === "play" && game.isMyTurn && !game.showdown;
-  createMyCards(game.hand, canPlay, game.turnPhase, game.showdown);
+  const canPlay =
+    currentTurnPhase === "play" && game.isMyTurn && !game.showdown;
+  createMyCards(game.hand, canPlay, currentTurnPhase, game.showdown);
 
-  if (game.turnPhase === "bidding" && game.isMyTurn) {
+  if (currentTurnPhase === "bidding" && game.isMyTurn) {
     createBidButtons(game);
   } else {
     resetBottomActions();
@@ -401,7 +411,6 @@ function createMySeat(
   table.appendChild(mySeat);
 
   const isEliminated = myData.placement !== null;
-
   const myLivesContainer = document.getElementById("myLives");
 
   if (isEliminated && myLivesContainer.classList.contains("gameEnded")) return;
@@ -420,6 +429,12 @@ function createMySeat(
     myBidsContainer.remove();
   } else {
     livesDiv.innerHTML = myData.lives;
+
+    if (turnPhase === "resolving" && isShowdown) {
+      livesDiv.innerHTML += " - Rivelando...";
+    }
+
+    myBidsContainer.hidden = isShowdown;
   }
 
   const isMyTurn = myData.playerId === currentPlayerId;
@@ -450,16 +465,25 @@ function createMySeat(
   };
 
   if (turnPhase !== "resolving") {
-    myBidsContainer.hidden = false;
+    myLivesContainer.classList.remove("showdown");
   }
 
   if (isShowdown) {
-    if (turnPhase === "bidding" && !hasBid) {
-      usernameDiv.innerHTML = "Showdown";
-      livesDiv.innerHTML += " - Come andrà?";
-      myLivesContainer.classList.add("showdown");
-      myBidsContainer.hidden = true;
-      if (!isMyTurn) updateBottomButtonDefault();
+    if (turnPhase === "bidding") {
+      if (!hasBid) {
+        usernameDiv.innerHTML = "Showdown";
+        livesDiv.innerHTML += " - Come andrà?";
+        myLivesContainer.classList.add("showdown");
+
+        if (!isMyTurn) updateBottomButtonDefault();
+      } else {
+        usernameDiv.innerHTML = myData.username;
+        const predictionText = myData.bid > 0 ? " - Vincerai" : " - Perderai";
+        livesDiv.innerHTML += predictionText;
+        myLivesContainer.classList.add("showdown");
+
+        updateBottomButtonDefault();
+      }
     } else {
       usernameDiv.innerHTML = myData.username;
       updateBottomButtonDefault();
@@ -485,6 +509,7 @@ function createMySeat(
     updateBottomButtonDefault();
   }
 }
+
 function createOpponents(
   table,
   turnPhase,
@@ -582,6 +607,8 @@ function createOpponents(
   }
 }
 
+let acePlayed = false;
+
 function createPlayedCards(cards, highestPlay) {
   if (!Array.isArray(cards)) return;
 
@@ -605,15 +632,11 @@ function createPlayedCards(cards, highestPlay) {
     }
 
     if (card.card.includes("asso")) {
-      const acePopup = document.getElementById("acePopup");
+      showCenterPopup(
+        card.card === "asso-prende" ? "Asso prende!" : "Asso non prende!",
+      );
 
-      acePopup.classList.remove("hidden");
-      acePopup.innerHTML =
-        card.card === "asso-prende" ? "Asso prende!" : "Asso non prende!";
-
-      setTimeout(() => {
-        acePopup.classList.add("hidden");
-      }, 2000);
+      acePlayed = true;
     }
   }
 }

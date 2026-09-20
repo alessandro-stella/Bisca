@@ -563,6 +563,7 @@ body {
     gap: 0.5em;
     width: calc(100% - 1.3em);
     margin: 0.65em;
+    font-size: 1.25em;
   }
 
   #ownerButtonsDesktop button {
