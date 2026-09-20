@@ -92,6 +92,9 @@ app.use(
 const setupSockets = require("./sockets");
 setupSockets(io);
 
+const profanityFilter = require("./profanityFilter");
+profanityFilter.setThreshold(95);
+
 server.listen(PORT, async () => {
   console.log(`Server started on port ${PORT}`);
 

@@ -70,7 +70,61 @@ socket.on("game:reconnect", () => {
 });
 
 socket.on("game:not-found", () => {
-  window.location.replace("/lobbies.html");
+  // window.location.replace("/lobbies.html");
+
+  const testGame = {
+    turnPhase: "bidding",
+    totalBids: 0,
+    showdown: false,
+    me: {
+      playerId: "6af2957e-d66a-4b98-a8ce-78b61ddb8ba0",
+      connected: true,
+      username: "Nuthe",
+      bid: -1,
+      lives: 2,
+      won: 0,
+      placement: null,
+    },
+    opponents: [
+      {
+        playerId: "caaae1b4-58fc-49be-9bb3-59e0f778d39d",
+        connected: true,
+        username: "Sup3r_",
+        bid: -1,
+        lives: 2,
+        won: 0,
+        placement: null,
+      },
+    ],
+    playedCards: [],
+    currentPlayerId: "6af2957e-d66a-4b98-a8ce-78b61ddb8ba0",
+    hand: [
+      "denari10",
+      "denari8",
+      "denari6",
+      "denari5",
+      "denari3",
+      "denari2",
+      "denari1",
+      "coppe7",
+      "coppe6",
+      "coppe5",
+      "coppe3",
+      "coppe2",
+      "coppe1",
+      "spade9",
+      "spade6",
+      "spade5",
+      "spade4",
+      "bastoni8",
+      "bastoni6",
+      "bastoni3",
+    ],
+    isMyTurn: true,
+    lastPlayer: false,
+  };
+
+  renderGameState(testGame);
 });
 
 socket.on("game:state", (game) => {
@@ -284,6 +338,7 @@ function updateBottomButton(card, cardElement) {
 let currentTurnPhase = null;
 
 function renderGameState(game) {
+  console.log(game);
   currentTurnPhase = game.turnPhase;
   if (game.turnPhase === "finished") {
     showScoreboard([game.me, ...game.opponents]);
@@ -547,6 +602,18 @@ function createPlayedCards(cards, highestPlay) {
 
     if (highestPlay && card.playerId === highestPlay.playerId) {
       playerSeat?.classList.add("highestPlay");
+    }
+
+    if (card.card.includes("asso")) {
+      const acePopup = document.getElementById("acePopup");
+
+      acePopup.classList.remove("hidden");
+      acePopup.innerHTML =
+        card.card === "asso-prende" ? "Asso prende!" : "Asso non prende!";
+
+      setTimeout(() => {
+        acePopup.classList.add("hidden");
+      }, 2000);
     }
   }
 }
