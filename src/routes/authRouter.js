@@ -94,6 +94,14 @@ router.post("/register", async (req, res) => {
     });
   }
 
+  if (/\s/.test(username)) {
+    return res.status(400).json({
+      errors: {
+        username: { msg: "Lo username non può contenere spazi" },
+      },
+    });
+  }
+
   if (isProfane(username)) {
     return res.status(400).json({
       errors: {
@@ -148,7 +156,7 @@ router.post("/register", async (req, res) => {
 
     return res.status(201).json({
       message:
-        "Account creato! Hai 5 minuti per verificare l'account cliccando sul link che ti abbiamo inviato. Se non vedi l'email, controlla la cartella Spam.",
+        "Account creato! Hai 5 minuti per verificare l'account cliccando sul link che ti abbiamo inviato. Se non vedi l'email, controlla la cartella Spam",
       user: {
         id: user.id,
         username: user.username,
@@ -184,7 +192,7 @@ router.post("/register", async (req, res) => {
 
     res.status(500).json({
       errors: {
-        general: { msg: "Errore interno del server. Riprova più tardi." },
+        general: { msg: "Errore interno del server. Riprova più tardi" },
       },
     });
   } finally {
@@ -198,7 +206,7 @@ router.post("/verify-email", async (req, res) => {
 
   if (!token) {
     return res.status(400).json({
-      error: "Token mancante",
+      error: "Missing token",
     });
   }
 
@@ -235,12 +243,12 @@ router.post("/verify-email", async (req, res) => {
         username: user.username,
         email: user.email,
       },
-      message: "Email verificata! Sei stato autenticato.",
+      message: "Email verificata! Sei stato autenticato",
     });
   } catch (error) {
     console.error("Error during email verification:", error);
     res.status(500).json({
-      error: "Errore durante la verifica. Riprova più tardi.",
+      error: "Errore durante la verifica. Riprova più tardi",
     });
   }
 });
@@ -360,7 +368,7 @@ router.post("/forgot-password", async (req, res) => {
     console.error("Forgot password error:", error);
 
     return res.status(500).json({
-      error: "Errore durante la richiesta. Riprova più tardi.",
+      error: "Errore durante la richiesta. Riprova più tardi",
     });
   }
 });
@@ -414,7 +422,6 @@ router.post("/reset-password", async (req, res) => {
   }
 
   try {
-    // Verifica il token
     const verificationResult = await verifyPasswordResetToken(token);
 
     if (!verificationResult.success) {
@@ -427,7 +434,6 @@ router.post("/reset-password", async (req, res) => {
     const user = verificationResult.user;
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Aggiorna la password e cancella i token di reset
     await db.query(
       `
         UPDATE users
@@ -440,16 +446,25 @@ router.post("/reset-password", async (req, res) => {
       [passwordHash, user.id],
     );
 
+    await db.query(
+      `
+        DELETE FROM sessions
+        WHERE user_id = $1
+      `,
+      [user.id],
+    );
+
     return res.status(200).json({
       success: true,
-      message: "Password aggiornata con successo",
+      message:
+        "Password aggiornata con successo. Tutte le sessioni sono state disconnesse",
     });
   } catch (error) {
     console.error("Reset password error:", error);
 
     res.status(500).json({
       success: false,
-      error: "Errore durante il reset della password. Riprova più tardi.",
+      error: "Errore durante il reset della password. Riprova più tardi",
     });
   }
 });

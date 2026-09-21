@@ -1,7 +1,8 @@
 body {
   display: flex;
   flex-direction: column;
-  min-height: 100svh;
+  height: 100svh;
+  overflow: hidden;
 }
 
 #baseContainer {
@@ -14,6 +15,8 @@ body {
   padding: 1em;
   padding-top: 0;
   flex: 1;
+
+  overflow-y: auto;
 }
 
 #loadingCover {
@@ -220,50 +223,72 @@ body {
   grid-column: unset;
 }
 
-.modal-overlay {
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(0.5em);
+  z-index: 10;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.modal-content {
+.editProfilePopup {
   background-color: var(--bg-card);
   padding: 2em;
   border-radius: 0.5em;
-  width: 90%;
-  max-width: 400px;
+  width: 40%;
   display: flex;
   flex-direction: column;
   gap: 1em;
 }
 
-.modal-content h2 {
+.editProfilePopup .title {
   color: var(--text-primary);
-  margin-bottom: 0.5em;
   font-size: 1.5em;
   font-weight: bold;
 }
 
-.modal-buttons {
-  display: flex;
-  gap: 1em;
-  margin-top: 1em;
+.inputTip {
+  color: var(--text-secondary);
+  font-size: 0.75em;
 }
 
-.modal-buttons button {
+#passwordResetContainer {
+  text-align: center;
+}
+
+#modalResetPasswordButton {
+  width: 100%;
+  padding: 0.75em;
+  border-radius: 0.25em;
+}
+
+#modalResetPasswordButton .fa-key {
+  margin-right: 0.5em;
+}
+
+#modalPasswordMessage {
+  font-size: 0.85em;
+  margin-top: 0.75em;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 1em;
+}
+
+.modalButtons button {
   flex: 1;
   padding: 0.75em;
   border-radius: 0.25em;
 }
 
-.modal-overlay[hidden] {
+.modalOverlay[hidden] {
   display: none !important;
 }
 
@@ -277,6 +302,12 @@ body {
     padding-top: 0;
     gap: 0.5em;
     min-height: 0;
+  }
+
+  .editProfilePopup {
+    width: 90%;
+    max-width: initial;
+    padding: 1em;
   }
 
   #userInfo,

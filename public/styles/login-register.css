@@ -151,6 +151,15 @@
   text-decoration: underline;
 }
 
+#registerSuccess {
+  color: var(--brand-green);
+  background-color: var(--bg-input);
+  border: 1px solid var(--brand-green);
+  padding: 1em;
+  border-radius: 0.25em;
+  text-align: center;
+}
+
 /* Properties for mobile */
 @media (max-width: 768px) {
   #loginContainer,

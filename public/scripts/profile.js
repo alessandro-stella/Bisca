@@ -153,59 +153,121 @@ const editProfileButton = document.getElementById("editProfileButton");
 const editProfileModal = document.getElementById("editProfileModal");
 const closeModalButton = document.getElementById("closeModalButton");
 const saveProfileButton = document.getElementById("saveProfileButton");
-const editUsernameInput = document.getElementById("editUsernameInput");
+
+const editUsernameContainer = document.getElementById("usernameInputContainer");
+const editUsernameInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("editUsernameInput")
+);
 const editError = document.getElementById("editError");
 
-if (editProfileButton) {
-  editProfileButton.addEventListener("click", () => {
-    const currentUsername =
-      document.getElementById("usernameInfo").dataset.username;
-    editUsernameInput.value = currentUsername;
-    editError.hidden = true;
-    editProfileModal.hidden = false;
-  });
-}
+editUsernameContainer.addEventListener("click", () => {
+  editUsernameInput.focus();
+});
 
-if (closeModalButton) {
-  closeModalButton.addEventListener("click", () => {
+editProfileModal.addEventListener("click", (event) => {
+  const target = /** @type {HTMLElement} */ (event.target);
+
+  if (target.id === "editProfileModal") {
     editProfileModal.hidden = true;
-  });
-}
+  }
+});
 
-if (saveProfileButton) {
-  saveProfileButton.addEventListener("click", async () => {
-    const newUsername = editUsernameInput.value.trim();
+closeModalButton.addEventListener("click", () => {
+  editProfileModal.hidden = true;
+});
 
-    if (!newUsername) {
-      editError.innerText = "Inserisci uno username valido.";
+editProfileButton.addEventListener("click", () => {
+  const currentUsername =
+    document.getElementById("usernameInfo").dataset.username;
+  editUsernameInput.value = currentUsername;
+  editError.hidden = true;
+  editProfileModal.hidden = false;
+});
+
+saveProfileButton.addEventListener("click", async () => {
+  const newUsername = editUsernameInput.value.trim();
+
+  if (!newUsername) {
+    editError.innerText = "Inserisci uno username valido";
+    editError.hidden = false;
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/user/update", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: newUsername }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const usernameInfo = document.getElementById("usernameInfo");
+      usernameInfo.classList.add("isMe");
+      usernameInfo.dataset.username = data.username;
+      usernameInfo.innerHTML = `Bentornato, ${data.username}!`;
+      editProfileModal.hidden = true;
+    } else {
+      editError.innerText = data.error || "Errore durante l'aggiornamento";
       editError.hidden = false;
-      return;
     }
+  } catch (error) {
+    editError.innerText = "Errore di connessione";
+    editError.hidden = false;
+  }
+});
 
-    try {
-      const response = await fetch("/api/user/update", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: newUsername }),
-      });
+const modalResetPasswordButton = document.getElementById(
+  "modalResetPasswordButton",
+);
+const modalPasswordMessage = document.getElementById("modalPasswordMessage");
 
-      const data = await response.json();
+modalResetPasswordButton.addEventListener("click", async () => {
+  const emailInfo = document.getElementById("emailInfo");
+  const userEmail = emailInfo.innerText.trim();
 
-      if (response.ok) {
-        const usernameInfo = document.getElementById("usernameInfo");
-        usernameInfo.classList.add("isMe");
-        usernameInfo.dataset.username = data.username;
-        usernameInfo.innerHTML = `Bentornato, ${data.username}!`;
-        editProfileModal.hidden = true;
-      } else {
-        editError.innerText = data.error || "Errore durante l'aggiornamento.";
-        editError.hidden = false;
-      }
-    } catch (error) {
-      editError.innerText = "Errore di connessione.";
-      editError.hidden = false;
+  modalResetPasswordButton.disabled = true;
+  modalResetPasswordButton.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin"></i> Invio in corso...';
+  modalPasswordMessage.hidden = true;
+
+  try {
+    const response = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: userEmail }),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    modalPasswordMessage.hidden = false;
+
+    if (response.ok && data.success) {
+      modalPasswordMessage.textContent =
+        "Ti abbiamo inviato un'email! Controlla la posta in arrivo (o lo spam).";
+      modalPasswordMessage.style.color = "var(--brand-green)";
+      modalResetPasswordButton.innerHTML =
+        '<i class="fa-solid fa-check"></i> Email inviata';
+    } else {
+      modalPasswordMessage.textContent =
+        data.error || "C'è stato un problema durante l'invio.";
+      modalPasswordMessage.style.color = "var(--accent-red)";
+      modalResetPasswordButton.disabled = false;
+      modalResetPasswordButton.innerHTML =
+        '<i class="fa-solid fa-key"></i> Riprova';
     }
-  });
-}
+  } catch (error) {
+    modalPasswordMessage.hidden = false;
+    modalPasswordMessage.textContent =
+      "Errore di connessione. Riprova tra poco.";
+    modalPasswordMessage.style.color = "var(--accent-red)";
+    modalResetPasswordButton.disabled = false;
+    modalResetPasswordButton.innerHTML =
+      '<i class="fa-solid fa-key"></i> Riprova';
+  }
+});

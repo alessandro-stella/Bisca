@@ -119,21 +119,43 @@
     </div>
 
     <div id="editProfileModal" class="modalOverlay" hidden>
-      <div class="modal-content">
-        <h2>Modifica Profilo</h2>
+      <div class="editProfilePopup">
+        <div class="title">Modifica Profilo</div>
 
-        <div class="inputWithIcon">
-          <input
-            type="text"
-            id="editUsernameInput"
-            placeholder="Nuovo Username"
-          />
+        <div class="inputWithError">
+          <div class="inputTip">Cambia username</div>
+          <div id="usernameInputContainer" class="inputWithIcon">
+            <i class="icon fa-solid fa-user"></i>
+            <input
+              id="editUsernameInput"
+              type="text"
+              minlength="3"
+              maxlength="30"
+              placeholder="Nuovo Username"
+              autocomplete="username"
+            />
+          </div>
+          <div id="editError" class="inputError" hidden></div>
         </div>
-        <div id="editError" class="inputError" hidden></div>
+
+        <div id="passwordResetContainer">
+          <button
+            id="modalResetPasswordButton"
+            type="button"
+            class="secondaryButton"
+          >
+            <i class="fa-solid fa-key"></i> Aggiorna la tua password
+          </button>
+          <p id="modalPasswordMessage" hidden></p>
+        </div>
 
         <div class="modalButtons">
-          <button id="saveProfileButton" class="primaryButton">Salva</button>
-          <button id="closeModalButton" class="secondaryButton">Annulla</button>
+          <button id="closeModalButton" class="secondaryButton">
+            <p>Annulla</p>
+          </button>
+          <button id="saveProfileButton" class="primaryButton">
+            <p>Salva</p>
+          </button>
         </div>
       </div>
     </div>

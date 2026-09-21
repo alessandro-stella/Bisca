@@ -8,6 +8,22 @@ body {
   display: none;
 }
 
+#backdrop.shown {
+  display: initial;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(0.5em);
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+#backdrop.shown .primaryButton {
+  display: none;
+}
+
 #joinLobbyPopup {
   display: none;
 }
@@ -16,7 +32,7 @@ body {
   background-color: var(--bg-card);
   box-shadow: var(--shadow);
   border-radius: 0.25em;
-  padding: 1em;
+  padding: 2em;
   display: flex;
   flex-direction: column;
   gap: 1em;
@@ -25,7 +41,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2;
+  z-index: 20;
   min-width: 350px;
 }
 
@@ -349,24 +365,9 @@ body {
 
 /* Properties for mobile */
 @media (max-width: 768px) {
-  #backdrop.shown {
-    display: initial;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(0.5em);
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1;
-  }
-
-  #backdrop.shown .primaryButton {
-    display: none;
-  }
-
-  #joinLobbyPopup {
+  #joinLobbyPopup.shown {
     width: 90%;
+    padding: 1em;
   }
 
   #baseContainer {
