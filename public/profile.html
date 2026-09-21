@@ -69,9 +69,33 @@
     </div>
 
     <div id="baseContainer">
+      <div id="loadingCover">
+        <i class="fa-solid fa-spinner"></i>
+      </div>
+
+      <div id="userNotFoundWrapper">
+        <div id="userNotFound">
+          <div class="title">Utente non trovato</div>
+          <div class="text">
+            Non sono stati trovati utenti con l'ID inserito
+          </div>
+        </div>
+      </div>
+
       <div id="userInfo">
-        <div id="usernameInfo"></div>
-        <div id="emailInfo"></div>
+        <div id="usernameContainer">
+          <div id="usernameInfo"></div>
+
+          <button
+            id="editProfileButton"
+            class="secondaryButton iconButton"
+            hidden
+          >
+            <i class="fa-solid fa-pen"></i>
+          </button>
+        </div>
+
+        <div id="emailInfo" hidden></div>
         <div id="eloInfo"></div>
         <div id="winRate"></div>
       </div>
@@ -91,6 +115,26 @@
           </thead>
           <tbody id="matchHistoryBody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <div id="editProfileModal" class="modalOverlay" hidden>
+      <div class="modal-content">
+        <h2>Modifica Profilo</h2>
+
+        <div class="inputWithIcon">
+          <input
+            type="text"
+            id="editUsernameInput"
+            placeholder="Nuovo Username"
+          />
+        </div>
+        <div id="editError" class="inputError" hidden></div>
+
+        <div class="modalButtons">
+          <button id="saveProfileButton" class="primaryButton">Salva</button>
+          <button id="closeModalButton" class="secondaryButton">Annulla</button>
+        </div>
       </div>
     </div>
   </body>

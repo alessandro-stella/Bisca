@@ -5,38 +5,72 @@ async function logout() {
   });
 
   if (response.ok) {
-    console.log("Logout successful");
     window.location.replace("login.html");
-  } else {
-    console.log("Logout error");
   }
 }
 
-async function checkSession() {
-  const response = await fetch("/api/session/me", {
+async function loadProfile() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetUserId = urlParams.get("id");
+
+  const sessionResponse = await fetch("/api/session/me", {
     method: "GET",
     credentials: "include",
   });
 
-  if (response.ok) {
-    console.log("Session OK");
-    const { user } = await response.json();
-
-    getStats(user);
-  } else {
-    console.log("No session or expired");
-    window.location.replace("/login.html");
+  let loggedInUser = null;
+  if (sessionResponse.ok) {
+    const data = await sessionResponse.json();
+    loggedInUser = data.user;
   }
+
+  const isOwnProfile =
+    !targetUserId || (loggedInUser && targetUserId === loggedInUser.id);
+  let userToDisplay = null;
+
+  const loader = document.getElementById("loadingCover");
+
+  if (isOwnProfile) {
+    if (!loggedInUser) {
+      window.location.replace("/login.html");
+      return;
+    }
+
+    userToDisplay = loggedInUser;
+  } else {
+    const userResponse = await fetch(`/api/user/${targetUserId}`);
+
+    if (userResponse.ok) {
+      userToDisplay = await userResponse.json();
+    } else {
+      const userInfo = document.getElementById("userInfo");
+      userInfo.hidden = true;
+
+      const matchHistoryContainer = document.getElementById(
+        "matchHistoryContainer",
+      );
+      matchHistoryContainer.hidden = true;
+
+      loader.classList.add("hidden");
+      return;
+    }
+  }
+
+  displayProfileInfo(userToDisplay, isOwnProfile);
+  getStats(userToDisplay);
+
+  const userNotFound = document.getElementById("userNotFoundWrapper");
+  userNotFound.hidden = true;
+  loader.classList.add("hidden");
 }
 
-checkSession();
+loadProfile();
 
 async function getStats(user) {
   const games = await fetch(`/api/user/${user.id}/games`).then(
     async (res) => await res.json(),
   );
 
-  displayProfileInfo(user);
   showMatchHistory(games);
 }
 
@@ -45,20 +79,31 @@ function formatDate(rawDate) {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(rawDate));
 }
 
-function displayProfileInfo(userInfo) {
+function displayProfileInfo(userInfo, isOwnProfile) {
   const usernameInfo = document.getElementById("usernameInfo");
   const emailInfo = document.getElementById("emailInfo");
   const eloInfo = document.getElementById("eloInfo");
+  const editButton = document.getElementById("editProfileButton");
 
-  usernameInfo.innerHTML = `${userInfo.username}`;
-  emailInfo.innerHTML = `${userInfo.email}`;
+  usernameInfo.dataset.username = userInfo.username;
   eloInfo.innerHTML = `${userInfo.elo}`;
+
+  if (isOwnProfile) {
+    usernameInfo.classList.add("isMe");
+    usernameInfo.innerHTML = `Bentornato, ${userInfo.username}!`;
+    emailInfo.innerHTML = `${userInfo.email}`;
+    emailInfo.hidden = false;
+    if (editButton) editButton.hidden = false;
+  } else {
+    usernameInfo.innerHTML = `${userInfo.username}`;
+    emailInfo.hidden = true;
+    if (editButton) editButton.hidden = true;
+  }
 }
 
 function showMatchHistory(gamesHistory) {
@@ -66,7 +111,6 @@ function showMatchHistory(gamesHistory) {
   totalMatches.innerHTML = gamesHistory.length;
 
   let won = 0;
-
   const tbody = document.getElementById("matchHistoryBody");
   tbody.innerHTML = "";
 
@@ -103,4 +147,65 @@ function showMatchHistory(gamesHistory) {
   } else {
     winRate.innerHTML = "0.00%";
   }
+}
+
+const editProfileButton = document.getElementById("editProfileButton");
+const editProfileModal = document.getElementById("editProfileModal");
+const closeModalButton = document.getElementById("closeModalButton");
+const saveProfileButton = document.getElementById("saveProfileButton");
+const editUsernameInput = document.getElementById("editUsernameInput");
+const editError = document.getElementById("editError");
+
+if (editProfileButton) {
+  editProfileButton.addEventListener("click", () => {
+    const currentUsername =
+      document.getElementById("usernameInfo").dataset.username;
+    editUsernameInput.value = currentUsername;
+    editError.hidden = true;
+    editProfileModal.hidden = false;
+  });
+}
+
+if (closeModalButton) {
+  closeModalButton.addEventListener("click", () => {
+    editProfileModal.hidden = true;
+  });
+}
+
+if (saveProfileButton) {
+  saveProfileButton.addEventListener("click", async () => {
+    const newUsername = editUsernameInput.value.trim();
+
+    if (!newUsername) {
+      editError.innerText = "Inserisci uno username valido.";
+      editError.hidden = false;
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/user/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: newUsername }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const usernameInfo = document.getElementById("usernameInfo");
+        usernameInfo.classList.add("isMe");
+        usernameInfo.dataset.username = data.username;
+        usernameInfo.innerHTML = `Bentornato, ${data.username}!`;
+        editProfileModal.hidden = true;
+      } else {
+        editError.innerText = data.error || "Errore durante l'aggiornamento.";
+        editError.hidden = false;
+      }
+    } catch (error) {
+      editError.innerText = "Errore di connessione.";
+      editError.hidden = false;
+    }
+  });
 }

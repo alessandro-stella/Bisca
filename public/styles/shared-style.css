@@ -124,6 +124,8 @@ body {
 #navbar {
   background-color: var(--bg-page);
 
+  z-index: 10;
+
   position: sticky;
   top: 0;
 
@@ -244,10 +246,6 @@ tbody tr:nth-child(odd) {
 
 tbody tr:nth-child(even) {
   background-color: var(--rows-even);
-}
-
-tbody tr:hover {
-  filter: brightness(1.2);
 }
 
 /* ================ */
