@@ -10,6 +10,7 @@ const {
   createPasswordResetToken,
   verifyPasswordResetToken,
 } = require("../email/verificationUtils");
+const { isProfane } = require("../profanityFilter");
 
 const db = require("../db");
 
@@ -89,6 +90,14 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({
       errors: {
         username: { msg: "Lo username deve essere lungo tra 3 e 30 caratteri" },
+      },
+    });
+  }
+
+  if (isProfane(username)) {
+    return res.status(400).json({
+      errors: {
+        username: { msg: "Lo username contiene termini non appropriati" },
       },
     });
   }

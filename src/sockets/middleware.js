@@ -1,5 +1,6 @@
 const { getLobbyByPlayer } = require("../game/lobbyManager");
 const { getGame } = require("../game/gameManager");
+const { isProfane } = require("../profanityFilter");
 
 function runMiddleware(middlewareFn, socket) {
   let passed = true;
@@ -163,11 +164,14 @@ const validators = {
     if (!lobbyId || typeof lobbyId !== "string") {
       return { valid: false, message: "Invalid lobby ID" };
     }
+
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
     if (!uuidRegex.test(lobbyId)) {
       return { valid: false, message: "Invalid lobby ID format" };
     }
+
     return { valid: true };
   },
 
@@ -191,6 +195,13 @@ const validators = {
         errors.push({
           field: "name",
           message: "Nome della lobby troppo lungo",
+        });
+      }
+
+      if (isProfane(name)) {
+        errors.push({
+          field: "name",
+          message: "Termini non appropriati rilevati",
         });
       }
     }
