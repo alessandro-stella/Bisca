@@ -123,10 +123,12 @@ body {
   padding-bottom: 0;
 }
 
-#editProfileButton {
+#editProfileButton,
+#deleteProfileButton {
   height: 100%;
   border-radius: 0.5em;
   padding-bottom: 6px;
+  margin-left: 0.5em;
 }
 
 #emailInfo {
@@ -237,7 +239,8 @@ body {
   align-items: center;
 }
 
-.editProfilePopup {
+.editProfilePopup,
+.deleteProfilePopup {
   background-color: var(--bg-card);
   padding: 2em;
   border-radius: 0.5em;
@@ -247,7 +250,8 @@ body {
   gap: 1em;
 }
 
-.editProfilePopup .title {
+.editProfilePopup .title,
+.deleteProfilePopup .title {
   color: var(--text-primary);
   font-size: 1.5em;
   font-weight: bold;
@@ -285,11 +289,15 @@ body {
 .modalButtons button {
   flex: 1;
   padding: 0.75em;
-  border-radius: 0.25em;
+  border-radius: 0.5em;
 }
 
 .modalOverlay[hidden] {
   display: none !important;
+}
+
+.dangerButton:hover {
+  color: var(--bg-card);
 }
 
 /* Properties for mobile */
@@ -304,7 +312,8 @@ body {
     min-height: 0;
   }
 
-  .editProfilePopup {
+  .editProfilePopup,
+  .deleteProfilePopup {
     width: 90%;
     max-width: initial;
     padding: 1em;

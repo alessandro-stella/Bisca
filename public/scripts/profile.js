@@ -1,4 +1,6 @@
-async function logout() {
+const logoutButton = document.getElementById("logout");
+
+logoutButton.addEventListener("click", async () => {
   const response = await fetch("/api/session/logout", {
     method: "POST",
     credentials: "include",
@@ -7,7 +9,7 @@ async function logout() {
   if (response.ok) {
     window.location.replace("login.html");
   }
-}
+});
 
 async function loadProfile() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -89,6 +91,7 @@ function displayProfileInfo(userInfo, isOwnProfile) {
   const emailInfo = document.getElementById("emailInfo");
   const eloInfo = document.getElementById("eloInfo");
   const editButton = document.getElementById("editProfileButton");
+  const deleteButton = document.getElementById("deleteProfileButton");
 
   usernameInfo.dataset.username = userInfo.username;
   eloInfo.innerHTML = `${userInfo.elo}`;
@@ -98,11 +101,12 @@ function displayProfileInfo(userInfo, isOwnProfile) {
     usernameInfo.innerHTML = `Bentornato, ${userInfo.username}!`;
     emailInfo.innerHTML = `${userInfo.email}`;
     emailInfo.hidden = false;
-    if (editButton) editButton.hidden = false;
+    editButton.hidden = false;
+    deleteButton.hidden = false;
   } else {
     usernameInfo.innerHTML = `${userInfo.username}`;
     emailInfo.hidden = true;
-    if (editButton) editButton.hidden = true;
+    deleteButton.hidden = true;
   }
 }
 
@@ -149,9 +153,13 @@ function showMatchHistory(gamesHistory) {
   }
 }
 
+// ============
+// Edit profile
+// ============
+
 const editProfileButton = document.getElementById("editProfileButton");
 const editProfileModal = document.getElementById("editProfileModal");
-const closeModalButton = document.getElementById("closeModalButton");
+const closeEditButton = document.getElementById("closeEditModalButton");
 const saveProfileButton = document.getElementById("saveProfileButton");
 
 const editUsernameContainer = document.getElementById("usernameInputContainer");
@@ -172,7 +180,7 @@ editProfileModal.addEventListener("click", (event) => {
   }
 });
 
-closeModalButton.addEventListener("click", () => {
+closeEditButton.addEventListener("click", () => {
   editProfileModal.hidden = true;
 });
 
@@ -220,8 +228,8 @@ saveProfileButton.addEventListener("click", async () => {
   }
 });
 
-const modalResetPasswordButton = document.getElementById(
-  "modalResetPasswordButton",
+const modalResetPasswordButton = /** @type {HTMLButtonElement} */ (
+  document.getElementById("modalResetPasswordButton")
 );
 const modalPasswordMessage = document.getElementById("modalPasswordMessage");
 
@@ -270,4 +278,28 @@ modalResetPasswordButton.addEventListener("click", async () => {
     modalResetPasswordButton.innerHTML =
       '<i class="fa-solid fa-key"></i> Riprova';
   }
+});
+
+// ==============
+// Delete profile
+// ==============
+
+const deleteProfileButton = document.getElementById("deleteProfileButton");
+const deleteProfileModal = document.getElementById("deleteProfileModal");
+const closeDeleteButton = document.getElementById("closeDeleteModalButton");
+
+deleteProfileModal.addEventListener("click", (event) => {
+  const target = /** @type {HTMLElement} */ (event.target);
+
+  if (target.id === "deleteProfileModal") {
+    deleteProfileModal.hidden = true;
+  }
+});
+
+closeDeleteButton.addEventListener("click", () => {
+  deleteProfileModal.hidden = true;
+});
+
+deleteProfileButton.addEventListener("click", () => {
+  deleteProfileModal.hidden = false;
 });

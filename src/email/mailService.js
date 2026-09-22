@@ -8,14 +8,6 @@ const transporter = nodemailer.createTransport({
   secure: false,
 });
 
-transporter.verify((error, _) => {
-  if (error) {
-    console.error("Mail service error:", error);
-  } else {
-    console.log("Mail service ready");
-  }
-});
-
 function loadTemplate(templateName, variables = {}) {
   const templatePath = path.join(__dirname, `./templates/${templateName}.html`);
   let html = fs.readFileSync(templatePath, "utf8");
@@ -50,4 +42,5 @@ async function sendEmail(to, subject, templateName, variables = {}) {
 
 module.exports = {
   sendEmail,
+  transporter,
 };

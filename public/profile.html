@@ -57,11 +57,7 @@
           <p>Tavoli</p>
         </a>
 
-        <button
-          id="logout"
-          class="secondaryButton iconButton"
-          onclick="logout()"
-        >
+        <button id="logout" class="secondaryButton iconButton">
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
           <p>Esci</p>
         </button>
@@ -92,6 +88,14 @@
             hidden
           >
             <i class="fa-solid fa-pen"></i>
+          </button>
+
+          <button
+            id="deleteProfileButton"
+            class="dangerButton iconButton"
+            hidden
+          >
+            <i class="fa-solid fa-trash"></i>
           </button>
         </div>
 
@@ -150,11 +154,26 @@
         </div>
 
         <div class="modalButtons">
-          <button id="closeModalButton" class="secondaryButton">
+          <button id="closeEditModalButton" class="secondaryButton">
             <p>Annulla</p>
           </button>
           <button id="saveProfileButton" class="primaryButton">
             <p>Salva</p>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="deleteProfileModal" class="modalOverlay" hidden>
+      <div class="deleteProfilePopup">
+        <div class="title">Sei sicuro di volerci lasciare?</div>
+
+        <div class="modalButtons">
+          <button id="deleteProfileButton" class="dangerButton">
+            <p>Procedi</p>
+          </button>
+          <button id="closeDeleteModalButton" class="secondaryButton">
+            <p>Annulla</p>
           </button>
         </div>
       </div>

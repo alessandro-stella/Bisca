@@ -12,6 +12,7 @@ const db = require("./db");
 const authRouter = require("./routes/authRouter");
 const userRouter = require("./routes/userRouter");
 const { router: sessionRouter } = require("./routes/sessionRouter");
+const { transporter } = require("./email/mailService");
 
 const app = express();
 const server = http.createServer(app);
@@ -92,22 +93,29 @@ app.use(
 const setupSockets = require("./sockets");
 setupSockets(io);
 
-const profanityFilter = require("./profanityFilter");
-profanityFilter.setThreshold(85);
-
-server.listen(PORT, async () => {
-  console.log(`Server started on port ${PORT}`);
-
-  try {
-    const result = await db.query("SELECT NOW()");
-    console.log("Database connected:", result.rows[0]);
-  } catch (error) {
-    console.error("Database connection failed:");
-    console.error(error);
-  }
-});
-
 app.use((err, _, res, __) => {
   console.error("ERROR:", err);
   res.status(500).send(err.message);
 });
+
+async function startApp() {
+  try {
+    const profanityFilter = require("./profanityFilter");
+    profanityFilter.setThreshold(85);
+
+    await transporter.verify();
+    console.log("Mail service ready");
+
+    const result = await db.query("SELECT NOW()");
+    console.log("Database connected:", result.rows[0]);
+
+    server.listen(PORT, () => {
+      console.log(`Server started on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Startup checks failed:", error);
+    process.exit(1);
+  }
+}
+
+startApp();
