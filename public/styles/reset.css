@@ -129,3 +129,14 @@ details,
 summary {
   display: block;
 }
+
+/* -----------------------
+  RESET CUSTOM PER CHECKBOX
+----------------------- */
+
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #fff;
+  margin: 0;
+}

@@ -175,6 +175,98 @@ async function verifyPasswordResetToken(token) {
   }
 }
 
+function generateAccountDeletionCode() {
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  const randomBytes = crypto.randomBytes(8);
+
+  for (let i = 0; i < 8; i++) {
+    code += charset[randomBytes[i] % charset.length];
+  }
+
+  return code;
+}
+
+async function createAccountDeletionCode(userId, expirationMinutes = 5) {
+  try {
+    const code = generateAccountDeletionCode();
+    const expiresAt = new Date(Date.now() + expirationMinutes * 60 * 1000);
+
+    const result = await db.query(
+      `
+        UPDATE users
+        SET 
+          account_deletion_code = $1,
+          account_deletion_expires_at = $2
+        WHERE id = $3
+        RETURNING id, username, email
+      `,
+      [code, expiresAt, userId],
+    );
+
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        code: null,
+        user: null,
+        error: "Utente non trovato",
+      };
+    }
+
+    return {
+      success: true,
+      code,
+      user: result.rows[0],
+      error: null,
+    };
+  } catch (error) {
+    console.error("Error creating account deletion code:", error);
+    return {
+      success: false,
+      code: null,
+      user: null,
+      error: "Errore durante la creazione del codice",
+    };
+  }
+}
+
+async function verifyAccountDeletionCode(userId, code) {
+  try {
+    const result = await db.query(
+      `
+        SELECT id, username, email
+        FROM users
+        WHERE id = $1
+          AND account_deletion_code = $2
+          AND account_deletion_expires_at > NOW()
+      `,
+      [userId, code],
+    );
+
+    if (result.rows.length === 0) {
+      return {
+        success: false,
+        user: null,
+        error: "Codice non valido o scaduto",
+      };
+    }
+
+    const user = result.rows[0];
+    return {
+      success: true,
+      user,
+      error: null,
+    };
+  } catch (error) {
+    console.error("Error verifying account deletion code:", error);
+    return {
+      success: false,
+      user: null,
+      error: "Errore durante la verifica",
+    };
+  }
+}
+
 module.exports = {
   generateVerificationToken,
   createEmailVerificationToken,
@@ -182,4 +274,7 @@ module.exports = {
   cleanupExpiredUnverifiedAccounts,
   createPasswordResetToken,
   verifyPasswordResetToken,
+  generateAccountDeletionCode,
+  createAccountDeletionCode,
+  verifyAccountDeletionCode,
 };

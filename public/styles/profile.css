@@ -239,8 +239,9 @@ body {
   align-items: center;
 }
 
-.editProfilePopup,
-.deleteProfilePopup {
+#editProfilePopup,
+#deleteProfilePopup,
+#confirmDeletePopup {
   background-color: var(--bg-card);
   padding: 2em;
   border-radius: 0.5em;
@@ -250,8 +251,9 @@ body {
   gap: 1em;
 }
 
-.editProfilePopup .title,
-.deleteProfilePopup .title {
+#editProfilePopup .title,
+#deleteProfilePopup .title,
+#confirmDeletePopup .title {
   color: var(--text-primary);
   font-size: 1.5em;
   font-weight: bold;
@@ -282,6 +284,7 @@ body {
 }
 
 .modalButtons {
+  margin-top: 0.5em;
   display: flex;
   gap: 1em;
 }
@@ -300,6 +303,147 @@ body {
   color: var(--bg-card);
 }
 
+/* ==================== */
+/* Delete profile popup */
+/* ==================== */
+
+#confirmDeletePopup {
+  width: 60%;
+}
+
+#deleteProfileModal .subtitle {
+  color: var(--text-secondary);
+}
+
+#deleteProfileModal .dangerButton {
+  font-weight: bold;
+
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+#deleteProfileModal .dangerButton.unlocked {
+  pointer-events: initial;
+  opacity: 1;
+}
+
+#deleteProfilePopup .checkDeleteWrapper {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75em;
+  align-items: start;
+}
+
+#deleteProfilePopup .checkDelete {
+  font: inherit;
+  color: var(--text-primary);
+
+  width: 1.4em;
+  height: 1.4em;
+
+  margin: 0.2em 0 0 0;
+
+  background-color: var(--bg-input);
+  border: 0.15em solid var(--border-inactive);
+  border-radius: 0.25em;
+
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    background-color 100ms ease-in-out,
+    border-color 100ms ease-in-out;
+}
+
+#deleteProfilePopup .checkDelete::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  transform: scale(0);
+  transform-origin: bottom left;
+  transition: 100ms transform ease-in-out;
+
+  background-color: var(--text-primary);
+}
+
+#deleteProfilePopup .checkDelete:checked {
+  background-color: var(--accent-red);
+  border-color: var(--accent-red);
+}
+
+#deleteProfilePopup .checkDelete:checked::before {
+  transform: scale(1);
+}
+
+#deleteProfilePopup .checkDelete:hover {
+  border-color: var(--border-active);
+}
+
+#deleteProfilePopup .checkDelete:focus {
+  outline: max(2px, 0.15em) solid var(--accent-red);
+  outline-offset: max(2px, 0.15em);
+}
+
+#deleteProfilePopup .checkLabel {
+  color: var(--text-primary);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+#confirmDeletePopup #confirmationCode {
+  display: flex;
+  gap: 0.5em;
+
+  margin: 0.5em 0;
+}
+
+#confirmationCode:has(+ .errorMessage) {
+  margin-bottom: 0 !important;
+}
+
+#confirmationCode input {
+  border: 1px solid var(--border-inactive);
+  border-radius: 0.5em;
+
+  color: var(--text-primary);
+
+  min-width: 0;
+  flex: 1;
+
+  font-size: 1.5em;
+  text-align: center;
+
+  padding: 0.5em 0;
+
+  font-family: "Roboto Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+#confirmationCode input:focus,
+#confirmationCode input:not(:placeholder-shown) {
+  border-color: var(--border-active);
+}
+
+#confirmationCode input::-moz-selection {
+  background-color: var(--text-active);
+  color: var(--bg-card);
+}
+
+#confirmationCode input::selection {
+  background-color: var(--text-active);
+  color: var(--bg-card);
+}
+
+#deleteProfileModal .errorMessage {
+  color: var(--accent-red);
+  text-align: center;
+}
+
 /* Properties for mobile */
 @media (max-width: 768px) {
   #baseContainer {
@@ -312,8 +456,9 @@ body {
     min-height: 0;
   }
 
-  .editProfilePopup,
-  .deleteProfilePopup {
+  #editProfilePopup,
+  #deleteProfilePopup,
+  #confirmDeletePopup {
     width: 90%;
     max-width: initial;
     padding: 1em;

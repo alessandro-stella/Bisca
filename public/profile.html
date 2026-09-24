@@ -42,6 +42,12 @@
       src="https://kit.fontawesome.com/df57a58519.js"
       crossorigin="anonymous"
     ></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,600;1,600&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
@@ -123,7 +129,7 @@
     </div>
 
     <div id="editProfileModal" class="modalOverlay" hidden>
-      <div class="editProfilePopup">
+      <div id="editProfilePopup">
         <div class="title">Modifica Profilo</div>
 
         <div class="inputWithError">
@@ -154,7 +160,7 @@
         </div>
 
         <div class="modalButtons">
-          <button id="closeEditModalButton" class="secondaryButton">
+          <button class="closeModalButton secondaryButton">
             <p>Annulla</p>
           </button>
           <button id="saveProfileButton" class="primaryButton">
@@ -164,15 +170,114 @@
       </div>
     </div>
 
-    <div id="deleteProfileModal" class="modalOverlay" hidden>
-      <div class="deleteProfilePopup">
+    <div id="deleteProfileModal" class="modalOverlay">
+      <div id="deleteProfilePopup">
         <div class="title">Sei sicuro di volerci lasciare?</div>
 
+        <div class="checkDeleteWrapper">
+          <input id="check1" type="checkbox" class="checkDelete" />
+          <label for="check1" class="checkLabel">
+            Confermo di voler eliminare l'account e tutti i dati ad essso
+            associati, quali username, email e storico partite
+          </label>
+        </div>
+
+        <div class="checkDeleteWrapper">
+          <input id="check2" type="checkbox" class="checkDelete" />
+          <label for="check2" class="checkLabel">
+            Sono consapevole che l'operazione è irreversibile e che, una volta
+            eliminati, i dati non saranno recuperabili
+          </label>
+        </div>
+
+        <div id="proceedError" class="errorMessage" hidden></div>
+
         <div class="modalButtons">
-          <button id="deleteProfileButton" class="dangerButton">
+          <button id="proceedDeleteButton" class="dangerButton" disabled>
             <p>Procedi</p>
           </button>
-          <button id="closeDeleteModalButton" class="secondaryButton">
+          <button class="closeModalButton secondaryButton">
+            <p>Annulla</p>
+          </button>
+        </div>
+      </div>
+
+      <div id="confirmDeletePopup" hidden>
+        <div class="title">Conferma eliminazione</div>
+        <div class="subtitle">
+          Per procedere abbiamo inviato un'email all'indirizzo associato al tuo
+          account, contenente un codice di 8 cifre da inserire nel campo
+          sottostante
+        </div>
+
+        <div id="confirmationCode">
+          <input
+            type="text"
+            class="codeDigit"
+            minlength="1"
+            maxlength="1"
+            placeholder=" "
+            pattern="[A-Z0-9]"
+          />
+          <input
+            type="text"
+            class="codeDigit"
+            minlength="1"
+            maxlength="1"
+            placeholder=" "
+            pattern="[A-Z0-9]"
+          /><input
+            type="text"
+            class="codeDigit"
+            minlength="1"
+            maxlength="1"
+            placeholder=" "
+            pattern="[A-Z0-9]"
+          /><input
+            type="text"
+            class="codeDigit"
+            minlength="1"
+            maxlength="1"
+            placeholder=" "
+            pattern="[A-Z0-9]"
+          /><input
+            type="text"
+            class="codeDigit"
+            minlength="1"
+            maxlength="1"
+            placeholder=" "
+            pattern="[A-Z0-9]"
+          /><input
+            type="text"
+            class="codeDigit"
+            minlength="1"
+            maxlength="1"
+            placeholder=" "
+            pattern="[A-Z0-9]"
+          /><input
+            type="text"
+            class="codeDigit"
+            minlength="1"
+            maxlength="1"
+            placeholder=" "
+            pattern="[A-Z0-9]"
+          /><input
+            type="text"
+            class="codeDigit"
+            minlength="1"
+            maxlength="1"
+            placeholder=" "
+            pattern="[A-Z0-9]"
+          />
+        </div>
+
+        <div id="deleteError" class="errorMessage" hidden></div>
+
+        <div class="modalButtons">
+          <button id="confirmDeleteButton" class="dangerButton" disabled>
+            <p>Elimina</p>
+          </button>
+          <button class="closeModalButton secondaryButton">
             <p>Annulla</p>
           </button>
         </div>

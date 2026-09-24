@@ -9,7 +9,10 @@ const {
   cleanupExpiredUnverifiedAccounts,
   createPasswordResetToken,
   verifyPasswordResetToken,
+  createAccountDeletionCode,
+  verifyAccountDeletionCode,
 } = require("../email/verificationUtils");
+const { getUserFromSession } = require("./sessionRouter");
 const { isProfane } = require("../profanityFilter");
 
 const db = require("../db");
@@ -466,6 +469,168 @@ router.post("/reset-password", async (req, res) => {
       success: false,
       error: "Errore durante il reset della password. Riprova più tardi",
     });
+  }
+});
+
+// Request account deletion - send code via email
+router.post("/request-account-deletion", async (req, res) => {
+  const sessionId = req.cookies?.sessionId;
+
+  try {
+    const user = await getUserFromSession(sessionId, db, true);
+    if (!user) {
+      return res.status(401).json({ error: "Non autorizzato" });
+    }
+
+    const codeResult = await createAccountDeletionCode(user.id, 15);
+
+    if (!codeResult.success) {
+      return res.status(500).json({
+        success: false,
+        error: codeResult.error,
+      });
+    }
+
+    const emailResult = await sendEmail(
+      user.email,
+      "Conferma eliminazione account BISCA",
+      "account_deletion_code",
+      {
+        username: user.username,
+        code: codeResult.code,
+        expirationMinutes: 5,
+      },
+    );
+
+    if (!emailResult.success) {
+      return res.status(500).json({
+        success: false,
+        error: "Impossibile inviare l'email. Riprova tra poco",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Codice di verifica inviato via email",
+    });
+  } catch (error) {
+    console.error("Request account deletion error:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: "Errore durante la richiesta. Riprova più tardi",
+    });
+  }
+});
+
+// Confirm account deletion - verify code and delete account
+router.post("/confirm-account-deletion", async (req, res) => {
+  const sessionId = req.cookies?.sessionId;
+  const { code } = req.body;
+
+  if (!code) {
+    return res.status(400).json({
+      success: false,
+      error: "Codice richiesto",
+    });
+  }
+
+  const dbClient = await db.connect();
+
+  try {
+    const user = await getUserFromSession(sessionId, db, true);
+    if (!user) {
+      return res.status(401).json({ error: "Non autorizzato" });
+    }
+
+    const verificationResult = await verifyAccountDeletionCode(user.id, code);
+
+    if (!verificationResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: verificationResult.error,
+      });
+    }
+
+    // Delete account and all associated data
+    await dbClient.query("BEGIN");
+
+    // Delete sessions
+    await dbClient.query(
+      `
+        DELETE FROM sessions
+        WHERE user_id = $1
+      `,
+      [user.id],
+    );
+
+    // Delete elo history
+    await dbClient.query(
+      `
+        DELETE FROM elo_history
+        WHERE user_id = $1
+      `,
+      [user.id],
+    );
+
+    // Delete game players records
+    await dbClient.query(
+      `
+        DELETE FROM game_players
+        WHERE user_id = $1
+      `,
+      [user.id],
+    );
+
+    // Update games where user was the winner (set winner_id to NULL)
+    await dbClient.query(
+      `
+        UPDATE games
+        SET winner_id = NULL
+        WHERE winner_id = $1
+      `,
+      [user.id],
+    );
+
+    // Delete the user account
+    await dbClient.query(
+      `
+        DELETE FROM users
+        WHERE id = $1
+      `,
+      [user.id],
+    );
+
+    await dbClient.query("COMMIT");
+
+    // Clear session cookie
+    res.clearCookie("sessionId");
+
+    sendEmail(user.email, "Account BISCA eliminato", "account_deleted", {
+      username: user.username,
+    }).catch((error) => {
+      console.error("Failed to send account deleted email:", error);
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Account eliminato con successo",
+    });
+  } catch (error) {
+    try {
+      await dbClient.query("ROLLBACK");
+    } catch (rollbackError) {
+      console.error("Rollback error:", error);
+    }
+
+    console.error("Confirm account deletion error:", error);
+
+    return res.status(500).json({
+      success: false,
+      error: "Errore durante l'eliminazione dell'account. Riprova più tardi",
+    });
+  } finally {
+    dbClient.release();
   }
 });
 

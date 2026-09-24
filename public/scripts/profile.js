@@ -154,12 +154,45 @@ function showMatchHistory(gamesHistory) {
 }
 
 // ============
+// Close modals
+// ============
+
+const editProfileModal = document.getElementById("editProfileModal");
+const deleteProfileModal = document.getElementById("deleteProfileModal");
+
+editProfileModal.addEventListener("click", (event) => {
+  const target = /** @type {HTMLElement} */ (event.target);
+
+  if (target.id === "editProfileModal") {
+    editProfileModal.hidden = true;
+  }
+});
+
+deleteProfileModal.addEventListener("click", (event) => {
+  const target = /** @type {HTMLElement} */ (event.target);
+
+  if (target.id === "deleteProfileModal") {
+    deleteProfileModal.hidden = true;
+    clearDeleteModal();
+  }
+});
+
+const closeModalButtons = document.getElementsByClassName("closeModalButton");
+
+for (const button of closeModalButtons) {
+  button.addEventListener("click", () => {
+    editProfileModal.hidden = true;
+    deleteProfileModal.hidden = true;
+
+    clearDeleteModal();
+  });
+}
+
+// ============
 // Edit profile
 // ============
 
 const editProfileButton = document.getElementById("editProfileButton");
-const editProfileModal = document.getElementById("editProfileModal");
-const closeEditButton = document.getElementById("closeEditModalButton");
 const saveProfileButton = document.getElementById("saveProfileButton");
 
 const editUsernameContainer = document.getElementById("usernameInputContainer");
@@ -170,18 +203,6 @@ const editError = document.getElementById("editError");
 
 editUsernameContainer.addEventListener("click", () => {
   editUsernameInput.focus();
-});
-
-editProfileModal.addEventListener("click", (event) => {
-  const target = /** @type {HTMLElement} */ (event.target);
-
-  if (target.id === "editProfileModal") {
-    editProfileModal.hidden = true;
-  }
-});
-
-closeEditButton.addEventListener("click", () => {
-  editProfileModal.hidden = true;
 });
 
 editProfileButton.addEventListener("click", () => {
@@ -285,21 +306,264 @@ modalResetPasswordButton.addEventListener("click", async () => {
 // ==============
 
 const deleteProfileButton = document.getElementById("deleteProfileButton");
-const deleteProfileModal = document.getElementById("deleteProfileModal");
-const closeDeleteButton = document.getElementById("closeDeleteModalButton");
-
-deleteProfileModal.addEventListener("click", (event) => {
-  const target = /** @type {HTMLElement} */ (event.target);
-
-  if (target.id === "deleteProfileModal") {
-    deleteProfileModal.hidden = true;
-  }
-});
-
-closeDeleteButton.addEventListener("click", () => {
-  deleteProfileModal.hidden = true;
-});
 
 deleteProfileButton.addEventListener("click", () => {
   deleteProfileModal.hidden = false;
+});
+
+const proceedDeleteButton = /** @type {HTMLButtonElement}*/ (
+  document.getElementById("proceedDeleteButton")
+);
+const confirmDeleteButton = /** @type {HTMLButtonElement}*/ (
+  document.getElementById("confirmDeleteButton")
+);
+
+const deleteProfilePopup = document.getElementById("deleteProfilePopup");
+const confirmDeletePopup = document.getElementById("confirmDeletePopup");
+
+/** @type {NodeListOf<HTMLInputElement>} */
+const checkDeleteList = document.querySelectorAll(
+  'input[type="checkbox"].checkDelete',
+);
+
+for (const check of checkDeleteList) {
+  check.addEventListener("change", function () {
+    if (!this.checked) {
+      updateProceedDelete(false);
+      return;
+    }
+
+    for (const check of checkDeleteList) {
+      if (!check.checked) {
+        updateProceedDelete(false);
+        return;
+      }
+    }
+
+    updateProceedDelete(true);
+  });
+}
+
+function clearDeleteModal() {
+  deleteProfilePopup.hidden = false;
+  confirmDeletePopup.hidden = true;
+
+  for (const check of checkDeleteList) {
+    check.checked = false;
+  }
+
+  updateProceedDelete(false);
+
+  // Ripristina l'errore del secondo step, se presente
+  const deleteErrorContainer = document.getElementById("deleteError");
+  if (deleteErrorContainer) {
+    deleteErrorContainer.hidden = true;
+    deleteErrorContainer.innerHTML = "";
+  }
+
+  // Svuota i campi del codice (se già inizializzati)
+  if (typeof confirmationCodeDigits !== "undefined") {
+    confirmationCodeDigits.forEach((digit) => {
+      digit.value = "";
+    });
+  }
+
+  // Blocca di nuovo il tasto Elimina
+  if (typeof updateConfirmDelete === "function") {
+    updateConfirmDelete(false);
+  }
+}
+
+function updateProceedDelete(unlock) {
+  if (unlock) {
+    proceedDeleteButton.classList.add("unlocked");
+    proceedDeleteButton.disabled = false;
+  } else {
+    proceedDeleteButton.classList.remove("unlocked");
+    proceedDeleteButton.disabled = true;
+  }
+}
+
+function updateConfirmDelete(unlock) {
+  if (unlock) {
+    confirmDeleteButton.classList.add("unlocked");
+    confirmDeleteButton.disabled = false;
+  } else {
+    confirmDeleteButton.classList.remove("unlocked");
+    confirmDeleteButton.disabled = true;
+  }
+}
+
+const proceedErrorContainer = document.getElementById("proceedError");
+
+proceedDeleteButton.addEventListener("click", async () => {
+  const oldText = proceedDeleteButton.innerHTML;
+
+  function resetButton() {
+    proceedDeleteButton.disabled = false;
+    proceedDeleteButton.innerHTML = oldText;
+
+    proceedErrorContainer.hidden = true;
+    proceedErrorContainer.innerHTML = "";
+
+    for (const check of checkDeleteList) {
+      check.checked = false;
+    }
+  }
+
+  function addError(errorText) {
+    resetButton();
+
+    proceedErrorContainer.hidden = false;
+    proceedErrorContainer.innerHTML = errorText;
+  }
+
+  proceedDeleteButton.disabled = true;
+  proceedDeleteButton.innerHTML = "Invio in corso...";
+
+  try {
+    const response = await fetch("/api/auth/request-account-deletion", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      deleteProfilePopup.hidden = true;
+      confirmDeletePopup.hidden = false;
+
+      resetButton();
+    } else {
+      addError(data.error);
+    }
+  } catch (error) {
+    addError("Errore durante l'invio dell'email, per favore riprova tra poco");
+  }
+});
+
+/** @type {NodeListOf<HTMLInputElement>} */
+const confirmationCodeDigits = document.querySelectorAll(
+  'input[type="text"].codeDigit',
+);
+
+function checkAllFilled() {
+  const allFilled = Array.from(confirmationCodeDigits).every(
+    (digit) => digit.value.length > 0,
+  );
+
+  if (allFilled) {
+    updateConfirmDelete(true);
+  } else {
+    updateConfirmDelete(false);
+  }
+}
+
+confirmationCodeDigits.forEach((digit, index) => {
+  digit.addEventListener("keydown", (e) => {
+    if (e.key === " " || e.code === "Space") {
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === "Backspace") {
+      if (digit.value === "" && index > 0) {
+        confirmationCodeDigits[index - 1].focus();
+      }
+    }
+  });
+
+  digit.addEventListener("input", (_) => {
+    const cleanedValue = digit.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+
+    if (cleanedValue.length > 0) {
+      digit.value = cleanedValue.slice(-1);
+
+      if (index < confirmationCodeDigits.length - 1) {
+        confirmationCodeDigits[index + 1].focus();
+      } else {
+        digit.blur();
+      }
+    } else {
+      digit.value = "";
+    }
+
+    checkAllFilled();
+  });
+
+  digit.addEventListener("paste", (e) => {
+    e.preventDefault();
+
+    const pasteData = (e.clipboardData || window.clipboardData).getData("text");
+
+    const chars = pasteData
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 8)
+      .split("");
+
+    chars.forEach((char, i) => {
+      if (confirmationCodeDigits[i]) {
+        confirmationCodeDigits[i].value = char;
+      }
+    });
+
+    if (chars.length < confirmationCodeDigits.length) {
+      confirmationCodeDigits[chars.length].focus();
+    } else {
+      digit.blur();
+    }
+
+    checkAllFilled();
+  });
+});
+
+const deleteErrorContainer = document.getElementById("deleteError");
+
+confirmDeleteButton.addEventListener("click", async () => {
+  const oldText = confirmDeleteButton.innerHTML;
+
+  function resetConfirmButton() {
+    confirmDeleteButton.disabled = false;
+    confirmDeleteButton.innerHTML = oldText;
+
+    deleteErrorContainer.hidden = true;
+    deleteErrorContainer.innerHTML = "";
+  }
+
+  function addConfirmError(errorText) {
+    resetConfirmButton();
+
+    deleteErrorContainer.hidden = false;
+    deleteErrorContainer.innerHTML = errorText;
+  }
+
+  confirmDeleteButton.disabled = true;
+  confirmDeleteButton.innerHTML = "Eliminazione in corso...";
+
+  const code = Array.from(confirmationCodeDigits)
+    .map((digit) => digit.value)
+    .join("");
+
+  try {
+    const response = await fetch("/api/auth/confirm-account-deletion", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code }),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+    console.log(data);
+
+    if (response.ok && data.success) {
+      window.location.replace("/login.html");
+    } else {
+      addConfirmError(data.error || "Codice errato o scaduto");
+    }
+  } catch (error) {
+    addConfirmError("Errore di connessione, riprova tra poco");
+  }
 });

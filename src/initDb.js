@@ -25,7 +25,10 @@ async function init() {
       email_verification_expires_at TIMESTAMP,
       
       password_reset_token VARCHAR(255) UNIQUE,
-      password_reset_expires_at TIMESTAMP
+      password_reset_expires_at TIMESTAMP,
+      
+      account_deletion_code VARCHAR(8),
+      account_deletion_expires_at TIMESTAMP
     );
 
     CREATE TABLE sessions (

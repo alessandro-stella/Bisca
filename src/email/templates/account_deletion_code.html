@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+      .email-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #302e2b;
+        padding: 30px;
+        text-align: center;
+        color: white;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 30px;
+        color: #333;
+        line-height: 1.6;
+      }
+      .content h2 {
+        color: #302e2b;
+        margin-top: 0;
+      }
+      .code-box {
+        background-color: #f5f5f5;
+        border: 2px solid #302e2b;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        margin: 20px 0;
+        font-family: "Roboto Mono", Consolas, Monaco, "Courier New", monospace;
+      }
+      .code-box .code {
+        font-size: 28px;
+        font-weight: bold;
+        letter-spacing: 4px;
+        color: #302e2b;
+        font-variant-numeric: slashed-zero;
+      }
+      .warning {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .danger {
+        background-color: #f8d7da;
+        border-left: 4px solid #f5222d;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 3px;
+      }
+      .footer {
+        background-color: #f9f9f9;
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+        border-top: 1px solid #eee;
+      }
+      .footer p {
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="header">
+        <h1>Conferma Eliminazione Account</h1>
+      </div>
+
+      <div class="content">
+        <h2>Ciao {{username}},</h2>
+
+        <p>
+          Hai richiesto di eliminare il tuo account BISCA. Per completare
+          l'operazione, inserisci il seguente codice di verifica nel modulo di
+          eliminazione:
+        </p>
+
+        <!-- Stile applicato anche inline (direttamente sul div) per i client (come Gmail o Outlook) che rimuovono o ignorano i blocchi <style> -->
+        <div
+          class="code-box"
+          style="
+            font-family:
+              &quot;Roboto Mono&quot;, Consolas, Monaco,
+              &quot;Courier New&quot;, monospace;
+          "
+        >
+          <div
+            class="code"
+            style="
+              font-family:
+                &quot;Roboto Mono&quot;, Consolas, Monaco,
+                &quot;Courier New&quot;, monospace;
+              font-variant-numeric: slashed-zero;
+            "
+          >
+            {{code}}
+          </div>
+        </div>
+
+        <p>
+          <strong>Il codice è valido per {{expirationMinutes}} minuti.</strong>
+          Dopo questo tempo, dovrai richiedere un nuovo codice.
+        </p>
+
+        <div class="danger">
+          <strong>Attenzione!</strong> L'eliminazione dell'account è
+          <strong>permanente e irreversibile</strong>. Una volta eliminato, il
+          tuo account, il tuo username, la tua email e tutto lo storico delle
+          partite non potranno essere recuperati.
+        </div>
+
+        <p>
+          <strong>Non hai richiesto l'eliminazione dell'account?</strong><br />
+          Se non sei stato tu a richiedere questa operazione, puoi ignorare
+          questo messaggio. Il tuo account rimarrà attivo e al sicuro.
+        </p>
+
+        <p style="font-size: 12px; color: #999">
+          Se ricevi questo messaggio ripetutamente e non sei tu a richiederlo,
+          ti consigliamo di cambiare la password del tuo account.
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>Questo è un messaggio automatico, per favore non rispondere.</p>
+      </div>
+    </div>
+  </body>
+</html>
