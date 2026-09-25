@@ -517,9 +517,14 @@ body {
   border: 1px solid var(--border-inactive);
 }
 
+.row:hover {
+  cursor: pointer;
+}
+
 .row.playerNotFound {
   opacity: 0.6;
   filter: saturate(0);
+  pointer-events: none;
 }
 
 .placement {
