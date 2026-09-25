@@ -156,4 +156,59 @@ router.get("/:userId/games", async (req, res) => {
   }
 });
 
+// Ottieni tutti i giocatori di una partita con variazioni di ELO
+router.get("/game/:gameId/players", async (req, res) => {
+  const { gameId } = req.params;
+
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if (!gameId || !uuidRegex.test(gameId)) {
+    return res.status(400).json({
+      error: "Invalid game ID format",
+    });
+  }
+
+  try {
+    const gameExists = await db.query(`SELECT 1 FROM games WHERE id = $1`, [
+      gameId,
+    ]);
+
+    if (gameExists.rows.length === 0) {
+      return res.status(404).json({
+        error: "Game not found",
+      });
+    }
+
+    const query = `
+      SELECT
+        u.id,
+        u.username,
+        u.elo as current_elo,
+        gp.placement,
+        gp.left_early,
+        eh.old_elo,
+        eh.elo_change,
+        eh.new_elo
+      FROM game_players gp
+      JOIN users u ON u.id = gp.user_id
+      LEFT JOIN elo_history eh 
+        ON eh.game_id = gp.game_id 
+        AND eh.user_id = gp.user_id
+      WHERE gp.game_id = $1
+      ORDER BY gp.placement ASC;
+    `;
+
+    const result = await db.query(query, [gameId]);
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching game players:", error);
+
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+});
+
 module.exports = router;

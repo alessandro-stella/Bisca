@@ -129,7 +129,7 @@
     </div>
 
     <div id="editProfileModal" class="modalOverlay" hidden>
-      <div id="editProfilePopup">
+      <div id="editProfilePopup" class="popupWrapper">
         <div class="title">Modifica Profilo</div>
 
         <div class="inputWithError">
@@ -170,8 +170,8 @@
       </div>
     </div>
 
-    <div id="deleteProfileModal" class="modalOverlay">
-      <div id="deleteProfilePopup">
+    <div id="deleteProfileModal" class="modalOverlay" hidden>
+      <div id="deleteProfilePopup" class="popupWrapper">
         <div class="title">Sei sicuro di volerci lasciare?</div>
 
         <div class="checkDeleteWrapper">
@@ -202,7 +202,7 @@
         </div>
       </div>
 
-      <div id="confirmDeletePopup" hidden>
+      <div id="confirmDeletePopup" class="popupWrapper" hidden>
         <div class="title">Conferma eliminazione</div>
         <div class="subtitle">
           Per procedere abbiamo inviato un'email all'indirizzo associato al tuo
@@ -280,6 +280,20 @@
           <button class="closeModalButton secondaryButton">
             <p>Annulla</p>
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="gameOpponentsModal" class="modalOverlay">
+      <div id="gameOpponentsPopup" class="popupWrapper">
+        <div class="title">Lista giocatori</div>
+
+        <div class="contentWrapper">
+          <div id="opponentsLoader">
+            <i class="fa-solid fa-spinner"></i>
+          </div>
+
+          <div id="opponentContainer"></div>
         </div>
       </div>
     </div>

@@ -199,6 +199,11 @@ body {
   overflow: hidden;
 }
 
+#matchHistoryBody tr:hover {
+  cursor: pointer;
+  filter: brightness(1.2);
+}
+
 .quit-badge {
   background-color: var(--border-inactive);
   color: var(--text-primary);
@@ -239,9 +244,7 @@ body {
   align-items: center;
 }
 
-#editProfilePopup,
-#deleteProfilePopup,
-#confirmDeletePopup {
+.popupWrapper {
   background-color: var(--bg-card);
   padding: 2em;
   border-radius: 0.5em;
@@ -251,9 +254,9 @@ body {
   gap: 1em;
 }
 
-#editProfilePopup .title,
-#deleteProfilePopup .title,
-#confirmDeletePopup .title {
+.popupWrapper .title,
+.popupWrapper .title,
+.popupWrapper .title {
   color: var(--text-primary);
   font-size: 1.5em;
   font-weight: bold;
@@ -444,6 +447,16 @@ body {
   text-align: center;
 }
 
+/* ===================== */
+/* Game's opponents list */
+/* ===================== */
+
+#opponentsLoader {
+  text-align: center;
+  font-size: 3em;
+  color: var(--text-secondary);
+}
+
 /* Properties for mobile */
 @media (max-width: 768px) {
   #baseContainer {
@@ -456,9 +469,7 @@ body {
     min-height: 0;
   }
 
-  #editProfilePopup,
-  #deleteProfilePopup,
-  #confirmDeletePopup {
+  .popupWrapper {
     width: 90%;
     max-width: initial;
     padding: 1em;

@@ -80,6 +80,14 @@ app.use(
   express.static(path.join(__dirname, "../public"), {
     setHeaders: (res, filePath) => {
       if (
+        filePath.endsWith("lobbies.html") ||
+        filePath.endsWith("profile.html") ||
+        filePath.endsWith("game.html")
+      ) {
+        res.setHeader("Cache-Control", "no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+      } else if (
         filePath.endsWith(".html") ||
         filePath.endsWith(".css") ||
         filePath.endsWith(".js")

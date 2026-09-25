@@ -123,6 +123,8 @@ function showMatchHistory(gamesHistory) {
 
     const tr = document.createElement("tr");
 
+    tr.dataset.gameId = game.id;
+
     if (game.left_early) {
       tr.setAttribute("data-quit", "true");
     }
@@ -145,11 +147,39 @@ function showMatchHistory(gamesHistory) {
     tbody.appendChild(tr);
   }
 
+  const tableRows = document.querySelectorAll("#matchHistoryBody tr");
+  tableRows.forEach((row) => {
+    row.addEventListener("click", async () => {
+      const gameId = row.dataset.gameId;
+      await fetchGamePlayers(gameId);
+    });
+  });
+
   const winRate = document.getElementById("winRate");
   if (gamesHistory.length > 0) {
     winRate.innerHTML = ((won / gamesHistory.length) * 100).toFixed(2) + "%";
   } else {
     winRate.innerHTML = "0.00%";
+  }
+}
+
+const opponentsContainer = document.getElementById("opponentsContainer");
+console.log(opponentsContainer);
+
+async function fetchGamePlayers(gameId) {
+  try {
+    const response = await fetch(`/api/user/game/${gameId}/players`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      console.error("Errore nel fetch dei giocatori della partita");
+      return;
+    }
+
+    const players = await response.json();
+  } catch (error) {
+    console.error("Errore durante il fetch:", error);
   }
 }
 
@@ -159,6 +189,7 @@ function showMatchHistory(gamesHistory) {
 
 const editProfileModal = document.getElementById("editProfileModal");
 const deleteProfileModal = document.getElementById("deleteProfileModal");
+const gameOpponentsModal = document.getElementById("gameOpponentsModal");
 
 editProfileModal.addEventListener("click", (event) => {
   const target = /** @type {HTMLElement} */ (event.target);
@@ -177,12 +208,21 @@ deleteProfileModal.addEventListener("click", (event) => {
   }
 });
 
+gameOpponentsModal.addEventListener("click", (event) => {
+  const target = /** @type {HTMLElement} */ (event.target);
+
+  if (target.id === "gameOpponentsModal") {
+    gameOpponentsModal.hidden = true;
+  }
+});
+
 const closeModalButtons = document.getElementsByClassName("closeModalButton");
 
 for (const button of closeModalButtons) {
   button.addEventListener("click", () => {
     editProfileModal.hidden = true;
     deleteProfileModal.hidden = true;
+    gameOpponentsModal.hidden = true;
 
     clearDeleteModal();
   });
