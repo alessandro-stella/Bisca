@@ -163,10 +163,27 @@ function showMatchHistory(gamesHistory) {
   }
 }
 
+const opponentsLoader = document.getElementById("opponentsLoader");
 const opponentsContainer = document.getElementById("opponentsContainer");
-console.log(opponentsContainer);
 
 async function fetchGamePlayers(gameId) {
+  const row = document.querySelector(`tr[data-game-id="${gameId}"]`);
+  let totalPlayers = 0;
+
+  if (row) {
+    const cells = row.querySelectorAll("td");
+
+    if (cells.length >= 2) {
+      const opponentsCell = cells[cells.length - 2];
+      totalPlayers = parseInt(opponentsCell.textContent.trim(), 10) + 1;
+    }
+  }
+
+  gameOpponentsModal.hidden = false;
+  opponentsLoader.hidden = false;
+  opponentsContainer.hidden = true;
+  opponentsContainer.innerHTML = "";
+
   try {
     const response = await fetch(`/api/user/game/${gameId}/players`, {
       credentials: "include",
@@ -178,8 +195,79 @@ async function fetchGamePlayers(gameId) {
     }
 
     const players = await response.json();
+    renderPlayers(players, totalPlayers);
   } catch (error) {
-    console.error("Errore durante il fetch:", error);
+    console.error("Error during player fetching/displaying:", error);
+  }
+}
+
+function renderPlayers(players, totalPlayers) {
+  opponentsContainer.hidden = false;
+  opponentsLoader.classList.add("hidden");
+
+  setTimeout(() => {
+    opponentsLoader.hidden = true;
+    opponentsLoader.classList.remove("hidden");
+  }, 300);
+
+  let allPlayersStats = [];
+
+  for (let i = 0; i < totalPlayers; i++) {
+    const row = document.createElement("div");
+    console.log(row);
+    row.classList.add("row", "playerNotFound");
+
+    const placementContainer = document.createElement("div");
+    placementContainer.classList.add("placement");
+    placementContainer.textContent = `${i + 1}°`;
+
+    const playerContainer = document.createElement("div");
+    playerContainer.classList.add("player");
+    playerContainer.textContent = "User not found";
+
+    const eloContainer = document.createElement("div");
+    eloContainer.classList.add("eloChange");
+
+    const oldElo = document.createElement("div");
+    oldElo.classList.add("oldElo");
+    oldElo.innerHTML = "/";
+
+    const eloDelta = document.createElement("div");
+    eloDelta.classList.add("eloDelta");
+    eloDelta.innerHTML = "/";
+
+    eloContainer.appendChild(oldElo);
+    eloContainer.appendChild(eloDelta);
+
+    row.appendChild(placementContainer);
+    row.appendChild(playerContainer);
+    row.appendChild(eloContainer);
+
+    allPlayersStats.push(row);
+  }
+
+  for (const player of players) {
+    const row = allPlayersStats[player.placement - 1];
+    row.classList.remove("playerNotFound");
+
+    const playerContainer = row.querySelector(".player");
+    playerContainer.textContent = player.username;
+
+    const oldElo = row.querySelector(".oldElo");
+    oldElo.innerHTML = player.new_elo;
+
+    const eloDelta = row.querySelector(".eloDelta");
+    eloDelta.innerHTML =
+      (player.elo_change >= 0 ? "+" : "") + player.elo_change;
+    eloDelta.classList.add(player.elo_change >= 0 ? "gain" : "loss");
+
+    row.addEventListener("click", () => {
+      window.location.href = `/profile.html?id=${player.id}`;
+    });
+  }
+
+  for (const row of allPlayersStats) {
+    opponentsContainer.appendChild(row);
   }
 }
 

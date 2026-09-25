@@ -156,7 +156,6 @@ router.get("/:userId/games", async (req, res) => {
   }
 });
 
-// Ottieni tutti i giocatori di una partita con variazioni di ELO
 router.get("/game/:gameId/players", async (req, res) => {
   const { gameId } = req.params;
 
@@ -184,10 +183,7 @@ router.get("/game/:gameId/players", async (req, res) => {
       SELECT
         u.id,
         u.username,
-        u.elo as current_elo,
         gp.placement,
-        gp.left_early,
-        eh.old_elo,
         eh.elo_change,
         eh.new_elo
       FROM game_players gp

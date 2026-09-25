@@ -248,7 +248,7 @@ body {
   background-color: var(--bg-card);
   padding: 2em;
   border-radius: 0.5em;
-  width: 40%;
+  width: 45%;
   display: flex;
   flex-direction: column;
   gap: 1em;
@@ -451,10 +451,163 @@ body {
 /* Game's opponents list */
 /* ===================== */
 
+#gameOpponentsModal .titleWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 0;
+}
+
+#gameOpponentsModal .closeModalButton {
+  font-size: 1.25em;
+  border-radius: 0.5em;
+
+  aspect-ratio: 1 / 1;
+  height: 3ch;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gameOpponentsModal .contentWrapper {
+  position: relative;
+}
+
 #opponentsLoader {
   text-align: center;
   font-size: 3em;
+
   color: var(--text-secondary);
+  background-color: var(--bg-card);
+
+  opacity: 1;
+  transition: all 0.2s ease-in-out;
+}
+
+#opponentsLoader.hidden {
+  opacity: 0;
+
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  z-index: 10;
+}
+
+#opponentsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  overflow-y: auto;
+  min-height: 0;
+  color: var(--text-primary);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.75em;
+  background: var(--bg-card);
+  border: 1px solid var(--border-inactive);
+}
+
+.row.playerNotFound {
+  opacity: 0.6;
+  filter: saturate(0);
+}
+
+.placement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  font-weight: bold;
+  border-radius: 0.5em;
+  background: var(--btn-secondary-bg);
+  color: var(--text-active);
+
+  padding-left: 0.25em;
+}
+
+.player {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+}
+
+.eloChange {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+
+.eloChange .eloDelta::before {
+  content: "(";
+}
+.eloChange .eloDelta::after {
+  content: ")";
+}
+.eloChange .eloDelta.gain {
+  color: var(--brand-green);
+}
+.eloChange .eloDelta.loss {
+  color: var(--accent-red);
+}
+
+.row:nth-child(1) {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.12),
+    rgba(255, 215, 0, 0.02)
+  );
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.row:nth-child(1) .placement {
+  background: rgba(255, 215, 0, 0.25);
+  color: #ffd700;
+}
+
+.row:nth-child(2) {
+  background: linear-gradient(
+    90deg,
+    rgba(192, 192, 192, 0.1),
+    rgba(192, 192, 192, 0.02)
+  );
+  border-color: rgba(192, 192, 192, 0.25);
+}
+
+.row:nth-child(2) .placement {
+  background: rgba(192, 192, 192, 0.2);
+  color: #e0e0e0;
+}
+
+.row:nth-child(3) {
+  background: linear-gradient(
+    90deg,
+    rgba(205, 127, 50, 0.1),
+    rgba(205, 127, 50, 0.02)
+  );
+  border-color: rgba(205, 127, 50, 0.25);
+}
+
+.row:nth-child(3) .placement {
+  background: rgba(205, 127, 50, 0.2);
+  color: #cd7f32;
+}
+
+#opponentsContainer .player {
+  font-size: 1.2em;
+  text-overflow: ellipsis;
 }
 
 /* Properties for mobile */

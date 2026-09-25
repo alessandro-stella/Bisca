@@ -284,16 +284,22 @@
       </div>
     </div>
 
-    <div id="gameOpponentsModal" class="modalOverlay">
+    <div id="gameOpponentsModal" class="modalOverlay" hidden>
       <div id="gameOpponentsPopup" class="popupWrapper">
-        <div class="title">Lista giocatori</div>
+        <div class="titleWrapper">
+          <div class="title">Lista giocatori</div>
+
+          <button class="closeModalButton secondaryButton">
+            <i class="fa-solid fa-close"></i>
+          </button>
+        </div>
 
         <div class="contentWrapper">
           <div id="opponentsLoader">
             <i class="fa-solid fa-spinner"></i>
           </div>
 
-          <div id="opponentContainer"></div>
+          <div id="opponentsContainer" hidden></div>
         </div>
       </div>
     </div>

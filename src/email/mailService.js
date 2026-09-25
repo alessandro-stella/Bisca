@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 
-const transporter = nodemailer.createTransport({
+const smtpConfig = {
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
   secure: false,
@@ -10,7 +10,12 @@ const transporter = nodemailer.createTransport({
   connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 10000,
-});
+};
+
+console.log("Current Transporter configuration:", smtpConfig);
+console.log("Sender (SMTP_FROM):", process.env.SMTP_FROM);
+
+const transporter = nodemailer.createTransport(smtpConfig);
 
 function loadTemplate(templateName, variables = {}) {
   const templatePath = path.join(__dirname, `./templates/${templateName}.html`);
