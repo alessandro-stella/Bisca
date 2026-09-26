@@ -1,10 +1,104 @@
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="icon" type="image/x-icon" href="./media/favicon.svg" />
+
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#302e2b" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) =>
+              console.log("Service Worker registered successfully!", reg),
+            )
+            .catch((err) =>
+              console.error("Error during Service Worker registration:", err),
+            );
+        });
+      }
+    </script>
+
+    <title>BISCA | Classifica</title>
+
+    <link rel="stylesheet" href="styles/reset.css" />
+    <link rel="stylesheet" href="styles/shared-style.css" />
+    <link rel="stylesheet" href="./styles/leaderboard.css" />
+
+    <script src="./scripts/leaderboard.js" defer></script>
+    <script
+      src="https://kit.fontawesome.com/df57a58519.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
+
   <body>
-    test
+    <div id="navbar">
+      <a id="logo" href="index.html">
+        <img src="./media/logo.svg" alt="STELLA'S" />
+        <p>BISCA</p>
+      </a>
+
+      <div class="buttons">
+        <a id="lobbies" class="primaryButton iconButton" href="lobbies.html">
+          <i class="fa-solid fa-door-closed"></i>
+        </a>
+
+        <a id="lobbies" class="primaryButton iconButton" href="profile.html">
+          <i class="fa-solid fa-user"></i>
+        </a>
+      </div>
+    </div>
+
+    <div id="baseContainer">
+      <div id="loadingCover">
+        <i class="fa-solid fa-spinner"></i>
+      </div>
+
+      <div id="leaderboardContainer">
+        <div class="header">
+          <div class="title">Classifica globale</div>
+          <div class="subtitle">
+            Di seguito è mostrata l'attuale classifica dei giocatori di BISCA,
+            ordinati per ELO, numero di partite giocate ed età dell'account.
+            Clicca su un giocatore per vedere più informazioni!
+          </div>
+
+          <div id="playerFilter" class="inputWithIcon">
+            <i class="icon fa-solid fa-search"></i>
+            <input id="searchInput" type="text" placeholder="Cerca giocatore" />
+          </div>
+        </div>
+
+        <div id="leaderboardDisplay">
+          <table id="leaderboardTable">
+            <thead>
+              <tr>
+                <th>Pos.</th>
+                <th>Giocatore</th>
+                <th>ELO</th>
+                <th>Partite</th>
+                <th>Membro da</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+
+          <div id="noResults" hidden>Nessun giocatore trovato</div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
