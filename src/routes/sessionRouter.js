@@ -51,10 +51,26 @@ async function getUserFromSession(
 
   const userResult = await client.query(
     `
-        SELECT id, username, email, elo, email_verified
-        FROM users
-        WHERE id = $1
-        `,
+      WITH ranked_users AS (
+        SELECT
+          u.id,
+          u.username,
+          u.email,
+          u.elo,
+          u.email_verified,
+          RANK() OVER (
+            ORDER BY u.elo DESC, 
+                     COUNT(gp.game_id) DESC, 
+                     u.created_at ASC
+          ) AS placement
+        FROM users u
+        LEFT JOIN game_players gp ON u.id = gp.user_id
+        GROUP BY u.id, u.username, u.email, u.elo, u.email_verified, u.created_at
+      )
+      SELECT id, username, email, elo, email_verified, placement
+      FROM ranked_users
+      WHERE id = $1;
+    `,
     [userId],
   );
 

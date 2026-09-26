@@ -87,14 +87,22 @@ function formatDate(rawDate) {
 }
 
 function displayProfileInfo(userInfo, isOwnProfile) {
+  console.log(userInfo);
+
   const usernameInfo = document.getElementById("usernameInfo");
   const emailInfo = document.getElementById("emailInfo");
+  const placement = document.getElementById("playerPlacement");
   const eloInfo = document.getElementById("eloInfo");
   const editButton = document.getElementById("editProfileButton");
   const deleteButton = document.getElementById("deleteProfileButton");
 
   usernameInfo.dataset.username = userInfo.username;
+  placement.innerHTML = `${userInfo.placement}°`;
   eloInfo.innerHTML = `${userInfo.elo}`;
+
+  placement.addEventListener("click", () => {
+    window.location.href = "/leaderboard.html";
+  });
 
   if (isOwnProfile) {
     usernameInfo.classList.add("isMe");

@@ -97,7 +97,7 @@ body {
   padding: 1.5em;
 
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1em;
 }
 
@@ -140,6 +140,7 @@ body {
   border-bottom: 1px solid var(--divider-line);
 }
 
+#playerPlacement,
 #eloInfo,
 #winRate {
   display: flex;
@@ -150,6 +151,10 @@ body {
   font-size: 1.2em;
 }
 
+#playerPlacement::before {
+  content: "Piazzamento";
+}
+
 #eloInfo::before {
   content: "ELO";
 }
@@ -158,6 +163,7 @@ body {
   content: "Winrate";
 }
 
+#playerPlacement::before,
 #eloInfo::before,
 #winRate::before {
   color: var(--text-secondary);
@@ -166,6 +172,22 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.2em;
+}
+
+#playerPlacement {
+  background-color: var(--bg-card);
+  transition: all 0.1s ease-in-out;
+  position: relative;
+}
+
+#playerPlacement:hover {
+  cursor: pointer;
+  filter: brightness(1.2);
+  border-radius: 0.5em;
+}
+
+#playerPlacement:hover::before {
+  content: "Mostra classifica";
 }
 
 /* ===================== */

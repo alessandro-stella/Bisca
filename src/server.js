@@ -101,6 +101,10 @@ app.use(
 const setupSockets = require("./sockets");
 setupSockets(io);
 
+app.use((_, res) => {
+  res.status(404).sendFile(path.join(__dirname, "../public/404.html"));
+});
+
 app.use((err, _, res, __) => {
   console.error("ERROR:", err);
   res.status(500).send(err.message);

@@ -86,10 +86,26 @@ router.get("/:userId", async (req, res) => {
 
   try {
     const query = `
-      SELECT id, username, elo
-      FROM users
-      WHERE id = $1
+      WITH ranked_users AS (
+        SELECT
+          u.id,
+          u.username,
+          u.elo,
+          u.created_at,
+          RANK() OVER (
+            ORDER BY u.elo DESC, 
+                     COUNT(gp.game_id) DESC, 
+                     u.created_at ASC
+          ) AS placement
+        FROM users u
+        LEFT JOIN game_players gp ON u.id = gp.user_id
+        GROUP BY u.id, u.username, u.elo, u.created_at
+      )
+      SELECT id, username, elo, placement
+      FROM ranked_users
+      WHERE id = $1;
     `;
+
     const result = await db.query(query, [userId]);
 
     if (result.rows.length === 0) {
@@ -200,6 +216,40 @@ router.get("/game/:gameId/players", async (req, res) => {
     return res.status(200).json(result.rows);
   } catch (error) {
     console.error("Error fetching game players:", error);
+
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+});
+
+router.get("/leaderboard/global", async (_, res) => {
+  try {
+    const query = `
+      SELECT
+        u.id,
+        u.username,
+        u.elo,
+        COUNT(gp.game_id) AS total_games,
+        u.created_at,
+        RANK() OVER (
+          ORDER BY u.elo DESC, 
+                   COUNT(gp.game_id) DESC, 
+                   u.created_at ASC
+        ) AS placement
+      FROM users u
+      LEFT JOIN game_players gp ON u.id = gp.user_id
+      GROUP BY u.id, u.username, u.elo, u.created_at
+      ORDER BY u.elo DESC, 
+               total_games DESC, 
+               u.created_at ASC;
+    `;
+
+    const result = await db.query(query, []);
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
 
     return res.status(500).json({
       error: "Internal server error",
