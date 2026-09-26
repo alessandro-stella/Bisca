@@ -1,10 +1,109 @@
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <link rel="icon" type="image/x-icon" href="./media/favicon.svg" />
+
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#302e2b" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) =>
+              console.log("Service Worker registered successfully!", reg),
+            )
+            .catch((err) =>
+              console.error("Error during Service Worker registration:", err),
+            );
+        });
+      }
+    </script>
+
+    <title>BISCA | Pagina non trovata</title>
+
+    <link rel="stylesheet" href="styles/reset.css" />
+    <link rel="stylesheet" href="styles/shared-style.css" />
+    <link rel="stylesheet" href="./styles/404.css" />
+
+    <script
+      src="https://kit.fontawesome.com/df57a58519.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
+
   <body>
-    404!
+    <div id="navbar">
+      <a id="logo" href="home.html">
+        <img src="./media/logo.svg" alt="STELLA'S" />
+        <p>BISCA</p>
+      </a>
+    </div>
+
+    <div id="baseContainer">
+      <div id="notFound">
+        <div class="code">404</div>
+        <div class="title">Pagina non trovata</div>
+        <div class="text">
+          Ops! Sembra che tu abbia sbagliato carta: la pagina che stai cercando
+          non esiste o è stata spostata.
+        </div>
+
+        <div class="buttons">
+          <a href="home.html" class="primaryButton iconButton">
+            <i class="fa-solid fa-house"></i>
+            <p>Torna alla home</p>
+          </a>
+
+          <a
+            id="authButton"
+            href="login.html"
+            class="secondaryButton iconButton"
+          >
+            <i id="authIcon" class="fa-solid fa-right-to-bracket"></i>
+            <p id="authText">Accedi</p>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="./scripts/404.js">
+      async function checkSession() {
+        try {
+          const response = await fetch("/api/session/me", {
+            method: "GET",
+            credentials: "include",
+          });
+
+          if (!response.ok) return;
+
+          const data = await response.json();
+          if (!data.user) return;
+
+          const authButton = document.getElementById("authButton");
+          const authIcon = document.getElementById("authIcon");
+          const authText = document.getElementById("authText");
+
+          authButton.href = "profile.html";
+          authIcon.className = "fa-solid fa-user";
+          authText.textContent = "Vai al profilo";
+        } catch (error) {
+          console.error("Error fetching session:", error);
+        }
+      }
+
+      checkSession();
+    </script>
   </body>
 </html>
