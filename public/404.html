@@ -44,13 +44,6 @@
   </head>
 
   <body>
-    <div id="navbar">
-      <a id="logo" href="home.html">
-        <img src="./media/logo.svg" alt="STELLA'S" />
-        <p>BISCA</p>
-      </a>
-    </div>
-
     <div id="baseContainer">
       <div id="notFound">
         <div class="code">404</div>
@@ -61,45 +54,78 @@
         </div>
 
         <div class="buttons">
-          <a href="home.html" class="primaryButton iconButton">
+          <a href="index.html" class="primaryButton iconButton">
             <i class="fa-solid fa-house"></i>
             <p>Torna alla home</p>
           </a>
 
-          <a
-            id="authButton"
-            href="login.html"
-            class="secondaryButton iconButton"
-          >
-            <i id="authIcon" class="fa-solid fa-right-to-bracket"></i>
-            <p id="authText">Accedi</p>
+          <a id="authButton" href="#" class="primaryButton iconButton">
+            <span id="loadingIcon"
+              ><i class="fa-solid fa-spinner fa-spin"></i
+            ></span>
+
+            <span id="profileIcon" hidden>
+              <i class="fa-solid fa-user"></i
+            ></span>
+
+            <span id="loginIcon" hidden>
+              <i class="fa-solid fa-right-to-bracket"></i>
+            </span>
+
+            <p id="authText">Caricamento...</p>
           </a>
         </div>
       </div>
     </div>
 
-    <script src="./scripts/404.js">
+    <script>
       async function checkSession() {
+        const authButton = document.getElementById("authButton");
+        const loadingIcon = document.getElementById("loadingIcon");
+        const profileIcon = document.getElementById("profileIcon");
+        const loginIcon = document.getElementById("loginIcon");
+        const authText = document.getElementById("authText");
+
+        const setLoggedOutState = () => {
+          console.log("Settings logged out");
+          console.log(loadingIcon, loginIcon);
+
+          loadingIcon.hidden = true;
+          loginIcon.hidden = false;
+          authButton.href = "login.html";
+          authText.textContent = "Accedi ora";
+        };
+
+        const setLoggedInState = () => {
+          console.log("Settings logged in");
+          console.log(loadingIcon, profileIcon);
+          loadingIcon.hidden = true;
+          profileIcon.hidden = false;
+          authButton.href = "profile.html";
+          authText.textContent = "Vai al profilo";
+        };
+
         try {
           const response = await fetch("/api/session/me", {
             method: "GET",
             credentials: "include",
           });
 
-          if (!response.ok) return;
+          if (!response.ok) {
+            setLoggedOutState();
+            return;
+          }
 
           const data = await response.json();
-          if (!data.user) return;
+          if (!data.user) {
+            setLoggedOutState();
+            return;
+          }
 
-          const authButton = document.getElementById("authButton");
-          const authIcon = document.getElementById("authIcon");
-          const authText = document.getElementById("authText");
-
-          authButton.href = "profile.html";
-          authIcon.className = "fa-solid fa-user";
-          authText.textContent = "Vai al profilo";
+          setLoggedInState();
         } catch (error) {
           console.error("Error fetching session:", error);
+          setLoggedOutState();
         }
       }
 

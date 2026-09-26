@@ -13,6 +13,33 @@ body {
   padding: 1em;
 }
 
+#baseContainer::before {
+  content: "";
+  position: absolute;
+
+  width: 100%;
+  min-width: 700px;
+  height: 100svh;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: -1;
+
+  -webkit-mask-image: url("../media/logo.svg");
+  mask-image: url("../media/logo.svg");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  background-color: var(--bg-page);
+  filter: brightness(1.1);
+}
+
 #notFound {
   background-color: var(--bg-card);
   border-radius: 0.5em;
