@@ -44,36 +44,58 @@
   </head>
 
   <body>
-    <div id="navbar">
-      <a id="logo" href="index.html">
-        <img src="./media/logo.svg" alt="STELLA'S" />
-        <p>BISCA</p>
-      </a>
-
-      <div class="buttons">
-        <a id="buttonLink" class="primaryButton iconButton">
-          <p id="spinner"><i class="fa-solid fa-spinner"></i></p>
-          <p id="lobbies" style="display: none">
-            <i class="fa-solid fa-door-closed"></i>
-          </p>
-          <p id="login" style="display: none">
-            <i class="fa-solid fa-user"></i>
-          </p>
-          <p id="buttonText">Caricamento...</p>
+    <div class="homePage">
+      <div id="navbar">
+        <a id="logo" href="index.html">
+          <img src="./media/logo.svg" alt="STELLA'S" />
+          <p>BISCA</p>
         </a>
+
+        <div class="buttons">
+          <a id="buttonLink" class="primaryButton iconButton">
+            <p id="spinner"><i class="fa-solid fa-spinner"></i></p>
+            <p id="userIcon" hidden>
+              <i class="fa-solid fa-user"></i>
+            </p>
+            <p id="buttonText">Caricamento...</p>
+          </a>
+        </div>
       </div>
+
+      <section class="hero">
+        <div class="title">Benvenuto su Bisca!</div>
+        <div class="subtitle">
+          Metti alla prova il tuo intuito e la tua strategia. Calcola le tue
+          prese, fai perdere vite agli avversari e resta l'ultimo giocatore al
+          tavolo. Hai la stoffa per conquistare la vetta?
+        </div>
+
+        <div class="buttons">
+          <a id="leftButton" class="primaryButton iconButton" href="">
+            <p id="ruleIcon" hidden><i class="fa-solid fa-gavel"></i></p>
+            <p id="tableIcon" hidden><i class="fa-solid fa-door-closed"></i></p>
+            <p id="loadingIcon"><i class="fa-solid fa-spinner"></i></p>
+            <p id="leftButtonText">Caricamento...</p>
+          </a>
+
+          <a class="primaryButton iconButton" href="leaderboard.html">
+            <i class="fa-solid fa-ranking-star"></i>
+            <p>Classifica globale</p>
+          </a>
+        </div>
+      </section>
     </div>
 
-    <section class="hero">
-      <h1>Benvenuto a Bisca!</h1>
-      <p>
-        <strong>Scopo del gioco:</strong> Ogni giocatore inizia con X vite. Al
-        termine di ogni turno, almeno un giocatore perderà una vita. Vince
-        l'ultimo giocatore con almeno una vita rimanente.
-      </p>
-    </section>
+    <div id="rules" class="container">
+      <div class="ruleCard">
+        <h2>Scopo del gioco</h2>
+        <p>
+          Ogni giocatore inizia con X vite. Al termine di ogni turno, almeno un
+          giocatore perderà una vita. Vince l'ultimo giocatore con almeno una
+          vita rimanente.
+        </p>
+      </div>
 
-    <div class="container">
       <div class="ruleCard">
         <h2>Il Turno di Gioco</h2>
         <p>
@@ -236,11 +258,14 @@
 
     <script>
       const spinnerContainer = document.getElementById("spinner");
-      const lobbiesContainer = document.getElementById("lobbies");
-      const loginContainer = document.getElementById("login");
+      const userIconContainer = document.getElementById("userIcon");
 
-      const buttonLink = document.getElementById("buttonLink");
-      const buttonText = document.getElementById("buttonText");
+      const leftButton = document.getElementById("leftButton");
+      const leftButtonSpinner = document.getElementById("loadingIcon");
+      const leftButtonText = document.getElementById("leftButtonText");
+
+      const topButtonLink = document.getElementById("buttonLink");
+      const topButtonText = document.getElementById("buttonText");
 
       async function checkSession() {
         const response = await fetch("/api/session/me", {
@@ -248,17 +273,25 @@
           credentials: "include",
         });
 
-        spinnerContainer.style.display = "none";
-
         if (response.ok) {
-          buttonLink.href = "lobbies.html";
-          buttonText.innerHTML = "Vai ai tavoli";
-          lobbiesContainer.style.display = "block";
+          topButtonLink.href = "profile.html";
+          topButtonText.innerHTML = "Profilo";
+
+          document.getElementById("tableIcon").hidden = false;
+          leftButtonText.innerHTML = "Cerca un tavolo";
+          leftButton.href = "lobbies.html";
         } else {
-          buttonLink.href = "login.html";
-          buttonText.innerHTML = "Accedi";
-          loginContainer.style.display = "block";
+          topButtonLink.href = "login.html";
+          topButtonText.innerHTML = "Accedi";
+
+          document.getElementById("ruleIcon").hidden = false;
+          leftButtonText.innerHTML = "Regole del gioco";
+          leftButton.href = "#rules";
         }
+
+        userIconContainer.hidden = false;
+        spinnerContainer.hidden = true;
+        leftButtonSpinner.hidden = true;
       }
 
       checkSession();

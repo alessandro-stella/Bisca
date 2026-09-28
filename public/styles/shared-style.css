@@ -91,6 +91,10 @@
   display: none !important;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--bg-page);
   color: var(--text-main);

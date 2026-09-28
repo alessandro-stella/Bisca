@@ -7,22 +7,76 @@ ul {
 }
 
 .hero {
+  position: relative;
+  isolation: isolate;
   text-align: center;
-  padding: 3.75em 1.25em;
+  padding: 8em 15%;
   background-color: var(--bg-card);
-  border-bottom: 1px solid var(--border-color);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5em;
+  overflow: hidden;
 }
 
-.hero h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1em;
+.hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+
+  width: 100%;
+  min-width: 700px;
+  height: 100%;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  -webkit-mask-image: url("../media/logo.svg");
+  mask-image: url("../media/logo.svg");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  background-color: var(--bg-card);
+  filter: brightness(1.1);
+  pointer-events: none;
+}
+
+.hero .title {
+  font-size: 3rem;
+  font-weight: bold;
   color: var(--text-heading);
+  line-height: 2.5lh;
 }
 
-.hero p {
-  font-size: 1.2rem;
-  max-width: 42em;
-  margin: 0 auto 1.875em auto;
+.hero .subtitle {
+  font-size: 1.5em;
+  line-height: 1.2lh;
+}
+
+.hero .buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+
+  width: 100%;
+  max-width: 65vw;
+}
+
+.hero .buttons > * {
+  flex: 1;
+  padding: 0.5em;
+  font-size: 1.25em;
+}
+
+.hero .buttons i {
+  font-size: 1.5em;
 }
 
 .container {
@@ -90,6 +144,45 @@ ul {
 }
 
 @media (max-width: 768px) {
+  .homePage {
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero {
+    flex: 1;
+    justify-content: center;
+
+    padding: 0 2em;
+  }
+
+  .hero .title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-heading);
+    line-height: 2.5lh;
+  }
+
+  .hero .subtitle {
+    font-size: 1.25em;
+  }
+
+  .hero .buttons > * {
+    font-size: 1em;
+  }
+
+  .hero .buttons {
+    width: 100%;
+    max-width: 100%;
+
+    flex-direction: column;
+  }
+
+  .hero .buttons > * {
+    width: 100%;
+  }
+
   .container {
     width: 100%;
     max-width: 100%;
