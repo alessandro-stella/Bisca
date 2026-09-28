@@ -120,8 +120,9 @@ async function startGame(socket, io) {
     for (const playerId of lobby.players.keys()) {
       await client.query(
         `
-          INSERT INTO game_players (game_id, user_id, placement, left_early) 
-          VALUES ($1, $2, $3, FALSE)
+          INSERT INTO elo_history (game_id, user_id, placement, left_early, old_elo) 
+          SELECT $1, $2, $3, FALSE, elo
+          FROM users WHERE id = $2
           ON CONFLICT (game_id, user_id) DO NOTHING
         `,
         [lobby.id, playerId, placementTracker],

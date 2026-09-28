@@ -573,25 +573,6 @@ router.post("/confirm-account-deletion", async (req, res) => {
       [user.id],
     );
 
-    // Delete game players records
-    await dbClient.query(
-      `
-        DELETE FROM game_players
-        WHERE user_id = $1
-      `,
-      [user.id],
-    );
-
-    // Update games where user was the winner (set winner_id to NULL)
-    await dbClient.query(
-      `
-        UPDATE games
-        SET winner_id = NULL
-        WHERE winner_id = $1
-      `,
-      [user.id],
-    );
-
     // Delete the user account
     await dbClient.query(
       `

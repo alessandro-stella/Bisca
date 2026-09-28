@@ -193,6 +193,7 @@ function setupSocket() {
     socket.emit("lobbies:check");
   });
 
+  // FIX: aggiungere bordo d'errore
   socket.on("lobby:join:error", (data) => {
     if (DOM.joinLobbyPopup && DOM.joinLobbyPopup.classList.contains("shown")) {
       DOM.joinPasswordError.textContent = data.message;

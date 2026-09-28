@@ -94,11 +94,11 @@ router.get("/:userId", async (req, res) => {
           u.created_at,
           RANK() OVER (
             ORDER BY u.elo DESC, 
-                     COUNT(gp.game_id) DESC, 
+                     COUNT(eh.game_id) DESC, 
                      u.created_at ASC
           ) AS placement
         FROM users u
-        LEFT JOIN game_players gp ON u.id = gp.user_id
+        LEFT JOIN elo_history eh ON u.id = eh.user_id
         GROUP BY u.id, u.username, u.elo, u.created_at
       )
       SELECT id, username, elo, placement
@@ -145,18 +145,15 @@ router.get("/:userId/games", async (req, res) => {
         g.id,
         g.duration,
         g.created_at,
-        gp.placement,
-        gp.left_early,
+        eh.placement,
+        eh.left_early,
         eh.old_elo,
         eh.elo_change,
         eh.new_elo,
         g.player_count - 1 AS opponents_count
-      FROM game_players gp
-      JOIN games g ON g.id = gp.game_id
-      LEFT JOIN elo_history eh
-        ON eh.game_id = gp.game_id
-       AND eh.user_id = gp.user_id
-      WHERE gp.user_id = $1
+      FROM elo_history eh
+      JOIN games g ON g.id = eh.game_id
+      WHERE eh.user_id = $1
       ORDER BY g.created_at DESC;
     `;
 
@@ -199,16 +196,13 @@ router.get("/game/:gameId/players", async (req, res) => {
       SELECT
         u.id,
         u.username,
-        gp.placement,
+        eh.placement,
         eh.elo_change,
         eh.new_elo
-      FROM game_players gp
-      JOIN users u ON u.id = gp.user_id
-      LEFT JOIN elo_history eh 
-        ON eh.game_id = gp.game_id 
-        AND eh.user_id = gp.user_id
-      WHERE gp.game_id = $1
-      ORDER BY gp.placement ASC;
+      FROM elo_history eh
+      JOIN users u ON u.id = eh.user_id
+      WHERE eh.game_id = $1
+      ORDER BY eh.placement ASC;
     `;
 
     const result = await db.query(query, [gameId]);
@@ -230,15 +224,15 @@ router.get("/leaderboard/global", async (_, res) => {
         u.id,
         u.username,
         u.elo,
-        COUNT(gp.game_id) AS total_games,
+        COUNT(eh.game_id) AS total_games,
         u.created_at,
         RANK() OVER (
           ORDER BY u.elo DESC, 
-                   COUNT(gp.game_id) DESC, 
+                   COUNT(eh.game_id) DESC, 
                    u.created_at ASC
         ) AS placement
       FROM users u
-      LEFT JOIN game_players gp ON u.id = gp.user_id
+      LEFT JOIN elo_history eh ON u.id = eh.user_id
       GROUP BY u.id, u.username, u.elo, u.created_at
       ORDER BY u.elo DESC, 
                total_games DESC, 

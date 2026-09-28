@@ -676,28 +676,18 @@ async function saveGameData(game) {
     await dbClient.query(
       `
         UPDATE games 
-        SET winner_id = $1, duration = $2
-        WHERE id = $3
+        SET duration = $1
+        WHERE id = $2
       `,
-      [game.winner || null, game.duration || 0, gameId],
+      [game.duration || 0, gameId],
     );
-
-    for (const p of game.players) {
-      await dbClient.query(
-        `
-          UPDATE game_players 
-          SET placement = $1, left_early = $2
-          WHERE game_id = $3 AND user_id = $4
-        `,
-        [p.placement, p.leftEarly || false, gameId, p.userId],
-      );
-    }
 
     await dbClient.query("COMMIT");
 
     const playersForElo = game.players.map((p) => ({
       id: p.userId,
       placement: p.placement,
+      leftEarly: p.leftEarly || false,
     }));
 
     await calculateAndUpdateElo(gameId, playersForElo);

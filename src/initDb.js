@@ -8,8 +8,7 @@ async function init() {
 
     DROP TABLE IF EXISTS users CASCADE;
     DROP TABLE IF EXISTS sessions CASCADE;
-    DROP TABLE IF EXISTS games CASCADE;
-    DROP TABLE IF EXISTS game_players CASCADE;
+    DROP TABLE IF EXISTS games CASCADE; 
     DROP TABLE IF EXISTS elo_history CASCADE;
 
     CREATE TABLE users (
@@ -43,29 +42,21 @@ async function init() {
 
     CREATE TABLE games (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      winner_id UUID REFERENCES users(id) ON DELETE SET NULL,
       player_count INT NOT NULL, 
       duration INT NOT NULL,
       created_at TIMESTAMP DEFAULT NOW()
-    );
-
-    CREATE TABLE game_players (
-      game_id UUID REFERENCES games(id) ON DELETE CASCADE,
-      user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-      placement INT NOT NULL,
-      left_early BOOLEAN DEFAULT FALSE,
-
-      PRIMARY KEY (game_id, user_id)
     );
 
     CREATE TABLE elo_history (
       game_id UUID NOT NULL REFERENCES games(id) ON DELETE CASCADE,
       user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
-      old_elo INTEGER NOT NULL,
-      elo_change INTEGER NOT NULL,
-      new_elo INTEGER NOT NULL,
       placement INTEGER NOT NULL,
+      left_early BOOLEAN DEFAULT FALSE,
+      
+      old_elo INTEGER NOT NULL,
+      elo_change INTEGER,
+      new_elo INTEGER,
 
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

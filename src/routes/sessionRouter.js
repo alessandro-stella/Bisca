@@ -60,11 +60,11 @@ async function getUserFromSession(
           u.email_verified,
           RANK() OVER (
             ORDER BY u.elo DESC, 
-                     COUNT(gp.game_id) DESC, 
+                     COUNT(eh.game_id) DESC, 
                      u.created_at ASC
           ) AS placement
         FROM users u
-        LEFT JOIN game_players gp ON u.id = gp.user_id
+        LEFT JOIN elo_history eh ON u.id = eh.user_id
         GROUP BY u.id, u.username, u.email, u.elo, u.email_verified, u.created_at
       )
       SELECT id, username, email, elo, email_verified, placement

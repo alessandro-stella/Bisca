@@ -64,10 +64,10 @@ async function getPlayersEloData(client, playerIds) {
       SELECT
         u.id,
         u.elo,
-        COUNT(gp.user_id)::integer AS matches_played
+        COUNT(eh.user_id)::integer AS matches_played
       FROM users u
-      LEFT JOIN game_players gp
-        ON gp.user_id = u.id
+      LEFT JOIN elo_history eh
+        ON eh.user_id = u.id
       WHERE u.id = ANY($1)
       GROUP BY u.id, u.elo
   `,
@@ -135,6 +135,7 @@ function calculateEloChanges(players, eloData) {
     return {
       id: player.id,
       placement: player.placement,
+      leftEarly: player.leftEarly || false,
       oldElo: playerElo,
       newElo,
       change: eloChange,
@@ -185,25 +186,23 @@ async function calculateAndUpdateElo(gameId, players) {
 
       await client.query(
         `
-          INSERT INTO elo_history (
-            game_id,
-            user_id,
-            old_elo,
-            elo_change,
-            new_elo,
-            placement
-          )
-          VALUES (
-            $1, $2, $3, $4, $5, $6
-          )
+          UPDATE elo_history
+          SET 
+            old_elo = $1,
+            elo_change = $2,
+            new_elo = $3,
+            placement = $4,
+            left_early = $5
+          WHERE game_id = $6 AND user_id = $7
         `,
         [
-          gameId,
-          player.id,
           player.oldElo,
           player.change,
           player.newElo,
           player.placement,
+          player.leftEarly,
+          gameId,
+          player.id,
         ],
       );
     }
