@@ -88,7 +88,9 @@ Il frontend è servito come file statici dal backend. Per accedervi basta aprire
 ## Funzionalità Extra Implementate
 
 - **WebSocket in tempo reale**: Comunicazione istantanea via Socket.io tra giocatori
-- **Servizio email**: Invio automatico di email per verifiche e recupero password
+- **Self-hosting**: Hosting autonomo del sito su home server
+- **Servizio email**: Invio automatico di email per verifiche e recupero password, anch'esso hostato su una macchina personale
+- **Indicizzazione su Google**: `sitemap.xml` e `robots.txt` per crawling + configurazione su Google Search Console
 - **Progressive Web App**: Installabile come app mobile con service worker
 - **Rating ELO**: Sistema competitivo con calcolo dinamico del rating
 - **Filtro anti-profanità**: Moderazione automatica dei contenuti
