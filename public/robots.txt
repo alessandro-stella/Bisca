@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /404.html
+Disallow: /forgot-password.html
+Disallow: /reset-password.html
+Disallow: /verify-email.html
+Disallow: /verify-email_2.html
+Disallow: /game.html
+Disallow: /lobbies.html
+Disallow: /profile.html
+
+Sitemap: https://bisca.alessandrostella.org/sitemap.xml
