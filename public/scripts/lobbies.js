@@ -193,9 +193,9 @@ function setupSocket() {
     socket.emit("lobbies:check");
   });
 
-  // FIX: aggiungere bordo d'errore
   socket.on("lobby:join:error", (data) => {
-    if (DOM.joinLobbyPopup && DOM.joinLobbyPopup.classList.contains("shown")) {
+    if (DOM.joinLobbyPopup.classList.contains("shown")) {
+      DOM.joinPasswordInput.parentElement.classList.add("error");
       DOM.joinPasswordError.textContent = data.message;
       DOM.joinPasswordError.hidden = false;
     } else {
@@ -511,6 +511,7 @@ function openPasswordPopup(lobbyId) {
 
   DOM.backdrop.classList.add("shown");
   DOM.joinLobbyPopup.classList.add("shown");
+  DOM.joinPasswordInput.parentElement.classList.remove("error");
 
   setTimeout(() => DOM.joinPasswordInput.focus(), 100);
 }
@@ -527,61 +528,49 @@ function closePopup() {
   DOM.filterLobbiesSection.classList.add("hidden");
   DOM.createLobbyContainer.classList.add("hidden");
 
-  if (DOM.joinLobbyPopup) {
-    DOM.joinLobbyPopup.classList.remove("shown");
-  }
+  DOM.joinLobbyPopup.classList.remove("shown");
   pendingLobbyId = null;
 }
 
-if (DOM.cancelJoinButton) {
-  DOM.cancelJoinButton.addEventListener("click", closePopup);
-}
+DOM.cancelJoinButton.addEventListener("click", closePopup);
 
-if (DOM.showPassword) {
-  DOM.showPassword.addEventListener("click", () => {
-    const iconSvg = DOM.showPassword.getElementsByTagName("svg")[0];
-    iconSvg.classList.toggle("fa-eye-slash");
-    iconSvg.classList.toggle("fa-eye");
+DOM.showPassword.addEventListener("click", () => {
+  const iconSvg = DOM.showPassword.getElementsByTagName("svg")[0];
+  iconSvg.classList.toggle("fa-eye-slash");
+  iconSvg.classList.toggle("fa-eye");
 
-    DOM.passwordInput.type =
-      DOM.passwordInput.type === "password" ? "text" : "password";
-  });
-}
+  DOM.passwordInput.type =
+    DOM.passwordInput.type === "password" ? "text" : "password";
+});
 
-if (DOM.showJoinPassword) {
-  DOM.showJoinPassword.addEventListener("click", () => {
-    const iconSvg = DOM.showJoinPassword.getElementsByTagName("svg")[0];
-    iconSvg.classList.toggle("fa-eye-slash");
-    iconSvg.classList.toggle("fa-eye");
+DOM.showJoinPassword.addEventListener("click", () => {
+  const iconSvg = DOM.showJoinPassword.getElementsByTagName("svg")[0];
+  iconSvg.classList.toggle("fa-eye-slash");
+  iconSvg.classList.toggle("fa-eye");
 
-    DOM.joinPasswordInput.type =
-      DOM.joinPasswordInput.type === "password" ? "text" : "password";
-  });
-}
+  DOM.joinPasswordInput.type =
+    DOM.joinPasswordInput.type === "password" ? "text" : "password";
+});
 
-if (DOM.confirmJoinButton) {
-  DOM.confirmJoinButton.addEventListener("click", () => {
-    const password = DOM.joinPasswordInput.value.trim();
+DOM.confirmJoinButton.addEventListener("click", () => {
+  const password = DOM.joinPasswordInput.value.trim();
 
-    if (!password) {
-      DOM.joinPasswordError.textContent = "Inserisci la password per entrare.";
-      DOM.joinPasswordError.hidden = false;
-      return;
-    }
+  if (!password) {
+    DOM.joinPasswordError.textContent = "Inserisci la password per entrare.";
+    DOM.joinPasswordError.hidden = false;
+    return;
+  }
 
-    DOM.joinPasswordError.hidden = true;
-    socket.emit("lobby:join", pendingLobbyId, password);
-    blockCreateTable();
-  });
-}
+  DOM.joinPasswordError.hidden = true;
+  socket.emit("lobby:join", pendingLobbyId, password);
+  blockCreateTable();
+});
 
-if (DOM.joinPasswordInput) {
-  DOM.joinPasswordInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      DOM.confirmJoinButton.click();
-    }
-  });
-}
+DOM.joinPasswordInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    DOM.confirmJoinButton.click();
+  }
+});
 
 function openCreatePopup() {
   openPopup();
