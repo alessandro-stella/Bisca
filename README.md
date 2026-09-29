@@ -151,4 +151,4 @@ Il frontend è servito come file statici dal backend. Per accedervi basta aprire
 - Relazioni integrità referenziale
 
 ## Uso dell'IA
-L'intelligenza artificiale è stata usata per scrivere situazioni d'esempio durante i test di sviluppo, per creare i template delle mail da inviare agli utenti (`src/email/templates/*.html`) e per generare liste di parole vietate. Inoltre è stata usata per refactoring generico e traduzione del codice, ad esempio il cambio del testo di messaggi d'errore o la traduzione di testo inizialmente scritto in inglese.
+L'intelligenza artificiale è stata usata per scrivere situazioni d'esempio durante i test di sviluppo, per creare i template delle mail da inviare agli utenti (`src/email/templates/*.html`) e per generare liste di parole vietate. Inoltre è stata usata per refactoring generico, ottimizzazione per SEO e traduzione del codice, ad esempio il cambio del testo di messaggi d'errore o la traduzione di testo inizialmente scritto in inglese.

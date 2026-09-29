@@ -1,25 +1,60 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Charset and Viewport -->
     <meta charset="UTF-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <link rel="icon" type="image/x-icon" href="./media/favicon.svg" />
+
+    <!-- SEO: Meta Description and Open Graph -->
     <meta
       name="description"
-      content="Crea un nuovo account su Bisca! Registrati gratuitamente per giocare a carte online, salvare le tue statistiche e competere contro altri giocatori."
+      content="Crea un nuovo account su Bisca! Registrati gratuitamente per giocare a carte online, salvare le tue statistiche e competere contro giocatori reali."
     />
+    <meta property="og:site_name" content="Bisca" />
+    <meta property="og:title" content="Bisca Online | Registrazione" />
 
+    <!-- SEO: Dynamic JSON-LD for Google Search -->
+    <script>
+      const schema = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "Bisca",
+        url: window.location.origin + "/",
+      };
+      const script = document.createElement("script");
+      script.type = "application/ld+json";
+      script.text = JSON.stringify(schema);
+      document.head.appendChild(script);
+    </script>
+
+    <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
+    <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/media/app/icon-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="/media/app/icon-512x512.png"
+    />
+    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+
+    <!-- PWA Manifest and Theme settings -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#302e2b" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
-    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
+    <!-- Service Worker Registration -->
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -35,34 +70,35 @@
       }
     </script>
 
+    <!-- Page Title -->
     <title>BISCA | Registrazione</title>
 
+    <!-- Stylesheets and External Scripts -->
     <link rel="stylesheet" href="styles/reset.css" />
     <link rel="stylesheet" href="styles/shared-style.css" />
     <link rel="stylesheet" href="styles/login-register.css" />
-
     <script
       src="https://kit.fontawesome.com/df57a58519.js"
       crossorigin="anonymous"
     ></script>
 
+    <!-- Session Management -->
     <script>
       async function checkSession() {
         const response = await fetch("/api/session/me", {
           method: "GET",
           credentials: "include",
         });
-
         if (response.ok) {
           window.location.replace("/lobbies.html");
         } else {
           console.log("No session or expired");
         }
       }
-
       checkSession();
     </script>
   </head>
+
   <body>
     <div id="baseContainer">
       <a id="registerTitle" href="index.html">

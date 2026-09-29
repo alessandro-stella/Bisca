@@ -1,52 +1,61 @@
 <!doctype html>
 <html lang="en">
-  <head>
+ <head>
+    <!-- Charset and Viewport -->
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
-    <meta
-      name="description"
-      content="Gioca a Bisca online gratis! Metti alla prova il tuo intuito, calcola le tue prese e sfida gli altri giocatori in questo emozionante gioco di carte strategico."
-    />
-    <link rel="icon" type="image/x-icon" href="./media/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#302e2b" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <!-- SEO: Meta Description and Open Graph -->
+    <meta name="description" content="Gioca a Bisca online gratis! Metti alla prova il tuo intuito, calcola le tue prese e sfida gli altri giocatori in questo emozionante gioco di carte strategico." />
+    <meta property="og:site_name" content="Bisca" />
+    <meta property="og:title" content="Bisca Online | Home" />
+
+    <!-- SEO: Dynamic JSON-LD for Google Search -->
+    <script>
+      const schema = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Bisca",
+        "url": window.location.origin + "/"
+      };
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.text = JSON.stringify(schema);
+      document.head.appendChild(script);
+    </script>
+
+    <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
+    <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/media/app/icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/media/app/icon-512x512.png" />
     <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
+    <!-- PWA Manifest and Theme settings -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#302e2b" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Service Worker Registration -->
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
             .register("/sw.js")
-            .then((reg) =>
-              console.log("Service Worker registered successfully!", reg),
-            )
-            .catch((err) =>
-              console.error("Error during Service Worker registration:", err),
-            );
+            .then((reg) => console.log("Service Worker registered successfully!", reg))
+            .catch((err) => console.error("Error during Service Worker registration:", err));
         });
       }
     </script>
 
+    <!-- Page Title -->
     <title>BISCA | Home</title>
 
+    <!-- Stylesheets and External Scripts -->
     <link rel="stylesheet" href="styles/reset.css" />
     <link rel="stylesheet" href="styles/shared-style.css" />
     <link rel="stylesheet" href="styles/home.css" />
-
-    <script
-      src="https://kit.fontawesome.com/df57a58519.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-
+    <script src="https://kit.fontawesome.com/df57a58519.js" crossorigin="anonymous"></script>
+  </head> 
   <body>
     <div class="homePage">
       <div id="navbar">
