@@ -101,6 +101,7 @@ Il frontend è servito come file statici dal backend. Per accedervi basta aprire
 Attualmente sia il sito che i servizi da esso utilizzati sono hostati su un home lab, rendendo completamente indipendente il progetto:
 - **Hosting**: tramite un tunnel Cloudflare i file sono associati al dominio pubblico `bisca.alessandrostella.org`, attualmente indicizzato anche nelle ricerche di Google
 - **Database**: un'installazione locale di `PostgreSQL` permette a host e utenti specifici l'accesso al database
+
 Era stato configurato anche un servizio SMTP autonomo, usando `postfix` in un container, slegando il progetto da piani gratuiti limitanti. Purtroppo il cambio di IP domestico rende instabile il sistema, necessitando il passaggio ad altri servizi. Ciò potrebbe essere risolto tramite l'uso di una VPS, opzione scartata per motivi economici.
 Nonostante l'attuale uso di servizi personali, il progetto è stato strutturato in modo tale da poter usare qualsiasi combinazione di hosting, database basato su SQL e Relay SMTP senza che ciò alteri il suo funzionamento.
 

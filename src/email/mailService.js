@@ -4,9 +4,9 @@ const path = require("path");
 
 const smtpConfig = {
   host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: false,
-  ignoreTLS: true,
+  port: Number(process.env.SMTP_PORT),
+  secure: process.env.SMTP_SECURE === "true",
+  ignoreTLS: process.env.IGNORETLS === "true",
   connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 10000,
