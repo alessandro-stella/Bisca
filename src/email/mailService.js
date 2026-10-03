@@ -12,6 +12,13 @@ const smtpConfig = {
   socketTimeout: 10000,
 };
 
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  smtpConfig.auth = {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  };
+}
+
 console.log("Current Transporter configuration:", smtpConfig);
 console.log("Sender (SMTP_FROM):", process.env.SMTP_FROM);
 
