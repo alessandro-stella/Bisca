@@ -741,6 +741,11 @@ function createSingleCard(card, eventListener = false) {
   const { suit, number } = parseCard(card);
 
   const cardElement = document.createElement("img");
+
+  cardElement.addEventListener("load", function () {
+    cardElement.classList.add("cardShown");
+  });
+
   cardElement.setAttribute("src", `media/${format}/${suit}${number}.${format}`);
   cardElement.setAttribute("alt", `${number} di ${suit}`);
   cardElement.setAttribute("title", `${number} di ${suit}`);

@@ -520,6 +520,14 @@
   flex: 1;
   font-size: 1.25em;
   border-radius: 0.25em;
+  min-width: 0;
+}
+
+#bottomButton p,
+#bottomButton {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .disabled {
@@ -712,6 +720,15 @@
   border-radius: inherit;
 }
 
+.playedCard .card {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.playedCard .card.cardShown {
+  opacity: 1;
+}
+
 @property --gradient-angle {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -719,7 +736,9 @@
 }
 
 .highestPlay .playedCard {
-  box-shadow: 0px 0px 4px var(--highest-dark);
+  position: relative;
+  box-shadow: 0px 0px 0px transparent;
+  transition: box-shadow 0.5s ease-in-out;
   overflow: hidden;
 }
 
@@ -746,6 +765,17 @@
 
   animation: animate-border 5s linear infinite;
   filter: blur(0.25em);
+
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.highestPlay .playedCard:has(.card.cardShown) {
+  box-shadow: 0px 0px 4px var(--highest-dark);
+}
+
+.highestPlay .playedCard:has(.card.cardShown)::before {
+  opacity: 1;
 }
 
 @keyframes animate-border {
@@ -760,8 +790,13 @@
 
 .opponentSeat .playedCard {
   height: 10svh;
-  margin-left: 5vw;
+  margin-left: 0vw;
   z-index: 1;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.opponentSeat .playedCard:has(.card.cardShown) {
+  margin-left: 5vw;
 }
 
 /* ============== */
