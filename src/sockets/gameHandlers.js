@@ -151,6 +151,10 @@ async function startGame(socket, io) {
 
 async function emitGameResult(io, lobbyId, game, result) {
   if (!result?.finished) {
+    if (result?.draw) {
+      io.to(`lobby:${lobbyId}`).emit("game:draw");
+    }
+
     broadcastGameState(io, lobbyId);
     return;
   }

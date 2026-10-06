@@ -73,6 +73,10 @@ socket.on("game:not-found", () => {
   window.location.replace("/lobbies.html");
 });
 
+socket.on("game:draw", () => {
+  showCenterPopup("Pareggio! <br>Tutti salvi, si ricomincia");
+});
+
 socket.on("game:state", (game) => {
   renderGameState(game);
 });
@@ -316,19 +320,21 @@ function showBidPopup(game, allPlayers) {
           const isMe = p.playerId === game.me.playerId;
           let popupText = "";
 
+          const nameSpan = `<span class="playerName">${p.username}</span>`;
+
           if (game.showdown) {
             if (isMe) {
               popupText = p.bid === 1 ? "Vincerò!" : "Perderò!";
             } else {
-              popupText =
-                p.bid === 1
-                  ? `${p.username} vincerà...`
-                  : `${p.username} perderà...`;
+              const actionText = p.bid === 1 ? " vincerà..." : " perderà...";
+              popupText = `${nameSpan}<span class="actionText">${actionText}</span>`;
             }
           } else {
-            const name = isMe ? "Hai" : p.username;
-            const verb = isMe ? "scommesso" : "scommette";
-            popupText = `${name} ${verb} ${p.bid} prese`;
+            if (isMe) {
+              popupText = `Hai detto ${p.bid}`;
+            } else {
+              popupText = `${nameSpan}<span class="actionText"> ha detto ${p.bid}</span>`;
+            }
           }
 
           showCenterPopup(popupText);
@@ -703,7 +709,7 @@ function createShowdownButtons(container) {
     const bidButton = document.createElement("button");
 
     bidButton.innerHTML = `<p>${label}</p>`;
-    bidButton.classList.add("bidButton", "primaryButton");
+    bidButton.classList.add("bidButton", "primaryButton", "showdownButton");
     bidButton.disabled = false;
 
     bidButton.addEventListener("click", () => {
@@ -742,14 +748,18 @@ function createSingleCard(card, eventListener = false) {
 
   const cardElement = document.createElement("img");
 
-  cardElement.addEventListener("load", function () {
-    cardElement.classList.add("cardShown");
-  });
-
   cardElement.setAttribute("src", `media/${format}/${suit}${number}.${format}`);
   cardElement.setAttribute("alt", `${number} di ${suit}`);
   cardElement.setAttribute("title", `${number} di ${suit}`);
   cardElement.classList.add("card");
+
+  if (cardElement.complete) {
+    cardElement.classList.add("cardShown");
+  } else {
+    cardElement.addEventListener("load", function () {
+      cardElement.classList.add("cardShown");
+    });
+  }
 
   if (eventListener) {
     cardElement.addEventListener("click", () => {
