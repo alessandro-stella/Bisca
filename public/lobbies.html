@@ -67,13 +67,13 @@
   </head>
 
   <body>
-    <div id="navbar">
+    <header id="navbar">
       <a id="logo" href="index.html">
         <img src="./media/logo.svg" alt="STELLA'S" />
         <p>BISCA</p>
       </a>
 
-      <div class="buttons">
+      <nav class="buttons">
         <a
           id="lobbies"
           class="primaryButton iconButton"
@@ -86,8 +86,8 @@
           <i class="fa-solid fa-user"></i>
           <p>Profilo</p>
         </a>
-      </div>
-    </div>
+      </nav>
+    </header>
 
     <div id="backdrop" class=""></div>
 
@@ -121,10 +121,10 @@
       </div>
     </div>
 
-    <div id="baseContainer">
-      <div id="leftColumn" class="">
-        <div id="filterLobbies">
-          <div class="title">Cerca tavoli</div>
+    <main id="baseContainer">
+      <aside id="leftColumn" class="">
+        <section id="filterLobbies">
+          <h2 class="title">Cerca tavoli</h2>
           <div id="nameFilterInputContainer" class="inputWithIcon">
             <i class="icon fa-solid fa-search"></i>
             <input id="searchInput" type="text" placeholder="Nome" />
@@ -141,10 +141,10 @@
           </div>
 
           <button id="applyFilters" class="primaryButton"><p>Cerca</p></button>
-        </div>
+        </section>
 
-        <div id="createLobbyContainer">
-          <div class="title">Crea tavolo</div>
+        <section id="createLobbyContainer">
+          <h2 class="title">Crea tavolo</h2>
 
           <div id="createLobbyInputs">
             <div class="inputWithError">
@@ -234,13 +234,22 @@
               <p>Elimina tavolo</p>
             </button>
           </div>
-        </div>
-      </div>
+        </section>
+      </aside>
 
-      <div id="rightColumn">
+      <section id="rightColumn">
         <div id="lobbiesContainer">
           <div class="title">
-            <p>Tavoli esistenti</p>
+            <h1
+              style="
+                display: inline;
+                font-size: inherit;
+                font-weight: inherit;
+                margin: 0;
+              "
+            >
+              Tavoli esistenti
+            </h1>
 
             <div id="quitButtonDesktop" class="dangerButton" hidden>
               Abbandona tavolo
@@ -279,7 +288,7 @@
         <button id="quitButtonMobile" class="primaryButton" hidden>
           <p>Abbandona tavolo</p>
         </button>
-      </div>
-    </div>
+      </section>
+    </main>
   </body>
 </html>

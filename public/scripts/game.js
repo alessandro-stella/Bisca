@@ -126,7 +126,7 @@ messageContentInput.addEventListener("keydown", (event) => {
 const messagesContainer = document.getElementById("oldMessages");
 
 socket.on("game:chat-message", (data) => {
-  const newMessage = document.createElement("div");
+  const newMessage = document.createElement("article");
 
   newMessage.classList.add("message");
   newMessage.innerHTML = `<strong>${data.senderUsername}: </strong>${data.text}`;

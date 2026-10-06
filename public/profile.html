@@ -72,13 +72,13 @@
   </head>
 
   <body>
-    <div id="navbar">
+    <header id="navbar">
       <a id="logo" href="index.html">
         <img src="./media/logo.svg" alt="STELLA'S" />
         <p>BISCA</p>
       </a>
 
-      <div class="buttons">
+      <nav class="buttons">
         <a
           id="lobbies"
           class="primaryButton iconButton"
@@ -95,24 +95,24 @@
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
           <p>Esci</p>
         </button>
-      </div>
-    </div>
+      </nav>
+    </header>
 
-    <div id="baseContainer">
+    <main id="baseContainer">
       <div id="loadingCover">
         <i class="fa-solid fa-spinner"></i>
       </div>
 
       <div id="userNotFoundWrapper">
-        <div id="userNotFound">
-          <div class="title">Utente non trovato</div>
+        <section id="userNotFound">
+          <h1 class="title">Utente non trovato</h1>
           <div class="text">
             Non sono stati trovati utenti con l'ID inserito
           </div>
-        </div>
+        </section>
       </div>
 
-      <div id="userInfo">
+      <section id="userInfo">
         <div id="usernameContainer">
           <div id="usernameInfo"></div>
 
@@ -137,9 +137,9 @@
         <div id="playerPlacement"></div>
         <div id="eloInfo"></div>
         <div id="winRate"></div>
-      </div>
+      </section>
 
-      <div id="matchHistoryContainer">
+      <section id="matchHistoryContainer">
         <div id="totalMatches"></div>
 
         <table id="matchHistory">
@@ -154,8 +154,8 @@
           </thead>
           <tbody id="matchHistoryBody"></tbody>
         </table>
-      </div>
-    </div>
+      </section>
+    </main>
 
     <div id="editProfileModal" class="modalOverlay" hidden>
       <div id="editProfilePopup" class="popupWrapper">

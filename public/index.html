@@ -1,12 +1,18 @@
 <!doctype html>
 <html lang="en">
- <head>
+  <head>
     <!-- Charset and Viewport -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
 
     <!-- SEO: Meta Description and Open Graph -->
-    <meta name="description" content="Gioca a Bisca online gratis! Metti alla prova il tuo intuito, calcola le tue prese e sfida gli altri giocatori in questo emozionante gioco di carte strategico." />
+    <meta
+      name="description"
+      content="Gioca a Bisca online gratis! Metti alla prova il tuo intuito, calcola le tue prese e sfida gli altri giocatori in questo emozionante gioco di carte strategico."
+    />
     <meta property="og:site_name" content="Bisca" />
     <meta property="og:title" content="Bisca Online | Home" />
 
@@ -15,25 +21,38 @@
       const schema = {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "Bisca",
-        "url": window.location.origin + "/"
+        name: "Bisca",
+        url: window.location.origin + "/",
       };
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
+      const script = document.createElement("script");
+      script.type = "application/ld+json";
       script.text = JSON.stringify(schema);
       document.head.appendChild(script);
     </script>
 
     <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
     <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/media/app/icon-192x192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="/media/app/icon-512x512.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/media/app/icon-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="/media/app/icon-512x512.png"
+    />
     <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
     <!-- PWA Manifest and Theme settings -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#302e2b" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
 
     <!-- Service Worker Registration -->
     <script>
@@ -41,8 +60,12 @@
         window.addEventListener("load", () => {
           navigator.serviceWorker
             .register("/sw.js")
-            .then((reg) => console.log("Service Worker registered successfully!", reg))
-            .catch((err) => console.error("Error during Service Worker registration:", err));
+            .then((reg) =>
+              console.log("Service Worker registered successfully!", reg),
+            )
+            .catch((err) =>
+              console.error("Error during Service Worker registration:", err),
+            );
         });
       }
     </script>
@@ -54,17 +77,20 @@
     <link rel="stylesheet" href="styles/reset.css" />
     <link rel="stylesheet" href="styles/shared-style.css" />
     <link rel="stylesheet" href="styles/home.css" />
-    <script src="https://kit.fontawesome.com/df57a58519.js" crossorigin="anonymous"></script>
-  </head> 
+    <script
+      src="https://kit.fontawesome.com/df57a58519.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
   <body>
-    <div class="homePage">
-      <div id="navbar">
+    <main class="homePage">
+      <header id="navbar">
         <a id="logo" href="index.html">
           <img src="./media/logo.svg" alt="STELLA'S" />
           <p>BISCA</p>
         </a>
 
-        <div class="buttons">
+        <nav class="buttons">
           <a id="buttonLink" class="primaryButton iconButton">
             <p id="spinner"><i class="fa-solid fa-spinner"></i></p>
             <p id="userIcon" hidden>
@@ -72,16 +98,16 @@
             </p>
             <p id="buttonText">Caricamento...</p>
           </a>
-        </div>
-      </div>
+        </nav>
+      </header>
 
       <section class="hero">
-        <div class="title">Benvenuto su Bisca!</div>
-        <div class="subtitle">
+        <h1 class="title">Benvenuto su Bisca!</h1>
+        <h2 class="subtitle">
           Metti alla prova il tuo intuito e la tua strategia. Calcola le tue
           prese, fai perdere vite agli avversari e resta l'ultimo giocatore al
           tavolo. Hai la stoffa per conquistare la vetta?
-        </div>
+        </h2>
 
         <div class="buttons">
           <a id="leftButton" class="primaryButton iconButton" href="">
@@ -97,19 +123,19 @@
           </a>
         </div>
       </section>
-    </div>
+    </main>
 
-    <div id="rules" class="container">
-      <div class="ruleCard">
+    <section id="rules" class="container">
+      <article class="ruleCard">
         <h2>Scopo del gioco</h2>
         <p>
           Ogni giocatore inizia con X vite. Al termine di ogni turno, almeno un
           giocatore perderà una vita. Vince l'ultimo giocatore con almeno una
           vita rimanente.
         </p>
-      </div>
+      </article>
 
-      <div class="ruleCard">
+      <article class="ruleCard">
         <h2>Il Turno di Gioco</h2>
         <p>
           Ad ogni turno verranno distribuite un tot di carte ad ogni giocatore.
@@ -146,9 +172,9 @@
           vincitore, allora il turno si considera come non valido. Si procede
           quindi al turno successivo, mantenendo però le vite immutate.
         </div>
-      </div>
+      </article>
 
-      <div class="ruleCard">
+      <article class="ruleCard">
         <h2>Proseguimento e Showdown</h2>
         <p>
           Ad ogni nuovo turno il giocatore alla destra del precedente mazziere
@@ -165,9 +191,9 @@
           possedute dagli altri. Alla fine si svelano le carte: chi ha sbagliato
           la previsione perde una vita.
         </div>
-      </div>
+      </article>
 
-      <div class="ruleCard">
+      <article class="ruleCard">
         <h2>Valore delle Carte</h2>
         <p>
           Tra carte dello stesso seme, vince il valore numerico (10 > 9 > ... >
@@ -216,9 +242,9 @@
           precedente, prendendo sul re di coppe e venendo preso dal due di
           denari.
         </div>
-      </div>
+      </article>
 
-      <div class="ruleCard">
+      <article class="ruleCard">
         <h2>Come garantire la perdita di vite</h2>
         <p>
           Per assicurare che qualcuno perda sempre,
@@ -248,9 +274,9 @@
             </li>
           </ul>
         </div>
-      </div>
+      </article>
 
-      <div class="ruleCard">
+      <article class="ruleCard">
         <h2>Modifiche per la versione online</h2>
         <p>
           Alcune modifiche sono state apportate rispetto alla versione cartacea:
@@ -266,8 +292,8 @@
           </li>
         </ul>
         <p>Tutte le restanti regole sono rispettate fedelmente.</p>
-      </div>
-    </div>
+      </article>
+    </section>
 
     <script>
       const spinnerContainer = document.getElementById("spinner");
