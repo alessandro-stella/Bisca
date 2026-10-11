@@ -63,9 +63,11 @@ async function init() {
       PRIMARY KEY (game_id, user_id)
     );
 
-    CREATE INDEX idx_email_verification_token ON users(email_verification_token);
-    CREATE INDEX idx_password_reset_token ON users(password_reset_token);
     CREATE INDEX idx_email_verified ON users(email_verified);
+    CREATE INDEX idx_elo_history_user_id ON elo_history(user_id);
+    CREATE INDEX idx_games_created_at ON games(created_at);
+    CREATE INDEX idx_sessions_user_id ON sessions(user_id);
+    CREATE INDEX idx_sessions_expires_at ON sessions(expires_at);
   `);
 
   console.log("Database initialized");

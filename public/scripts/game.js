@@ -1,3 +1,8 @@
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
 function getOrCreateDeviceId() {
   let id = localStorage.getItem("bisca_device_id");
   if (!id) {
@@ -49,8 +54,13 @@ socket.on("connect", () => {
   startHeartbeat();
 });
 
-socket.on("connect_error", () => {
-  window.location.replace("/lobbies.html");
+socket.on("connect_error", (error) => {
+  if (
+    error.message === "Not authenticated or email not verified" ||
+    error.message === "Authentication failed"
+  ) {
+    window.location.replace("/lobbies.html");
+  }
 });
 
 socket.on("disconnect", (reason) => {
@@ -129,11 +139,17 @@ messageContentInput.addEventListener("keydown", (event) => {
 
 const messagesContainer = document.getElementById("oldMessages");
 
+socket.on("game:chat-rejected", (data) => {
+  showCenterPopup(escapeHtml(data.message));
+});
+
 socket.on("game:chat-message", (data) => {
   const newMessage = document.createElement("article");
 
   newMessage.classList.add("message");
-  newMessage.innerHTML = `<strong>${data.senderUsername}: </strong>${data.text}`;
+  const strong = document.createElement("strong");
+  strong.textContent = `${data.senderUsername}: `;
+  newMessage.append(strong, document.createTextNode(data.text));
 
   if (data.isMe) {
     newMessage.classList.add("isMe");
@@ -320,7 +336,7 @@ function showBidPopup(game, allPlayers) {
           const isMe = p.playerId === game.me.playerId;
           let popupText = "";
 
-          const nameSpan = `<span class="playerName">${p.username}</span>`;
+          const nameSpan = `<span class="playerName">${escapeHtml(p.username)}</span>`;
 
           if (game.showdown) {
             if (isMe) {
@@ -483,7 +499,7 @@ function createMySeat(
 
         if (!isMyTurn) updateBottomButtonDefault();
       } else {
-        usernameDiv.innerHTML = myData.username;
+        usernameDiv.textContent = myData.username;
         const predictionText = myData.bid > 0 ? " - Vincerai" : " - Perderai";
         livesDiv.innerHTML += predictionText;
         myLivesContainer.classList.add("showdown");
@@ -491,7 +507,7 @@ function createMySeat(
         updateBottomButtonDefault();
       }
     } else {
-      usernameDiv.innerHTML = myData.username;
+      usernameDiv.textContent = myData.username;
       updateBottomButtonDefault();
     }
   } else if (turnPhase === "bidding" && !hasBid) {
@@ -500,7 +516,7 @@ function createMySeat(
 
     if (!isMyTurn) updateBottomButtonDefault();
   } else {
-    usernameDiv.innerHTML = myData.username;
+    usernameDiv.textContent = myData.username;
 
     if (!isEliminated) {
       bidsDiv.innerHTML = `${myData.won}/${myData.bid}`;
@@ -544,7 +560,7 @@ function createOpponents(
 
     const username = document.createElement("div");
     username.classList.add("username");
-    username.innerHTML = opponent.username;
+    username.textContent = opponent.username;
 
     const stats = document.createElement("div");
     stats.classList.add("stats");

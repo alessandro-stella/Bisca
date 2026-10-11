@@ -229,10 +229,15 @@ form.addEventListener("submit", async (event) => {
     hasFrontendErrors = true;
   }
 
-  if (password && confirmedPassword && password !== confirmedPassword) {
+  if (password && password !== confirmedPassword) {
     errors.confirmedPassword = { msg: "Le password non coincidono" };
     hasFrontendErrors = true;
   }
+
+  if (username && !/^[A-Za-z0-9_.-]{3,30}$/.test(username)) {
+  errors.username = { msg: "Username: 3-30 caratteri, solo lettere, numeri, _ . -" };
+  hasFrontendErrors = true;
+}
 
   if (hasFrontendErrors) {
     addErrors(errors);

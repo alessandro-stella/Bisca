@@ -57,6 +57,11 @@ async function handleCreateLobby(
   password,
 ) {
   try {
+    if (getLobbyByPlayer(socket.user.id)) {
+  socket.emit("lobby:create:error", { message: "Sei già in un tavolo" });
+  return;
+}
+
     let passwordHash = null;
     if (password && password.trim() !== "") {
       passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);

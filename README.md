@@ -7,7 +7,7 @@
 ## Installazione
 
 ### Prerequisiti
-- Node.js (versione 16 o superiore)
+- Node.js 18 o superiore
 - npm
 - Un database PostgreSQL
 - Credenziali SMTP per il servizio email
@@ -29,9 +29,27 @@
    
    Crea un file `.env` nella root del progetto prendendo, come riferimento il file `.env.example`.
 
+Variabili d'ambiente:
+
+| Variabile | Descrizione |
+|---|---|
+| `DATABASE_URL` | Stringa di connessione a PostgreSQL |
+| `DATABASE_SSL` | Abilita SSL per la connessione al database |
+| `DATABASE_SSL_REJECT_UNAUTHORIZED` | Determina se verificare il certificato TLS del database |
+| `PORT` | Porta del server |
+| `NODE_ENV` | Ambiente di esecuzione, ad esempio `development` o `production` |
+| `CLIENT_URL` | URL del client utilizzato per la configurazione dell'origine |
+| `SMTP_FROM` | Indirizzo mittente delle email |
+| `SMTP_HOST` | Host del server SMTP |
+| `SMTP_PORT` | Porta del server SMTP |
+| `SMTP_SECURE` | Abilita la connessione SMTP sicura |
+| `SMTP_IGNORETLS` | Configura la gestione di STARTTLS |
+| `SMTP_USER` | Utente per l'autenticazione SMTP |
+| `SMTP_PASS` | Password per l'autenticazione SMTP |
+
 4. **Inserisci le parole vietate**
    
-   Crea un file `profane-list.json` nella root del progetto, prendendo come riferimento il file `profane-list.json.example`.
+   Crea un file `profanity-list.json` nella root del progetto, prendendo come riferimento il file `profanity-list.json.example`. Il file deve contenere un oggetto JSON con liste di parole per lingua, ad esempio: `{ "italian": ["…"], "english": ["…"] }`.
    
 5. **Inizializza il database**
    ```bash
@@ -53,7 +71,7 @@ Il frontend è servito come file statici dal backend. Per accedervi basta aprire
 ### Autenticazione e Gestione Utenti
 - Registrazione utente con validazione email
 - Login/Logout con gestione sessioni
-- Verifica email (doppio fattore)
+- Verifica email alla registrazione
 - Reset password con link via email
 - Profilo utente con statistiche personali
 - Eliminazione account
@@ -69,7 +87,7 @@ Il frontend è servito come file statici dal backend. Per accedervi basta aprire
 - Sistema di rating ELO dinamico
 - Classifica globale dei giocatori
 - Calcolo automatico ELO dopo ogni partita
-- Statistiche personali (partite giocate, vittorie, sconfitte)
+- Statistiche personali: partite giocate, percentuale di vittorie e storico partite con variazione ELO
 
 ### Sicurezza e Moderazione
 - Filtro anti-profanità nei nomi dei profili e dei tavoli
@@ -83,7 +101,7 @@ Il frontend è servito come file statici dal backend. Per accedervi basta aprire
 - Layout con Flexbox e Grid CSS
 - Gestione visibile degli stati (caricamento, errore, successo)
 - Animazioni e feedback visuale
-- Progressive Web App (Service Worker per offline)
+- Service Worker: cache dell’interfaccia statica (installabile come app); per giocare serve connessione
 
 ## Funzionalità Extra Implementate
 
@@ -92,9 +110,9 @@ Il frontend è servito come file statici dal backend. Per accedervi basta aprire
 - **Indicizzazione su Google**: `sitemap.xml` e `robots.txt` per crawling + configurazione su Google Search Console
 - **Progressive Web App**: Installabile come app mobile con service worker
 - **Rating ELO**: Sistema competitivo con calcolo dinamico del rating
-- **Filtro anti-profanità**: Moderazione automatica dei contenuti
+- **Filtro anti-profanità**: applicato a username e nomi dei tavoli
 - **Persistenza dati**: Database PostgreSQL per tutti i dati
-- **Gestione sessioni**: Token JWT e cookie per autenticazione persistente
+- **Gestione sessioni**: UUID salvato nella tabella `sessions` (durata 7 giorni) e cookie `httpOnly` `sessionId`
 
 ## Self-hosting
 
@@ -103,7 +121,7 @@ Attualmente sia il sito che i servizi da esso utilizzati sono hostati su un home
 - **Database**: un'installazione locale di `PostgreSQL` permette a host e utenti specifici l'accesso al database
 
 Era stato configurato anche un servizio SMTP autonomo, usando `postfix` in un container, slegando il progetto da piani gratuiti limitanti. Purtroppo il cambio di IP domestico rende instabile il sistema, necessitando il passaggio ad altri servizi. Ciò potrebbe essere risolto tramite l'uso di una VPS, opzione scartata per motivi economici.
-Nonostante l'attuale uso di servizi personali, il progetto è stato strutturato in modo tale da poter usare qualsiasi combinazione di hosting, database basato su SQL e Relay SMTP senza che ciò alteri il suo funzionamento.
+Nonostante l'attuale uso di servizi personali, il progetto può essere distribuito con diverse combinazioni di hosting e relay SMTP. Il database richiesto è PostgreSQL, locale o gestito.
 
 ## REST API Endpoints
 
@@ -134,28 +152,50 @@ Nonostante l'attuale uso di servizi personali, il progetto è stato strutturato 
  | ----- | ----- | ----- | ----- | ----- | ----- | ----- | 
 | /user/update | PUT | Body: username | richiede sessionId | 3-30 char, no spazi, no profanita, unico | `{ message, username }` | 200 / 400 / 401 / 409 / 500 | 
 | /user/:userId | GET | Param: userId (UUID) | \- | formato UUID, utente esistente | `{ id, username, elo, placement }` | 200 / 400 / 404 / 500 | 
-| /user/:userId/games | GET | Param: userId (UUID) | \- | formato UUID, utente esistente | `[{ id, duration, created_at, placement, left_early, old_elo, elo_change, new_elo, opponents_count }]` | 200 / 400 / 404 / 500 | 
+| /user/:userId/games | GET | Param: userId (UUID) | \- | formato UUID, utente esistente | `[{ id, duration, created_at, placement, left_early, old_elo, elo_change, new_elo, opponents_count }]` (`duration`: numero di turni completati) | 200 / 400 / 404 / 500 | 
 | /user/game/:gameId/players | GET | Param: gameId (UUID) | \- | formato UUID, gioco esistente | `[{ id, username, placement, elo_change, new_elo }]` | 200 / 400 / 404 / 500 | 
 | /user/leaderboard/global | GET | \- | \- | \- | `[{ id, username, elo, total_games, created_at, placement }]` (ordinati per ELO DESC) | 200 / 500 | 
 
-**WebSocket (Socket.io)** per comunicazione real-time:
-- `lobby:create` - Crea nuovo tavolo
-- `lobby:join` - Unirsi a un tavolo
-- `lobby:leave` - Abbandonare il tavolo
-- `game:bid` - Effettua un bid (puntata) durante l'asta
-- `game:play` - Gioca una carta durante la partita
-- `game:start` - Inizia la partita quando tutti pronti
+**WebSocket (Socket.io)** per comunicazione in tempo reale.
+
+Eventi client → server:
+
+| Evento | Parametri | Note |
+|---|---|---|
+| `lobby:create` | `name, maxPlayers, lives, cards, password` | Errori su `lobby:create:error` |
+| `lobby:join` | `lobbyId, password` | Errori su `lobby:join:error` |
+| `lobby:leave` | – | |
+| `lobby:update` | `lives, cards` | Solo proprietario, partita non iniziata |
+| `lobby:delete` | – | Solo proprietario, partita non iniziata |
+| `game:start` | – | Solo proprietario, almeno 2 giocatori |
+| `game:get-state` | – | Risposta `game:state` o `game:not-found` |
+| `game:place-bid` | `bid` | |
+| `game:play-card` | `card` (`asso-prende` / `asso-lascia` per l'asso di denari) | |
+| `game:chat-message` | `text` (max 250 caratteri) | Solo con partita in corso |
+| `lobbies:check` | – | Risposta `game:reconnect` se la partita è iniziata |
+| `ping` | – | Risposta `pong` |
+
+Eventi server → client:
+
+| Evento | Significato |
+|---|---|
+| `lobbies:update`, `lobbies:update:sync` | Elenco tavoli / sincronizzazione tra dispositivi |
+| `lobby:deleted` | Tavolo eliminato |
+| `game:started`, `game:reconnect`, `game:not-found` | Ciclo di vita partita |
+| `game:state`, `game:draw` | Stato personalizzato / pareggio |
+| `game:chat-message` | Messaggio di chat |
+| `lobby:*:error`, `game:start:error`, `error` | Errori |
 
 ### Frontend - Vanilla JavaScript
 - **Fetch API con async/await** per comunicazione REST
 - **Socket.io client** per comunicazione in tempo reale
 - **DOM manipulation** per aggiornamento interfaccia
 - **Validazione client** dei dati inseriti
-- **Service Worker** per funzionamento offline
+- **Service Worker** per la cache dell’interfaccia statica; per giocare serve connessione
 
 ### Database - PostgreSQL
-- Schema relazionale con tabelle: users, sessions, games, stats
-- Indici su campi frequentemente consultati
+- Schema relazionale con tabelle: `users`, `sessions`, `games`, `elo_history`
+- Indici creati sui token e sul campo `email_verified`
 - Relazioni integrità referenziale
 
 ## Uso dell'IA

@@ -32,12 +32,11 @@ function createConnectionHandlers() {
 
   function isUserOnline(socket, io, lobby) {
     const userId = socket.user?.id;
-    const currentDeviceId = socket.deviceId;
 
     for (const otherSocket of io.sockets.sockets.values()) {
       if (
         otherSocket.user?.id === userId &&
-        otherSocket.deviceId !== currentDeviceId &&
+        otherSocket.id !== socket.id &&
         otherSocket.connected
       ) {
         if (lobby.started) {

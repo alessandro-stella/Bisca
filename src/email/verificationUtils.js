@@ -27,48 +27,30 @@ async function verifyEmailToken(token) {
   try {
     const result = await db.query(
       `
-        SELECT id, username, email
-        FROM users
-        WHERE email_verification_token = $1
-          AND email_verification_expires_at > NOW()
-          AND email_verified = FALSE
-      `,
+    UPDATE users
+    SET email_verified = TRUE,
+        email_verification_token = NULL,
+        email_verification_expires_at = NULL
+    WHERE email_verification_token = $1
+      AND email_verification_expires_at > NOW()
+      AND email_verified = FALSE
+    RETURNING id, username, email
+  `,
       [token],
     );
 
     if (result.rows.length === 0) {
-      return {
-        success: false,
-        user: null,
-        error: "Token non valido, scaduto o account già verificato",
-      };
+      return { success: false, user: null, error: "Token non valido, scaduto o account già verificato", code: "INVALID_TOKEN" };
     }
 
-    const user = result.rows[0];
-
-    await db.query(
-      `
-        UPDATE users
-        SET 
-          email_verified = TRUE,
-          email_verification_token = NULL,
-          email_verification_expires_at = NULL
-        WHERE id = $1
-      `,
-      [user.id],
-    );
-
-    return {
-      success: true,
-      user,
-      error: null,
-    };
+    return { success: true, user: result.rows[0], error: null };
   } catch (error) {
     console.error("Error verifying email token:", error);
     return {
       success: false,
       user: null,
       error: "Errore durante la verifica",
+      code: "SERVER_ERROR"
     };
   }
 }
@@ -103,13 +85,15 @@ async function createPasswordResetToken(email, expirationMinutes = 5) {
     const result = await db.query(
       `
         UPDATE users
-        SET 
-          password_reset_token = $1,
-          password_reset_expires_at = $2
+        SET password_reset_token = $1, password_reset_expires_at = NOW() + make_interval(mins => $2)
         WHERE email = $3
+        AND (
+          password_reset_expires_at IS NULL
+          OR password_reset_expires_at < NOW() + make_interval(mins => $2 - 1)
+        )
         RETURNING id, username
       `,
-      [token, expiresAt, email],
+      [token, expirationMinutes, email],
     );
 
     if (result.rows.length === 0) {
@@ -124,7 +108,7 @@ async function createPasswordResetToken(email, expirationMinutes = 5) {
     return {
       success: true,
       token,
-      username: result.rows[0].username,
+      username: result.rows[0],
       error: null,
     };
   } catch (error) {
@@ -155,6 +139,7 @@ async function verifyPasswordResetToken(token) {
         success: false,
         user: null,
         error: "Token non valido o scaduto",
+        code: "INVALID_TOKEN"
       };
     }
 
@@ -171,6 +156,7 @@ async function verifyPasswordResetToken(token) {
       success: false,
       user: null,
       error: "Errore durante la verifica",
+      code: "SERVER_ERROR"
     };
   }
 }

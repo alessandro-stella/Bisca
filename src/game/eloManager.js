@@ -58,6 +58,24 @@ function getActualScore(placement, totalPlayers) {
   return (totalPlayers - placement) / (totalPlayers - 1);
 }
 
+function getEffectivePositions(players) {
+  const sorted = [...players].sort((a, b) => a.placement - b.placement);
+  const positions = new Map();
+  let i = 0;
+
+  while (i < sorted.length) {
+    let j = i;
+    while (j + 1 < sorted.length && sorted[j + 1].placement === sorted[i].placement) j++;
+
+    const average = (i + 1 + (j + 1)) / 2;
+    for (let k = i; k <= j; k++) positions.set(sorted[k].id, average);
+
+    i = j + 1;
+  }
+
+  return positions;
+}
+
 async function getPlayersEloData(client, playerIds) {
   const result = await client.query(
     `
@@ -67,7 +85,7 @@ async function getPlayersEloData(client, playerIds) {
         COUNT(eh.user_id)::integer AS matches_played
       FROM users u
       LEFT JOIN elo_history eh
-        ON eh.user_id = u.id
+        ON eh.user_id = u.id AND eh.new_elo IS NOT NULL
       WHERE u.id = ANY($1)
       GROUP BY u.id, u.elo
   `,
@@ -87,6 +105,7 @@ async function getPlayersEloData(client, playerIds) {
 
 function calculateEloChanges(players, eloData) {
   const totalPlayers = players.length;
+  const positions = getEffectivePositions(players);
 
   return players.map((player) => {
     const playerData = eloData.get(player.id);
@@ -120,7 +139,7 @@ function calculateEloChanges(players, eloData) {
       opponents,
     );
 
-    const actualScore = getActualScore(player.placement, totalPlayers);
+    const actualScore = getActualScore(positions.get(player.id), totalPlayers);
 
     const kBase = getPlayerKBase(playerData.matchesPlayed, playerElo);
 
@@ -146,7 +165,7 @@ function calculateEloChanges(players, eloData) {
   });
 }
 
-async function calculateAndUpdateElo(gameId, players) {
+async function calculateAndUpdateElo(gameId, players, externalClient = null) {
   if (!gameId) {
     throw new Error("gameId is required");
   }
@@ -155,66 +174,47 @@ async function calculateAndUpdateElo(gameId, players) {
     throw new Error("players must be a non-empty array");
   }
 
-  const placements = players.map((player) => player.placement);
-
-  const uniquePlacements = new Set(placements);
-
-  if (uniquePlacements.size !== placements.length) {
-    throw new Error("Player placements must be unique");
-  }
-
-  const client = await db.connect();
+  const client = externalClient || (await db.connect());
+  const ownsTransaction = !externalClient;
 
   try {
-    await client.query("BEGIN");
+    if (ownsTransaction) await client.query("BEGIN");
 
-    const playerIds = players.map((player) => player.id);
+    const eloData = await getPlayersEloData(
+      client,
+      players.map((player) => player.id),
+    );
 
-    const eloData = await getPlayersEloData(client, playerIds);
+    const presentPlayers = players.filter((player) => eloData.has(player.id));
 
-    const evaluatedPlayers = calculateEloChanges(players, eloData);
+    if (presentPlayers.length < 2) {
+      if (ownsTransaction) await client.query("COMMIT");
+      return [];
+    }
+
+    const evaluatedPlayers = calculateEloChanges(presentPlayers, eloData);
 
     for (const player of evaluatedPlayers) {
-      await client.query(
-        `
-          UPDATE users
-          SET elo = $1
-          WHERE id = $2
-        `,
-        [player.newElo, player.id],
-      );
+      await client.query(`UPDATE users SET elo = $1 WHERE id = $2`, [player.newElo, player.id]);
 
       await client.query(
         `
           UPDATE elo_history
-          SET 
-            old_elo = $1,
-            elo_change = $2,
-            new_elo = $3,
-            placement = $4,
-            left_early = $5
+          SET old_elo = $1, elo_change = $2, new_elo = $3, placement = $4, left_early = $5
           WHERE game_id = $6 AND user_id = $7
         `,
-        [
-          player.oldElo,
-          player.change,
-          player.newElo,
-          player.placement,
-          player.leftEarly,
-          gameId,
-          player.id,
-        ],
+        [player.oldElo, player.change, player.newElo, player.placement, player.leftEarly, gameId, player.id],
       );
     }
 
-    await client.query("COMMIT");
+    if (ownsTransaction) await client.query("COMMIT");
 
     return evaluatedPlayers;
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (ownsTransaction) await client.query("ROLLBACK");
     throw error;
   } finally {
-    client.release();
+    if (ownsTransaction) client.release();
   }
 }
 

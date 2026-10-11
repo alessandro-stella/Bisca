@@ -1,294 +1,322 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <!-- Charset and Viewport -->
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+<html lang="it">
+    <head>
+        <!-- Charset and Viewport -->
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- SEO: Prevent indexing of this private page -->
-    <meta name="robots" content="noindex, nofollow" />
+        <!-- SEO: Prevent indexing of this private page -->
+        <meta name="robots" content="noindex, nofollow" />
 
-    <!-- Icons: SVG for browser tab, PNGs for PWA -->
-    <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/media/app/icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="512x512"
-      href="/media/app/icon-512x512.png"
-    />
-    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+        <!-- Icons: SVG for browser tab, PNGs for PWA -->
+        <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="/media/app/icon-192x192.png" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="/media/app/icon-512x512.png" />
+        <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
-    <!-- PWA Manifest and Theme settings -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#302e2b" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+        <!-- PWA Manifest and Theme settings -->
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#302e2b" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent" />
 
-    <!-- Service Worker Registration -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) =>
-              console.log("Service Worker registered successfully!", reg),
-            )
-            .catch((err) =>
-              console.error("Error during Service Worker registration:", err),
-            );
-        });
-      }
-    </script>
+        <!-- Service Worker Registration -->
+        <script>
+            if ("serviceWorker" in navigator) {
+                window.addEventListener("load", () => {
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then((reg) =>
+                            console.log(
+                                "Service Worker registered successfully!",
+                                reg,
+                            ),
+                        )
+                        .catch((err) =>
+                            console.error(
+                                "Error during Service Worker registration:",
+                                err,
+                            ),
+                        );
+                });
+            }
+        </script>
 
-    <!-- Page Title -->
-    <title>BISCA | Tavoli</title>
+        <!-- Page Title -->
+        <title>BISCA | Tavoli</title>
 
-    <!-- Stylesheets and External Scripts -->
-    <link rel="stylesheet" href="styles/reset.css" />
-    <link rel="stylesheet" href="styles/shared-style.css" />
-    <link rel="stylesheet" href="styles/lobbies.css" />
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="scripts/lobbies.js" defer></script>
-    <script
-      src="https://kit.fontawesome.com/df57a58519.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
+        <!-- Stylesheets and External Scripts -->
+        <link rel="stylesheet" href="styles/reset.css" />
+        <link rel="stylesheet" href="styles/shared-style.css" />
+        <link rel="stylesheet" href="styles/lobbies.css" />
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="scripts/lobbies.js" defer></script>
+        <script
+            src="https://kit.fontawesome.com/df57a58519.js"
+            crossorigin="anonymous"></script>
+    </head>
 
-  <body>
-    <header id="navbar">
-      <a id="logo" href="index.html">
-        <img src="./media/logo.svg" alt="STELLA'S" />
-        <p>BISCA</p>
-      </a>
+    <body>
+        <header id="navbar">
+            <a id="logo" href="index.html">
+                <img src="./media/logo.svg" alt="STELLA'S" />
+                <p>BISCA</p>
+            </a>
 
-      <nav class="buttons">
-        <a
-          id="lobbies"
-          class="primaryButton iconButton"
-          href="leaderboard.html"
-        >
-          <i class="fa-solid fa-ranking-star"></i>
-        </a>
+            <nav class="buttons">
+                <a
+                    id="lobbies"
+                    class="primaryButton iconButton"
+                    href="leaderboard.html">
+                    <i class="fa-solid fa-ranking-star"></i>
+                </a>
 
-        <a class="primaryButton iconButton" href="profile.html">
-          <i class="fa-solid fa-user"></i>
-          <p>Profilo</p>
-        </a>
-      </nav>
-    </header>
+                <a class="primaryButton iconButton" href="profile.html">
+                    <i class="fa-solid fa-user"></i>
+                    <p>Profilo</p>
+                </a>
+            </nav>
+        </header>
 
-    <div id="backdrop" class=""></div>
+        <div id="backdrop" class=""></div>
 
-    <div id="joinLobbyPopup">
-      <div class="title">Tavolo Privato</div>
-
-      <div class="inputWithError">
-        <div class="inputWithIcon inputPassword">
-          <i class="icon fa-solid fa-lock"></i>
-          <input
-            id="joinPasswordInput"
-            type="password"
-            placeholder="Password del tavolo"
-          />
-          <div id="showJoinPassword" class="iconContainer">
-            <i class="icon fa-solid fa-eye-slash"></i>
-          </div>
-        </div>
-        <div id="joinPasswordError" class="inputError" hidden>
-          Password errata. Riprova.
-        </div>
-      </div>
-
-      <div id="joinLobbyButtons">
-        <button id="cancelJoinButton" class="secondaryButton">
-          <p>Annulla</p>
-        </button>
-        <button id="confirmJoinButton" class="primaryButton">
-          <p>Entra</p>
-        </button>
-      </div>
-    </div>
-
-    <main id="baseContainer">
-      <aside id="leftColumn" class="">
-        <section id="filterLobbies">
-          <h2 class="title">Cerca tavoli</h2>
-          <div id="nameFilterInputContainer" class="inputWithIcon">
-            <i class="icon fa-solid fa-search"></i>
-            <input id="searchInput" type="text" placeholder="Nome" />
-          </div>
-          <div id="ownerFilterInputContainer" class="inputWithIcon">
-            <i class="icon fa-solid fa-search"></i>
-            <input id="ownerInput" type="text" placeholder="Creatore" />
-          </div>
-
-          <div id="filterButtons">
-            <div id="onlyPublic" class="filterButton">Pubblici</div>
-            <div id="onlyPrivate" class="filterButton">Privati</div>
-            <div id="onlyAccessible" class="filterButton">Accessibili</div>
-          </div>
-
-          <button id="applyFilters" class="primaryButton"><p>Cerca</p></button>
-        </section>
-
-        <section id="createLobbyContainer">
-          <h2 class="title">Crea tavolo</h2>
-
-          <div id="createLobbyInputs">
-            <div class="inputWithError">
-              <div id="nameInputContainer" class="inputWithIcon">
-                <i class="icon fa-solid fa-pencil"></i>
-                <input id="nameInput" type="text" required placeholder="Nome" />
-              </div>
-              <div id="nameInputError" class="inputError" hidden></div>
-            </div>
+        <div id="joinLobbyPopup">
+            <div class="title">Tavolo Privato</div>
 
             <div class="inputWithError">
-              <div id="playersInputContainer" class="inputWithIcon">
-                <i class="icon fa-solid fa-user"></i>
-                <input
-                  id="playersInput"
-                  type="number"
-                  required
-                  min="2"
-                  placeholder="Giocatori"
-                />
-              </div>
-              <div id="playersInputError" class="inputError" hidden></div>
-            </div>
-
-            <div id="livesAndCards">
-              <div class="inputWithError">
-                <div id="livesInputContainer" class="inputWithIcon">
-                  <i class="icon fa-solid fa-heart"></i>
-                  <input
-                    id="livesInput"
-                    type="number"
-                    required
-                    min="1"
-                    placeholder="Vite"
-                  />
+                <div class="inputWithIcon inputPassword">
+                    <i class="icon fa-solid fa-lock"></i>
+                    <input
+                        id="joinPasswordInput"
+                        type="password"
+                        placeholder="Password del tavolo" />
+                    <div id="showJoinPassword" class="iconContainer">
+                        <i class="icon fa-solid fa-eye-slash"></i>
+                    </div>
                 </div>
-                <div id="livesInputError" class="inputError" hidden></div>
-              </div>
-
-              <div class="inputWithError">
-                <div id="cardsInputContainer" class="inputWithIcon">
-                  <i class="icon fa-solid fa-layer-group"></i>
-                  <input
-                    id="cardsInput"
-                    type="number"
-                    required
-                    min="1"
-                    placeholder="Carte"
-                  />
+                <div id="joinPasswordError" class="inputError" hidden>
+                    Password errata. Riprova.
                 </div>
-                <div id="cardsInputError" class="inputError" hidden></div>
-              </div>
             </div>
 
-            <div class="inputWithError">
-              <div class="inputWithIcon inputPassword">
-                <i class="icon fa-solid fa-lock"></i>
-                <input
-                  id="passwordInput"
-                  type="password"
-                  required
-                  placeholder="Password (vuoto se pubblica)"
-                />
-                <div id="showPassword" class="iconContainer">
-                  <i class="icon fa-solid fa-eye-slash"></i>
-                </div>
-              </div>
-
-              <div id="loginError" class="inputError" hidden>
-                Email o password non valida
-              </div>
+            <div id="joinLobbyButtons">
+                <button id="cancelJoinButton" class="secondaryButton">
+                    <p>Annulla</p>
+                </button>
+                <button id="confirmJoinButton" class="primaryButton">
+                    <p>Entra</p>
+                </button>
             </div>
-          </div>
-
-          <button id="createLobby" class="primaryButton">
-            <p>Crea</p>
-          </button>
-
-          <div id="ownerButtonsContainer" hidden>
-            <button id="startLobbyButton" class="primaryButton">
-              <p>Avvia partita</p>
-            </button>
-            <button id="updateLobbyButton" class="secondaryButton">
-              <p>Aggiorna valori</p>
-            </button>
-            <button id="deleteLobbyButton" class="dangerButton">
-              <p>Elimina tavolo</p>
-            </button>
-          </div>
-        </section>
-      </aside>
-
-      <section id="rightColumn">
-        <div id="lobbiesContainer">
-          <div class="title">
-            <h1
-              style="
-                display: inline;
-                font-size: inherit;
-                font-weight: inherit;
-                margin: 0;
-              "
-            >
-              Tavoli esistenti
-            </h1>
-
-            <div id="quitButtonDesktop" class="dangerButton" hidden>
-              Abbandona tavolo
-            </div>
-
-            <div id="filterLobbiesPopupButton" class="secondaryButton">
-              <i class="icon fa-solid fa-search"></i>
-            </div>
-          </div>
-
-          <div id="lobbiesListContainer">
-            <div id="lobbiesGrid">
-              <div class="gridHeader lobbyName">Nome</div>
-              <div class="gridHeader lobbyOwner">Creatore</div>
-              <div class="gridHeader lobbyLives">Vite</div>
-              <div class="gridHeader lobbyCards">Carte</div>
-              <div class="gridHeader lobbyPlayers">Giocatori</div>
-              <div class="gridHeader lobbyStatus">Stato</div>
-            </div>
-          </div>
         </div>
 
-        <button id="createLobbyPopupButton" class="primaryButton">
-          <p>Crea tavolo</p>
-        </button>
+        <main id="baseContainer">
+            <aside id="leftColumn" class="">
+                <section id="filterLobbies">
+                    <h2 class="title">Cerca tavoli</h2>
+                    <div id="nameFilterInputContainer" class="inputWithIcon">
+                        <i class="icon fa-solid fa-search"></i>
+                        <input
+                            id="searchInput"
+                            type="text"
+                            placeholder="Nome" />
+                    </div>
+                    <div id="ownerFilterInputContainer" class="inputWithIcon">
+                        <i class="icon fa-solid fa-search"></i>
+                        <input
+                            id="ownerInput"
+                            type="text"
+                            placeholder="Creatore" />
+                    </div>
 
-        <div id="ownerButtonsDesktop" hidden>
-          <button id="modifyLobbyButton" class="primaryButton">
-            <p>Gestisci tavolo</p>
-          </button>
-          <button id="startLobbyButtonDesktop" class="primaryButton">
-            <p>Avvia partita</p>
-          </button>
-        </div>
+                    <div id="filterButtons">
+                        <div id="onlyPublic" class="filterButton">Pubblici</div>
+                        <div id="onlyPrivate" class="filterButton">Privati</div>
+                        <div id="onlyAccessible" class="filterButton">
+                            Accessibili
+                        </div>
+                    </div>
 
-        <button id="quitButtonMobile" class="primaryButton" hidden>
-          <p>Abbandona tavolo</p>
-        </button>
-      </section>
-    </main>
-  </body>
+                    <button id="applyFilters" class="primaryButton">
+                        <p>Cerca</p>
+                    </button>
+                </section>
+
+                <section id="createLobbyContainer">
+                    <h2 class="title">Crea tavolo</h2>
+
+                    <div id="createLobbyInputs">
+                        <div class="inputWithError">
+                            <div id="nameInputContainer" class="inputWithIcon">
+                                <i class="icon fa-solid fa-pencil"></i>
+                                <input
+                                    id="nameInput"
+                                    type="text"
+                                    required
+                                    placeholder="Nome" />
+                            </div>
+                            <div
+                                id="nameInputError"
+                                class="inputError"
+                                hidden></div>
+                        </div>
+
+                        <div class="inputWithError">
+                            <div
+                                id="playersInputContainer"
+                                class="inputWithIcon">
+                                <i class="icon fa-solid fa-user"></i>
+                                <input
+                                    id="playersInput"
+                                    type="number"
+                                    required
+                                    min="2"
+                                    placeholder="Giocatori" />
+                            </div>
+                            <div
+                                id="playersInputError"
+                                class="inputError"
+                                hidden></div>
+                        </div>
+
+                        <div id="livesAndCards">
+                            <div class="inputWithError">
+                                <div
+                                    id="livesInputContainer"
+                                    class="inputWithIcon">
+                                    <i class="icon fa-solid fa-heart"></i>
+                                    <input
+                                        id="livesInput"
+                                        type="number"
+                                        required
+                                        min="1"
+                                        placeholder="Vite" />
+                                </div>
+                                <div
+                                    id="livesInputError"
+                                    class="inputError"
+                                    hidden></div>
+                            </div>
+
+                            <div class="inputWithError">
+                                <div
+                                    id="cardsInputContainer"
+                                    class="inputWithIcon">
+                                    <i class="icon fa-solid fa-layer-group"></i>
+                                    <input
+                                        id="cardsInput"
+                                        type="number"
+                                        required
+                                        min="1"
+                                        placeholder="Carte" />
+                                </div>
+                                <div
+                                    id="cardsInputError"
+                                    class="inputError"
+                                    hidden></div>
+                            </div>
+                        </div>
+
+                        <div class="inputWithError">
+                            <div class="inputWithIcon inputPassword">
+                                <i class="icon fa-solid fa-lock"></i>
+                                <input
+                                    id="passwordInput"
+                                    type="password"
+                                    required
+                                    placeholder="Password (vuoto se pubblica)" />
+                                <div id="showPassword" class="iconContainer">
+                                    <i class="icon fa-solid fa-eye-slash"></i>
+                                </div>
+                            </div>
+
+                            <div id="loginError" class="inputError" hidden>
+                                Email o password non valida
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="createLobby" class="primaryButton">
+                        <p>Crea</p>
+                    </button>
+
+                    <div id="ownerButtonsContainer" hidden>
+                        <button id="startLobbyButton" class="primaryButton">
+                            <p>Avvia partita</p>
+                        </button>
+                        <button id="updateLobbyButton" class="secondaryButton">
+                            <p>Aggiorna valori</p>
+                        </button>
+                        <button id="deleteLobbyButton" class="dangerButton">
+                            <p>Elimina tavolo</p>
+                        </button>
+                    </div>
+                </section>
+            </aside>
+
+            <section id="rightColumn">
+                <div id="lobbiesContainer">
+                    <div class="title">
+                        <h1
+                            style="
+                                display: inline;
+                                font-size: inherit;
+                                font-weight: inherit;
+                                margin: 0;
+                            ">
+                            Tavoli esistenti
+                        </h1>
+
+                        <div id="quitButtonDesktop" class="dangerButton" hidden>
+                            Abbandona tavolo
+                        </div>
+
+                        <div
+                            id="filterLobbiesPopupButton"
+                            class="secondaryButton">
+                            <i class="icon fa-solid fa-search"></i>
+                        </div>
+                    </div>
+
+                    <div id="lobbiesListContainer">
+                        <div id="lobbiesGrid">
+                            <div class="gridHeader lobbyName">Nome</div>
+                            <div class="gridHeader lobbyOwner">Creatore</div>
+                            <div class="gridHeader lobbyLives">Vite</div>
+                            <div class="gridHeader lobbyCards">Carte</div>
+                            <div class="gridHeader lobbyPlayers">Giocatori</div>
+                            <div class="gridHeader lobbyStatus">Stato</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="createLobbyPopupButton" class="primaryButton">
+                    <p>Crea tavolo</p>
+                </button>
+
+                <div id="ownerButtonsDesktop" hidden>
+                    <button id="modifyLobbyButton" class="primaryButton">
+                        <p>Gestisci tavolo</p>
+                    </button>
+                    <button id="startLobbyButtonDesktop" class="primaryButton">
+                        <p>Avvia partita</p>
+                    </button>
+                </div>
+
+                <button id="quitButtonMobile" class="primaryButton" hidden>
+                    <p>Abbandona tavolo</p>
+                </button>
+            </section>
+        </main>
+    </body>
 </html>

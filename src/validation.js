@@ -1,0 +1,1 @@
+module.exports = { USERNAME_REGEX: /^[A-Za-z0-9_.-]{3,30}$/ };

@@ -1,339 +1,359 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <!-- Charset and Viewport -->
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+<html lang="it">
+    <head>
+        <!-- Charset and Viewport -->
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- SEO: Meta Description and Open Graph -->
-    <meta
-      name="description"
-      content="Gioca a Bisca online gratis! Metti alla prova il tuo intuito, calcola le tue prese e sfida gli altri giocatori in questo emozionante gioco di carte strategico."
-    />
-    <meta property="og:site_name" content="Bisca" />
-    <meta property="og:title" content="Bisca Online | Home" />
+        <!-- SEO: Meta Description and Open Graph -->
+        <meta
+            name="description"
+            content="Gioca a Bisca online gratis! Metti alla prova il tuo intuito, calcola le tue prese e sfida gli altri giocatori in questo emozionante gioco di carte strategico." />
+        <meta property="og:site_name" content="Bisca" />
+        <meta property="og:title" content="Bisca Online | Home" />
 
-    <!-- SEO: Dynamic JSON-LD for Google Search -->
-    <script>
-      const schema = {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "Bisca",
-        url: window.location.origin + "/",
-      };
-      const script = document.createElement("script");
-      script.type = "application/ld+json";
-      script.text = JSON.stringify(schema);
-      document.head.appendChild(script);
-    </script>
+        <!-- SEO: Dynamic JSON-LD for Google Search -->
+        <script>
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "Bisca",
+                url: window.location.origin + "/",
+            };
+            const script = document.createElement("script");
+            script.type = "application/ld+json";
+            script.text = JSON.stringify(schema);
+            document.head.appendChild(script);
+        </script>
 
-    <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
-    <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/media/app/icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="512x512"
-      href="/media/app/icon-512x512.png"
-    />
-    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+        <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
+        <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="/media/app/icon-192x192.png" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="/media/app/icon-512x512.png" />
+        <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
-    <!-- PWA Manifest and Theme settings -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#302e2b" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+        <!-- PWA Manifest and Theme settings -->
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#302e2b" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent" />
 
-    <!-- Service Worker Registration -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) =>
-              console.log("Service Worker registered successfully!", reg),
-            )
-            .catch((err) =>
-              console.error("Error during Service Worker registration:", err),
-            );
-        });
-      }
-    </script>
+        <!-- Service Worker Registration -->
+        <script>
+            if ("serviceWorker" in navigator) {
+                window.addEventListener("load", () => {
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then((reg) =>
+                            console.log(
+                                "Service Worker registered successfully!",
+                                reg,
+                            ),
+                        )
+                        .catch((err) =>
+                            console.error(
+                                "Error during Service Worker registration:",
+                                err,
+                            ),
+                        );
+                });
+            }
+        </script>
 
-    <!-- Page Title -->
-    <title>BISCA | Home</title>
+        <!-- Page Title -->
+        <title>BISCA | Home</title>
 
-    <!-- Stylesheets and External Scripts -->
-    <link rel="stylesheet" href="styles/reset.css" />
-    <link rel="stylesheet" href="styles/shared-style.css" />
-    <link rel="stylesheet" href="styles/home.css" />
-    <script
-      src="https://kit.fontawesome.com/df57a58519.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <main class="homePage">
-      <header id="navbar">
-        <a id="logo" href="index.html">
-          <img src="./media/logo.svg" alt="STELLA'S" />
-          <p>BISCA</p>
-        </a>
+        <!-- Stylesheets and External Scripts -->
+        <link rel="stylesheet" href="styles/reset.css" />
+        <link rel="stylesheet" href="styles/shared-style.css" />
+        <link rel="stylesheet" href="styles/home.css" />
+        <script
+            src="https://kit.fontawesome.com/df57a58519.js"
+            crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <main class="homePage">
+            <header id="navbar">
+                <a id="logo" href="index.html">
+                    <img src="./media/logo.svg" alt="STELLA'S" />
+                    <p>BISCA</p>
+                </a>
 
-        <nav class="buttons">
-          <a id="buttonLink" class="primaryButton iconButton">
-            <p id="spinner"><i class="fa-solid fa-spinner"></i></p>
-            <p id="userIcon" hidden>
-              <i class="fa-solid fa-user"></i>
-            </p>
-            <p id="buttonText">Caricamento...</p>
-          </a>
-        </nav>
-      </header>
+                <nav class="buttons">
+                    <a id="buttonLink" class="primaryButton iconButton">
+                        <p id="spinner"><i class="fa-solid fa-spinner"></i></p>
+                        <p id="userIcon" hidden>
+                            <i class="fa-solid fa-user"></i>
+                        </p>
+                        <p id="buttonText">Caricamento...</p>
+                    </a>
+                </nav>
+            </header>
 
-      <section class="hero">
-        <h1 class="title">Benvenuto su Bisca!</h1>
-        <h2 class="subtitle">
-          Metti alla prova il tuo intuito e la tua strategia. Calcola le tue
-          prese, fai perdere vite agli avversari e resta l'ultimo giocatore al
-          tavolo. Hai la stoffa per conquistare la vetta?
-        </h2>
+            <section class="hero">
+                <h1 class="title">Benvenuto su Bisca!</h1>
+                <h2 class="subtitle">
+                    Metti alla prova il tuo intuito e la tua strategia. Calcola
+                    le tue prese, fai perdere vite agli avversari e resta
+                    l'ultimo giocatore al tavolo. Hai la stoffa per conquistare
+                    la vetta?
+                </h2>
 
-        <div class="buttons">
-          <a id="leftButton" class="primaryButton iconButton" href="">
-            <p id="ruleIcon" hidden><i class="fa-solid fa-gavel"></i></p>
-            <p id="tableIcon" hidden><i class="fa-solid fa-door-closed"></i></p>
-            <p id="loadingIcon"><i class="fa-solid fa-spinner"></i></p>
-            <p id="leftButtonText">Caricamento...</p>
-          </a>
+                <div class="buttons">
+                    <a id="leftButton" class="primaryButton iconButton" href="">
+                        <p id="ruleIcon" hidden>
+                            <i class="fa-solid fa-gavel"></i>
+                        </p>
+                        <p id="tableIcon" hidden>
+                            <i class="fa-solid fa-door-closed"></i>
+                        </p>
+                        <p id="loadingIcon">
+                            <i class="fa-solid fa-spinner"></i>
+                        </p>
+                        <p id="leftButtonText">Caricamento...</p>
+                    </a>
 
-          <a class="primaryButton iconButton" href="leaderboard.html">
-            <i class="fa-solid fa-ranking-star"></i>
-            <p>Classifica globale</p>
-          </a>
-        </div>
-      </section>
-    </main>
+                    <a class="primaryButton iconButton" href="leaderboard.html">
+                        <i class="fa-solid fa-ranking-star"></i>
+                        <p>Classifica globale</p>
+                    </a>
+                </div>
+            </section>
+        </main>
 
-    <section id="rules" class="container">
-      <article class="ruleCard">
-        <h2>Scopo del gioco</h2>
-        <p>
-          Ogni giocatore inizia con X vite. Al termine di ogni turno, almeno un
-          giocatore perderà una vita. Vince l'ultimo giocatore con almeno una
-          vita rimanente.
-        </p>
-      </article>
+        <section id="rules" class="container">
+            <article class="ruleCard">
+                <h2>Scopo del gioco</h2>
+                <p>
+                    Ogni giocatore inizia con X vite. Al termine di ogni turno,
+                    almeno un giocatore perderà una vita. Vince l'ultimo
+                    giocatore con almeno una vita rimanente.
+                </p>
+            </article>
 
-      <article class="ruleCard">
-        <h2>Il Turno di Gioco</h2>
-        <p>
-          Ad ogni turno verranno distribuite un tot di carte ad ogni giocatore.
-        </p>
-        <ul>
-          <li>
-            Cominciando dal giocatore alla destra del mazziere, in senso
-            antiorario, ognuno annuncia quante "mani" vincerà in totale.
-          </li>
-          <li>
-            Completato il giro delle dichiarazioni, ogni giocatore dovrà calare
-            una carta nello stesso ordine.
-          </li>
-          <li>
-            Alla fine del giro, il giocatore che ha tirato la carta più alta
-            vincerà la mano.
-          </li>
-          <li>
-            Chi vince la mano è il primo a tirare la carta successiva, finché
-            tutti non terminano le carte.
-          </li>
-        </ul>
-        <div class="highlightBox">
-          <strong>Calcolo del punteggio:</strong> Alla fine di un turno ogni
-          giocatore confronta le prese previste con quelle effettuate. Perde
-          vite in base alla differenza. Pronosticare 2 prese e farne 3 farà
-          perdere una vita; occorre prestare attenzione anche a quante mani
-          perdere!
-        </div>
+            <article class="ruleCard">
+                <h2>Il Turno di Gioco</h2>
+                <p>
+                    Ad ogni turno verranno distribuite un tot di carte ad ogni
+                    giocatore.
+                </p>
+                <ul>
+                    <li>
+                        Cominciando dal giocatore alla destra del mazziere, in
+                        senso antiorario, ognuno annuncia quante "mani" vincerà
+                        in totale.
+                    </li>
+                    <li>
+                        Completato il giro delle dichiarazioni, ogni giocatore
+                        dovrà calare una carta nello stesso ordine.
+                    </li>
+                    <li>
+                        Alla fine del giro, il giocatore che ha tirato la carta
+                        più alta vincerà la mano.
+                    </li>
+                    <li>
+                        Chi vince la mano è il primo a tirare la carta
+                        successiva, finché tutti non terminano le carte.
+                    </li>
+                </ul>
+                <div class="highlightBox">
+                    <strong>Calcolo del punteggio:</strong> Alla fine di un
+                    turno ogni giocatore confronta le prese previste con quelle
+                    effettuate. Perde vite in base alla differenza. Pronosticare
+                    2 prese e farne 3 farà perdere una vita; occorre prestare
+                    attenzione anche a quante mani perdere!
+                </div>
 
-        <div class="warningBox">
-          <strong>In caso di pareggio:</strong> Se tutti i giocatori rimasti in
-          vita perdono le loro vite nello stesso turno, non potendo decretare un
-          vincitore, allora il turno si considera come non valido. Si procede
-          quindi al turno successivo, mantenendo però le vite immutate.
-        </div>
-      </article>
+                <div class="warningBox">
+                    <strong>In caso di pareggio:</strong> Se tutti i giocatori
+                    rimasti in vita perdono le loro vite nello stesso turno, non
+                    potendo decretare un vincitore, allora il turno si considera
+                    come non valido. Si procede quindi al turno successivo,
+                    mantenendo però le vite immutate.
+                </div>
+            </article>
 
-      <article class="ruleCard">
-        <h2>Proseguimento e Showdown</h2>
-        <p>
-          Ad ogni nuovo turno il giocatore alla destra del precedente mazziere
-          diventa il nuovo mazziere. Si distribuisce una carta in meno rispetto
-          al turno precedente (partendo generalmente da 6) fino ad arrivare a
-          uno. Terminata la mano con una carta, se ci sono ancora giocatori in
-          vita, si ricomincia dal numero di carte iniziale.
-        </p>
-        <div class="highlightBox">
-          <strong>Showdown (Il round con una carta):</strong><br />
-          Quando si resta con una sola carta si possono vedere solo le carte
-          degli avversari, ma non la propria. Mantenendo il proprio turno,
-          ognuno decide se vincerà o perderà la mano in base alle carte
-          possedute dagli altri. Alla fine si svelano le carte: chi ha sbagliato
-          la previsione perde una vita.
-        </div>
-      </article>
+            <article class="ruleCard">
+                <h2>Proseguimento e Showdown</h2>
+                <p>
+                    Ad ogni nuovo turno il giocatore alla destra del precedente
+                    mazziere diventa il nuovo mazziere. Si distribuisce una
+                    carta in meno rispetto al turno precedente (partendo
+                    generalmente da 6) fino ad arrivare a uno. Terminata la mano
+                    con una carta, se ci sono ancora giocatori in vita, si
+                    ricomincia dal numero di carte iniziale.
+                </p>
+                <div class="highlightBox">
+                    <strong>Showdown (Il round con una carta):</strong><br />
+                    Quando si resta con una sola carta si possono vedere solo le
+                    carte degli avversari, ma non la propria. Mantenendo il
+                    proprio turno, ognuno decide se vincerà o perderà la mano in
+                    base alle carte possedute dagli altri. Alla fine si svelano
+                    le carte: chi ha sbagliato la previsione perde una vita.
+                </div>
+            </article>
 
-      <article class="ruleCard">
-        <h2>Valore delle Carte</h2>
-        <p>
-          Tra carte dello stesso seme, vince il valore numerico (10 > 9 > ... >
-          2 > Asso). Tra semi diversi, la gerarchia è la seguente:
-        </p>
-        <table id="cardValue">
-          <thead>
-            <tr>
-              <th>Seme</th>
-              <th>Potere</th>
-              <th>Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Denari</strong></td>
-              <td>Più forte</td>
-              <td>Il Re di Denari è la carta fissa più alta.</td>
-            </tr>
-            <tr>
-              <td><strong>Coppe</strong></td>
-              <td>Forte</td>
-              <td>Batte Spade e Bastoni.</td>
-            </tr>
-            <tr>
-              <td><strong>Spade</strong></td>
-              <td>Medio</td>
-              <td>Batte solo Bastoni.</td>
-            </tr>
-            <tr>
-              <td><strong>Bastoni</strong></td>
-              <td>Più debole</td>
-              <td>L'Asso di Bastoni è la carta fissa più bassa.</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="warningBox">
-          <strong>Attenzione all'Asso di Denari! (Jolly)</strong><br />
-          L'asso di denari è speciale. Quando un giocatore lo gioca, può
-          decidere al momento se considerarlo la carta <em>più alta</em> o
-          <em>più bassa</em> della mano. Scavalca qualsiasi ordinamento, potendo
-          battere il Re di Denari o farsi battere dall'Asso di Bastoni! <br />
-          Questa regola <strong>non vale durante la fase di showdown</strong> ,
-          poichè assicurerebbe la vittoria in ogni caso al fortunato che ha
-          ricevuto l'asso di denari. In questo caso la carta segue la gerarchia
-          precedente, prendendo sul re di coppe e venendo preso dal due di
-          denari.
-        </div>
-      </article>
+            <article class="ruleCard">
+                <h2>Valore delle Carte</h2>
+                <p>
+                    Tra carte dello stesso seme, vince il valore numerico (10 >
+                    9 > ... > 2 > Asso). Tra semi diversi, la gerarchia è la
+                    seguente:
+                </p>
+                <table id="cardValue">
+                    <thead>
+                        <tr>
+                            <th>Seme</th>
+                            <th>Potere</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Denari</strong></td>
+                            <td>Più forte</td>
+                            <td>Il Re di Denari è la carta fissa più alta.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coppe</strong></td>
+                            <td>Forte</td>
+                            <td>Batte Spade e Bastoni.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spade</strong></td>
+                            <td>Medio</td>
+                            <td>Batte solo Bastoni.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bastoni</strong></td>
+                            <td>Più debole</td>
+                            <td>
+                                L'Asso di Bastoni è la carta fissa più bassa.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="warningBox">
+                    <strong>Attenzione all'Asso di Denari! (Jolly)</strong
+                    ><br />
+                    L'asso di denari è speciale. Quando un giocatore lo gioca,
+                    può decidere al momento se considerarlo la carta
+                    <em>più alta</em> o <em>più bassa</em> della mano. Scavalca
+                    qualsiasi ordinamento, potendo battere il Re di Denari o
+                    farsi battere dall'Asso di Bastoni! <br />
+                    Questa regola
+                    <strong>non vale durante la fase di showdown</strong> ,
+                    poichè assicurerebbe la vittoria in ogni caso al fortunato
+                    che ha ricevuto l'asso di denari. In questo caso la carta
+                    segue la gerarchia precedente, prendendo sul re di coppe e
+                    venendo preso dal due di denari.
+                </div>
+            </article>
 
-      <article class="ruleCard">
-        <h2>Come garantire la perdita di vite</h2>
-        <p>
-          Per assicurare che qualcuno perda sempre,
-          <strong
-            >la somma delle prese dichiarate da tutti i giocatori deve essere
-            diversa dal totale delle carte in mano.</strong
-          >
-        </p>
-        <p>
-          Questo impedisce che tutti possano indovinare la propria previsione.
-          Penalizza l'ultimo giocatore a parlare, ma bilancia il suo vantaggio
-          di poter vedere le scelte degli altri.
-        </p>
+            <article class="ruleCard">
+                <h2>Come garantire la perdita di vite</h2>
+                <p>
+                    Per assicurare che qualcuno perda sempre,
+                    <strong
+                        >la somma delle prese dichiarate da tutti i giocatori
+                        deve essere diversa dal totale delle carte in
+                        mano.</strong
+                    >
+                </p>
+                <p>
+                    Questo impedisce che tutti possano indovinare la propria
+                    previsione. Penalizza l'ultimo giocatore a parlare, ma
+                    bilancia il suo vantaggio di poter vedere le scelte degli
+                    altri.
+                </p>
 
-        <div class="highlightBox">
-          <strong
-            >Esempio pratico (3 giocatori, 4 carte a testa = 4 prese
-            totali):</strong
-          >
-          <ul>
-            <li>Giocatore 1: dice "farò 2 prese"</li>
-            <li>Giocatore 2: dice "farò 1 presa"</li>
-            <li>
-              <strong>Giocatore 3:</strong> la somma provvisoria è 3. Non potrà
-              dire "1", altrimenti la somma totale farebbe 4. Dovrà per forza
-              dichiarare 0, 2, 3 o 4.
-            </li>
-          </ul>
-        </div>
-      </article>
+                <div class="highlightBox">
+                    <strong
+                        >Esempio pratico (3 giocatori, 4 carte a testa = 4 prese
+                        totali):</strong
+                    >
+                    <ul>
+                        <li>Giocatore 1: dice "farò 2 prese"</li>
+                        <li>Giocatore 2: dice "farò 1 presa"</li>
+                        <li>
+                            <strong>Giocatore 3:</strong> la somma provvisoria è
+                            3. Non potrà dire "1", altrimenti la somma totale
+                            farebbe 4. Dovrà per forza dichiarare 0, 2, 3 o 4.
+                        </li>
+                    </ul>
+                </div>
+            </article>
 
-      <article class="ruleCard">
-        <h2>Modifiche per la versione online</h2>
-        <p>
-          Alcune modifiche sono state apportate rispetto alla versione cartacea:
-        </p>
-        <ul>
-          <li>
-            La figura del mazziere non esiste, in quanto il ruolo è
-            automatizzato.
-          </li>
-          <li>
-            Il primo giocatore è il creatore del tavolo, in seguito si procede
-            come nella versione cartacea
-          </li>
-        </ul>
-        <p>Tutte le restanti regole sono rispettate fedelmente.</p>
-      </article>
-    </section>
+            <article class="ruleCard">
+                <h2>Modifiche per la versione online</h2>
+                <p>
+                    Alcune modifiche sono state apportate rispetto alla versione
+                    cartacea:
+                </p>
+                <ul>
+                    <li>
+                        La figura del mazziere non esiste, in quanto il ruolo è
+                        automatizzato.
+                    </li>
+                    <li>
+                        Il primo giocatore è il creatore del tavolo, in seguito
+                        si procede come nella versione cartacea
+                    </li>
+                </ul>
+                <p>Tutte le restanti regole sono rispettate fedelmente.</p>
+            </article>
+        </section>
 
-    <script>
-      const spinnerContainer = document.getElementById("spinner");
-      const userIconContainer = document.getElementById("userIcon");
+        <script>
+            const spinnerContainer = document.getElementById("spinner");
+            const userIconContainer = document.getElementById("userIcon");
 
-      const leftButton = document.getElementById("leftButton");
-      const leftButtonSpinner = document.getElementById("loadingIcon");
-      const leftButtonText = document.getElementById("leftButtonText");
+            const leftButton = document.getElementById("leftButton");
+            const leftButtonSpinner = document.getElementById("loadingIcon");
+            const leftButtonText = document.getElementById("leftButtonText");
 
-      const topButtonLink = document.getElementById("buttonLink");
-      const topButtonText = document.getElementById("buttonText");
+            const topButtonLink = document.getElementById("buttonLink");
+            const topButtonText = document.getElementById("buttonText");
 
-      async function checkSession() {
-        const response = await fetch("/api/session/me", {
-          method: "GET",
-          credentials: "include",
-        });
+            async function checkSession() {
+                const response = await fetch("/api/session/me", {
+                    method: "GET",
+                    credentials: "include",
+                });
 
-        if (response.ok) {
-          topButtonLink.href = "profile.html";
-          topButtonText.innerHTML = "Profilo";
+                if (response.ok) {
+                    topButtonLink.href = "profile.html";
+                    topButtonText.innerHTML = "Profilo";
 
-          document.getElementById("tableIcon").hidden = false;
-          leftButtonText.innerHTML = "Cerca un tavolo";
-          leftButton.href = "lobbies.html";
-        } else {
-          topButtonLink.href = "login.html";
-          topButtonText.innerHTML = "Accedi";
+                    document.getElementById("tableIcon").hidden = false;
+                    leftButtonText.innerHTML = "Cerca un tavolo";
+                    leftButton.href = "lobbies.html";
+                } else {
+                    topButtonLink.href = "login.html";
+                    topButtonText.innerHTML = "Accedi";
 
-          document.getElementById("ruleIcon").hidden = false;
-          leftButtonText.innerHTML = "Regole del gioco";
-          leftButton.href = "#rules";
-        }
+                    document.getElementById("ruleIcon").hidden = false;
+                    leftButtonText.innerHTML = "Regole del gioco";
+                    leftButton.href = "#rules";
+                }
 
-        userIconContainer.hidden = false;
-        spinnerContainer.hidden = true;
-        leftButtonSpinner.hidden = true;
-      }
+                userIconContainer.hidden = false;
+                spinnerContainer.hidden = true;
+                leftButtonSpinner.hidden = true;
+            }
 
-      checkSession();
-    </script>
-  </body>
+            checkSession();
+        </script>
+    </body>
 </html>

@@ -1,6 +1,6 @@
-async function getLeaderboardData() {
+async function getLeaderboardData(query = "") {
   try {
-    const response = await fetch("/api/user/leaderboard/global", {
+    const response = await fetch(`/api/user/leaderboard/global?q=${encodeURIComponent(query)}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,6 @@ function formatMemberSince(rawDate) {
   }).format(new Date(rawDate));
 }
 
-let allPlayers = [];
 let currentUserId = null;
 
 function createLeaderboard(players) {
@@ -58,8 +57,7 @@ function createLeaderboard(players) {
     loader.hidden = true;
   }, 1000);
 
-  allPlayers = players || [];
-  renderLeaderboard(allPlayers);
+  renderLeaderboard(players);
 }
 
 function renderLeaderboard(players) {
@@ -68,7 +66,14 @@ function renderLeaderboard(players) {
 
   tbody.innerHTML = "";
 
-  if (!players || players.length === 0) {
+  if (players === null) {
+    noResults.textContent = "Errore durante il caricamento della classifica.";
+    noResults.hidden = false;
+    return;
+  }
+
+  if (players.length === 0) {
+    noResults.textContent = "Nessun risultato trovato.";
     noResults.hidden = false;
     return;
   }
@@ -132,16 +137,17 @@ function renderLeaderboard(players) {
 const searchInput = /** @type {HTMLInputElement} */ (
   document.getElementById("searchInput")
 );
+
+let debounceTimeout;
+
 searchInput.addEventListener("input", () => {
-  const query = searchInput.value.trim().toLowerCase();
+  clearTimeout(debounceTimeout);
+  const query = searchInput.value.trim();
 
-  const filtered = query
-    ? allPlayers.filter((player) =>
-        player.username.toLowerCase().includes(query),
-      )
-    : allPlayers;
-
-  renderLeaderboard(filtered);
+  debounceTimeout = setTimeout(async () => {
+    const players = await getLeaderboardData(query);
+    renderLeaderboard(players || []);
+  }, 300);
 });
 
 const playerFilter = document.getElementById("playerFilter");

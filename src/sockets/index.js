@@ -32,6 +32,20 @@ const {
 
 const createConnectionHandlers = require("./connectionHandlers");
 
+const hits = new Map();
+
+function allow(socket, key, max, windowMs) {
+  const id = `${socket.id}:${key}`;
+  const now = Date.now();
+  const recent = (hits.get(id) || []).filter((t) => now - t < windowMs);
+
+  if (recent.length >= max) return false;
+
+  recent.push(now);
+  hits.set(id, recent);
+  return true;
+}
+
 function setupSockets(io) {
   io.use(authenticateSocket);
 
@@ -58,6 +72,11 @@ function setupSockets(io) {
     // =============================================
 
     socket.on("lobby:create", (name, maxPlayers, lives, cards, password) => {
+      if (!allow(socket, "lobby:create", 5, 60_000)) {
+        socket.emit("lobby:create:error", { message: "Troppe richieste, riprova tra poco" });
+        return;
+      }
+
       const validation = validators.validateLobbyParams(
         name,
         maxPlayers,
@@ -100,6 +119,8 @@ function setupSockets(io) {
     });
 
     socket.on("lobby:join", (lobbyId, password) => {
+      if (!allow(socket, "lobby:join", 10, 60_000)) return;
+
       const validation = validators.validateLobbyId(lobbyId);
       if (!validation.valid) {
         socket.emit("error", { message: validation.message });
@@ -191,6 +212,8 @@ function setupSockets(io) {
     });
 
     socket.on("game:chat-message", (text) => {
+      if (!allow(socket, "chat", 10, 10_000)) return;
+
       if (runMiddleware(requireActiveGame, socket)) {
         handleChatMessage(socket, text);
       }
@@ -201,6 +224,10 @@ function setupSockets(io) {
     // =============================================
 
     socket.on("disconnect", () => {
+      for (const key of hits.keys()) {
+        if (key.startsWith(`${socket.id}:`)) hits.delete(key);
+      }
+
       console.log(
         `User ${socket.user.username} disconnected from device ${socket.deviceId}`,
       );

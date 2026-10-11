@@ -1,206 +1,216 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <!-- Charset and Viewport -->
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+<html lang="it">
+    <head>
+        <!-- Charset and Viewport -->
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- SEO: Meta Description and Open Graph -->
-    <meta
-      name="description"
-      content="Crea un nuovo account su Bisca! Registrati gratuitamente per giocare a carte online, salvare le tue statistiche e competere contro giocatori reali."
-    />
-    <meta property="og:site_name" content="Bisca" />
-    <meta property="og:title" content="Bisca Online | Registrazione" />
+        <!-- SEO: Meta Description and Open Graph -->
+        <meta
+            name="description"
+            content="Crea un nuovo account su Bisca! Registrati gratuitamente per giocare a carte online, salvare le tue statistiche e competere contro giocatori reali." />
+        <meta property="og:site_name" content="Bisca" />
+        <meta property="og:title" content="Bisca Online | Registrazione" />
 
-    <!-- SEO: Dynamic JSON-LD for Google Search -->
-    <script>
-      const schema = {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "Bisca",
-        url: window.location.origin + "/",
-      };
-      const script = document.createElement("script");
-      script.type = "application/ld+json";
-      script.text = JSON.stringify(schema);
-      document.head.appendChild(script);
-    </script>
+        <!-- SEO: Dynamic JSON-LD for Google Search -->
+        <script>
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "Bisca",
+                url: window.location.origin + "/",
+            };
+            const script = document.createElement("script");
+            script.type = "application/ld+json";
+            script.text = JSON.stringify(schema);
+            document.head.appendChild(script);
+        </script>
 
-    <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
-    <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/media/app/icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="512x512"
-      href="/media/app/icon-512x512.png"
-    />
-    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+        <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
+        <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="/media/app/icon-192x192.png" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="/media/app/icon-512x512.png" />
+        <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
-    <!-- PWA Manifest and Theme settings -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#302e2b" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+        <!-- PWA Manifest and Theme settings -->
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#302e2b" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent" />
 
-    <!-- Service Worker Registration -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) =>
-              console.log("Service Worker registered successfully!", reg),
-            )
-            .catch((err) =>
-              console.error("Error during Service Worker registration:", err),
-            );
-        });
-      }
-    </script>
+        <!-- Service Worker Registration -->
+        <script>
+            if ("serviceWorker" in navigator) {
+                window.addEventListener("load", () => {
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then((reg) =>
+                            console.log(
+                                "Service Worker registered successfully!",
+                                reg,
+                            ),
+                        )
+                        .catch((err) =>
+                            console.error(
+                                "Error during Service Worker registration:",
+                                err,
+                            ),
+                        );
+                });
+            }
+        </script>
 
-    <!-- Page Title -->
-    <title>BISCA | Registrazione</title>
+        <!-- Page Title -->
+        <title>BISCA | Registrazione</title>
 
-    <!-- Stylesheets and External Scripts -->
-    <link rel="stylesheet" href="styles/reset.css" />
-    <link rel="stylesheet" href="styles/shared-style.css" />
-    <link rel="stylesheet" href="styles/login-register.css" />
-    <script
-      src="https://kit.fontawesome.com/df57a58519.js"
-      crossorigin="anonymous"
-    ></script>
+        <!-- Stylesheets and External Scripts -->
+        <link rel="stylesheet" href="styles/reset.css" />
+        <link rel="stylesheet" href="styles/shared-style.css" />
+        <link rel="stylesheet" href="styles/login-register.css" />
+        <script
+            src="https://kit.fontawesome.com/df57a58519.js"
+            crossorigin="anonymous"></script>
 
-    <!-- Session Management -->
-    <script>
-      async function checkSession() {
-        const response = await fetch("/api/session/me", {
-          method: "GET",
-          credentials: "include",
-        });
-        if (response.ok) {
-          window.location.replace("/lobbies.html");
-        } else {
-          console.log("No session or expired");
-        }
-      }
-      checkSession();
-    </script>
-  </head>
+        <!-- Session Management -->
+        <script>
+            async function checkSession() {
+                const response = await fetch("/api/session/me", {
+                    method: "GET",
+                    credentials: "include",
+                });
+                if (response.ok) {
+                    window.location.replace("/lobbies.html");
+                } else {
+                    console.log("No session or expired");
+                }
+            }
+            checkSession();
+        </script>
+    </head>
 
-  <body>
-    <main id="baseContainer">
-      <a id="registerTitle" href="index.html">
-        <img src="./media/logo.svg" alt="STELLA'S" />
-        <p>BISCA</p>
-      </a>
+    <body>
+        <main id="baseContainer">
+            <a id="registerTitle" href="index.html">
+                <img src="./media/logo.svg" alt="STELLA'S" />
+                <p>BISCA</p>
+            </a>
 
-      <section id="registerContainer">
-        <h1 class="title">Crea il tuo account</h1>
+            <section id="registerContainer">
+                <h1 class="title">Crea il tuo account</h1>
 
-        <form id="registrationForm">
-          <div class="inputWithError">
-            <div id="usernameInputContainer" class="inputWithIcon">
-              <i class="icon fa-solid fa-user"></i>
-              <input
-                id="usernameInput"
-                type="text"
-                minlength="3"
-                maxlength="30"
-                placeholder="Username"
-                required
-                autocomplete="username"
-              />
-            </div>
-            <div id="usernameInputError" class="inputError" hidden></div>
-          </div>
+                <form id="registrationForm">
+                    <div class="inputWithError">
+                        <div id="usernameInputContainer" class="inputWithIcon">
+                            <i class="icon fa-solid fa-user"></i>
+                            <input
+                                id="usernameInput"
+                                type="text"
+                                minlength="3"
+                                maxlength="30"
+                                placeholder="Username"
+                                required
+                                autocomplete="username" />
+                        </div>
+                        <div
+                            id="usernameInputError"
+                            class="inputError"
+                            hidden></div>
+                    </div>
 
-          <div class="inputWithError">
-            <div id="emailInputContainer" class="inputWithIcon">
-              <i class="icon fa-solid fa-envelope"></i>
-              <input
-                id="emailInput"
-                type="email"
-                placeholder="Email"
-                required
-                autocomplete="email"
-              />
-            </div>
-            <div id="emailInputError" class="inputError" hidden></div>
-          </div>
+                    <div class="inputWithError">
+                        <div id="emailInputContainer" class="inputWithIcon">
+                            <i class="icon fa-solid fa-envelope"></i>
+                            <input
+                                id="emailInput"
+                                type="email"
+                                placeholder="Email"
+                                required
+                                autocomplete="email" />
+                        </div>
+                        <div
+                            id="emailInputError"
+                            class="inputError"
+                            hidden></div>
+                    </div>
 
-          <div class="inputWithError">
-            <div
-              id="passwordInputContainer"
-              class="inputWithIcon inputPassword"
+                    <div class="inputWithError">
+                        <div
+                            id="passwordInputContainer"
+                            class="inputWithIcon inputPassword">
+                            <i class="icon fa-solid fa-lock"></i>
+                            <input
+                                id="passwordInput"
+                                type="password"
+                                placeholder="Password"
+                                required
+                                autocomplete="new-password" />
+                            <div id="showPassword" class="iconContainer">
+                                <i class="icon fa-solid fa-eye-slash"></i>
+                            </div>
+                        </div>
+                        <div
+                            id="passwordInputError"
+                            class="inputError"
+                            hidden></div>
+                    </div>
+
+                    <div class="inputWithError">
+                        <div
+                            id="confirmedPasswordInputContainer"
+                            class="inputWithIcon inputPassword">
+                            <i class="icon fa-solid fa-lock"></i>
+                            <input
+                                id="confirmedPasswordInput"
+                                type="password"
+                                placeholder="Conferma password"
+                                required
+                                autocomplete="new-password" />
+                            <div id="showPasswordConfirm" class="iconContainer">
+                                <i class="icon fa-solid fa-eye-slash"></i>
+                            </div>
+                        </div>
+                        <div
+                            id="confirmedPasswordInputError"
+                            class="inputError"
+                            hidden></div>
+                    </div>
+
+                    <button
+                        id="registerButton"
+                        class="primaryButton"
+                        type="submit">
+                        Registrati
+                    </button>
+
+                    <div id="registerSuccess" hidden></div>
+
+                    <div id="missingData" class="inputError" hidden>
+                        Compilare l'intero questionario
+                    </div>
+
+                    <div
+                        id="registerGeneralError"
+                        class="inputError"
+                        hidden></div>
+                </form>
+            </section>
+
+            <a id="loginLink" href="login.html"
+                >Hai già un account? Accedi ora!</a
             >
-              <i class="icon fa-solid fa-lock"></i>
-              <input
-                id="passwordInput"
-                type="password"
-                placeholder="Password"
-                required
-                autocomplete="new-password"
-              />
-              <div id="showPassword" class="iconContainer">
-                <i class="icon fa-solid fa-eye-slash"></i>
-              </div>
-            </div>
-            <div id="passwordInputError" class="inputError" hidden></div>
-          </div>
+        </main>
 
-          <div class="inputWithError">
-            <div
-              id="confirmedPasswordInputContainer"
-              class="inputWithIcon inputPassword"
-            >
-              <i class="icon fa-solid fa-lock"></i>
-              <input
-                id="confirmedPasswordInput"
-                type="password"
-                placeholder="Conferma password"
-                required
-                autocomplete="new-password"
-              />
-              <div id="showPasswordConfirm" class="iconContainer">
-                <i class="icon fa-solid fa-eye-slash"></i>
-              </div>
-            </div>
-            <div
-              id="confirmedPasswordInputError"
-              class="inputError"
-              hidden
-            ></div>
-          </div>
-
-          <button id="registerButton" class="primaryButton" type="submit">
-            Registrati
-          </button>
-
-          <div id="registerSuccess" hidden></div>
-
-          <div id="missingData" class="inputError" hidden>
-            Compilare l'intero questionario
-          </div>
-
-          <div id="registerGeneralError" class="inputError" hidden></div>
-        </form>
-      </section>
-
-      <a id="loginLink" href="login.html">Hai già un account? Accedi ora!</a>
-    </main>
-
-    <script src="scripts/register.js"></script>
-  </body>
+        <script src="scripts/register.js"></script>
+    </body>
 </html>

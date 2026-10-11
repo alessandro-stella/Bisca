@@ -1,143 +1,153 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <!-- Charset and Viewport -->
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+<html lang="it">
+    <head>
+        <!-- Charset and Viewport -->
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- SEO: Meta Description and Open Graph -->
-    <meta
-      name="description"
-      content="Scopri la classifica globale dei migliori giocatori di Bisca online. Scala le posizioni vincendo le partite, aumenta il tuo ELO e diventa il campione assoluto."
-    />
-    <meta property="og:site_name" content="Bisca" />
-    <meta property="og:title" content="Bisca Online | Classifica" />
+        <!-- SEO: Meta Description and Open Graph -->
+        <meta
+            name="description"
+            content="Scopri la classifica globale dei migliori giocatori di Bisca online. Scala le posizioni vincendo le partite, aumenta il tuo ELO e diventa il campione assoluto." />
+        <meta property="og:site_name" content="Bisca" />
+        <meta property="og:title" content="Bisca Online | Classifica" />
 
-    <!-- SEO: Dynamic JSON-LD for Google Search -->
-    <script>
-      const schema = {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "Bisca",
-        url: window.location.origin + "/",
-      };
-      const script = document.createElement("script");
-      script.type = "application/ld+json";
-      script.text = JSON.stringify(schema);
-      document.head.appendChild(script);
-    </script>
+        <!-- SEO: Dynamic JSON-LD for Google Search -->
+        <script>
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "Bisca",
+                url: window.location.origin + "/",
+            };
+            const script = document.createElement("script");
+            script.type = "application/ld+json";
+            script.text = JSON.stringify(schema);
+            document.head.appendChild(script);
+        </script>
 
-    <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
-    <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/media/app/icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="512x512"
-      href="/media/app/icon-512x512.png"
-    />
-    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+        <!-- Icons: SVG for browser tab, PNGs for Google Search and PWA -->
+        <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="/media/app/icon-192x192.png" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="/media/app/icon-512x512.png" />
+        <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
-    <!-- PWA Manifest and Theme settings -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#302e2b" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+        <!-- PWA Manifest and Theme settings -->
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#302e2b" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent" />
 
-    <!-- Service Worker Registration -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) =>
-              console.log("Service Worker registered successfully!", reg),
-            )
-            .catch((err) =>
-              console.error("Error during Service Worker registration:", err),
-            );
-        });
-      }
-    </script>
+        <!-- Service Worker Registration -->
+        <script>
+            if ("serviceWorker" in navigator) {
+                window.addEventListener("load", () => {
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then((reg) =>
+                            console.log(
+                                "Service Worker registered successfully!",
+                                reg,
+                            ),
+                        )
+                        .catch((err) =>
+                            console.error(
+                                "Error during Service Worker registration:",
+                                err,
+                            ),
+                        );
+                });
+            }
+        </script>
 
-    <!-- Page Title -->
-    <title>BISCA | Classifica</title>
+        <!-- Page Title -->
+        <title>BISCA | Classifica</title>
 
-    <!-- Stylesheets and External Scripts -->
-    <link rel="stylesheet" href="styles/reset.css" />
-    <link rel="stylesheet" href="styles/shared-style.css" />
-    <link rel="stylesheet" href="./styles/leaderboard.css" />
-    <script src="./scripts/leaderboard.js" defer></script>
-    <script
-      src="https://kit.fontawesome.com/df57a58519.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <header id="navbar">
-      <a id="logo" href="index.html">
-        <img src="./media/logo.svg" alt="STELLA'S" />
-        <p>BISCA</p>
-      </a>
+        <!-- Stylesheets and External Scripts -->
+        <link rel="stylesheet" href="styles/reset.css" />
+        <link rel="stylesheet" href="styles/shared-style.css" />
+        <link rel="stylesheet" href="./styles/leaderboard.css" />
+        <script src="./scripts/leaderboard.js" defer></script>
+        <script
+            src="https://kit.fontawesome.com/df57a58519.js"
+            crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <header id="navbar">
+            <a id="logo" href="index.html">
+                <img src="./media/logo.svg" alt="STELLA'S" />
+                <p>BISCA</p>
+            </a>
 
-      <nav class="buttons">
-        <a id="lobbies" class="primaryButton iconButton" href="lobbies.html">
-          <i class="fa-solid fa-door-closed"></i>
-        </a>
+            <nav class="buttons">
+                <a
+                    id="lobbies"
+                    class="primaryButton iconButton"
+                    href="lobbies.html">
+                    <i class="fa-solid fa-door-closed"></i>
+                </a>
 
-        <a id="lobbies" class="primaryButton iconButton" href="profile.html">
-          <i class="fa-solid fa-user"></i>
-        </a>
-      </nav>
-    </header>
-
-    <main id="baseContainer">
-      <div id="loadingCover">
-        <i class="fa-solid fa-spinner"></i>
-      </div>
-
-      <section id="leaderboardContainer">
-        <header class="header">
-          <h1 class="title">Classifica globale</h1>
-          <h2 class="subtitle">
-            Di seguito è mostrata l'attuale classifica dei giocatori di BISCA,
-            ordinati per ELO, numero di partite giocate ed età dell'account.
-            Clicca su un giocatore per vedere più informazioni!
-          </h2>
-
-          <div id="playerFilter" class="inputWithIcon">
-            <i class="icon fa-solid fa-search"></i>
-            <input id="searchInput" type="text" placeholder="Cerca giocatore" />
-          </div>
+                <a
+                    id="lobbies"
+                    class="primaryButton iconButton"
+                    href="profile.html">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            </nav>
         </header>
 
-        <div id="leaderboardDisplay">
-          <table id="leaderboardTable">
-            <thead>
-              <tr>
-                <th>Pos.</th>
-                <th>Giocatore</th>
-                <th>ELO</th>
-                <th>Partite</th>
-                <th>Membro da</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboardBody"></tbody>
-          </table>
+        <main id="baseContainer">
+            <div id="loadingCover">
+                <i class="fa-solid fa-spinner"></i>
+            </div>
 
-          <div id="noResults" hidden>Nessun giocatore trovato</div>
-        </div>
-      </section>
-    </main>
-  </body>
+            <section id="leaderboardContainer">
+                <header class="header">
+                    <h1 class="title">Classifica globale</h1>
+                    <h2 class="subtitle">
+                        Di seguito è mostrata l'attuale classifica dei giocatori
+                        di BISCA, ordinati per ELO, numero di partite giocate ed
+                        età dell'account. Clicca su un giocatore per vedere più
+                        informazioni!
+                    </h2>
+
+                    <div id="playerFilter" class="inputWithIcon">
+                        <i class="icon fa-solid fa-search"></i>
+                        <input
+                            id="searchInput"
+                            type="text"
+                            placeholder="Cerca giocatore" />
+                    </div>
+                </header>
+
+                <div id="leaderboardDisplay">
+                    <table id="leaderboardTable">
+                        <thead>
+                            <tr>
+                                <th>Pos.</th>
+                                <th>Giocatore</th>
+                                <th>ELO</th>
+                                <th>Partite</th>
+                                <th>Membro da</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody"></tbody>
+                    </table>
+
+                    <div id="noResults" hidden>Nessun giocatore trovato</div>
+                </div>
+            </section>
+        </main>
+    </body>
 </html>

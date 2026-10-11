@@ -13,6 +13,9 @@ const authRouter = require("./routes/authRouter");
 const userRouter = require("./routes/userRouter");
 const { router: sessionRouter } = require("./routes/sessionRouter");
 const { transporter } = require("./email/mailService");
+const { cleanupExpiredUnverifiedAccounts } = require("./email/verificationUtils");
+const { rateLimit } = require("express-rate-limit");
+const profanityFilter = require("./profanityFilter");
 
 const app = express();
 const server = http.createServer(app);
@@ -29,6 +32,7 @@ const io = new Server(server, {
   transports: ["websocket", "polling"],
   cors: corsOptions,
 });
+app.set("io", io);
 
 const PORT = process.env.PORT || 8000;
 
@@ -37,6 +41,35 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 const SERVER_START_TIME = Date.now().toString();
+
+app.set("trust proxy", 1);
+
+const generalAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Troppe richieste, riprova più tardi" },
+});
+
+const strictAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Troppi tentativi, riprova più tardi" },
+});
+
+app.use("/api/auth", generalAuthLimiter);
+app.use(
+  [
+    "/api/auth/login",
+    "/api/auth/register",
+    "/api/auth/forgot-password",
+    "/api/auth/confirm-account-deletion",
+  ],
+  strictAuthLimiter,
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
@@ -107,19 +140,39 @@ app.use((_, res) => {
 
 app.use((err, _, res, __) => {
   console.error("ERROR:", err);
-  res.status(500).send(err.message);
+  res.status(500).json({ error: "Internal server error" });
 });
 
 async function startApp() {
   try {
-    const profanityFilter = require("./profanityFilter");
     profanityFilter.setThreshold(85);
+
+    if (!profanityFilter.isLoaded()) {
+      throw new Error("profanity-list.json missing or empty");
+    }
 
     await transporter.verify();
     console.log("Mail service ready");
 
     const result = await db.query("SELECT NOW()");
     console.log("Database connected:", result.rows[0]);
+
+    await db.query(`
+      DELETE FROM games
+      WHERE id IN (
+        SELECT game_id FROM elo_history
+        GROUP BY game_id
+        HAVING bool_or(new_elo IS NULL)
+      )
+    `);
+
+    setInterval(() => {
+      db.query("DELETE FROM sessions WHERE expires_at < NOW()").catch((error) =>
+        console.error("Session cleanup error:", error),
+      );
+    }, 60 * 60 * 1000);
+
+    setInterval(cleanupExpiredUnverifiedAccounts, 60 * 1000);
 
     server.listen(PORT, () => {
       console.log(`Server started on port ${PORT}`);

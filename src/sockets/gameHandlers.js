@@ -14,6 +14,7 @@ const {
   playCard,
   resolveShowdown,
   saveGameData,
+  deleteGame,
 } = require("../game/gameManager");
 
 const db = require("../db");
@@ -134,10 +135,13 @@ async function startGame(socket, io) {
   } catch (error) {
     await client.query("ROLLBACK");
 
-    console.error(
-      "START GAME: Error saving game players to DB, rolled back",
-      error,
-    );
+    console.error("START GAME: Error saving game players to DB, rolled back", error);
+
+    deleteGame(lobby.id);
+    setLobbyStarted(lobby.id, false);
+    socket.emit("game:start:error", {
+      message: "Errore durante l'avvio della partita, riprova",
+    });
 
     return;
   } finally {
@@ -215,6 +219,7 @@ async function handlePlaceBid(io, socket, bid) {
   const accepted = placeBid(game, playerId, bid);
 
   if (!accepted) {
+    socket.emit("game:state", getPlayerGameState(game, playerId));
     return;
   }
 

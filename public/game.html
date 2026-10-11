@@ -1,167 +1,171 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <!-- Charset and Viewport -->
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+<html lang="it">
+    <head>
+        <!-- Charset and Viewport -->
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- SEO: Prevent indexing of this private page -->
-    <meta name="robots" content="noindex, nofollow" />
+        <!-- SEO: Prevent indexing of this private page -->
+        <meta name="robots" content="noindex, nofollow" />
 
-    <!-- Icons: SVG for browser tab, PNGs for PWA -->
-    <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/media/app/icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="512x512"
-      href="/media/app/icon-512x512.png"
-    />
-    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+        <!-- Icons: SVG for browser tab, PNGs for PWA -->
+        <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="/media/app/icon-192x192.png" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="/media/app/icon-512x512.png" />
+        <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
-    <!-- PWA Manifest and Custom Theme Color for Game -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#262421" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+        <!-- PWA Manifest and Custom Theme Color for Game -->
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#262421" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent" />
 
-    <!-- Service Worker Registration -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("/sw.js")
-            .then((reg) =>
-              console.log("Service Worker registered successfully!", reg),
-            )
-            .catch((err) =>
-              console.error("Error during Service Worker registration:", err),
-            );
-        });
-      }
-    </script>
+        <!-- Service Worker Registration -->
+        <script>
+            if ("serviceWorker" in navigator) {
+                window.addEventListener("load", () => {
+                    navigator.serviceWorker
+                        .register("/sw.js")
+                        .then((reg) =>
+                            console.log(
+                                "Service Worker registered successfully!",
+                                reg,
+                            ),
+                        )
+                        .catch((err) =>
+                            console.error(
+                                "Error during Service Worker registration:",
+                                err,
+                            ),
+                        );
+                });
+            }
+        </script>
 
-    <!-- Page Title -->
-    <title>BISCA | Partita</title>
+        <!-- Page Title -->
+        <title>BISCA | Partita</title>
 
-    <!-- Stylesheets and External Scripts -->
-    <link rel="stylesheet" href="styles/reset.css" />
-    <link rel="stylesheet" href="styles/shared-style.css" />
-    <link rel="stylesheet" href="styles/game.css" />
-    <script src="/socket.io/socket.io.js" defer></script>
-    <script src="/scripts/game.js" defer></script>
-    <script
-      src="https://kit.fontawesome.com/df57a58519.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
+        <!-- Stylesheets and External Scripts -->
+        <link rel="stylesheet" href="styles/reset.css" />
+        <link rel="stylesheet" href="styles/shared-style.css" />
+        <link rel="stylesheet" href="styles/game.css" />
+        <script src="/socket.io/socket.io.js" defer></script>
+        <script src="/scripts/game.js" defer></script>
+        <script
+            src="https://kit.fontawesome.com/df57a58519.js"
+            crossorigin="anonymous"></script>
+    </head>
 
-  <body>
-    <main id="baseContainer">
-      <div id="loadingCover">
-        <i class="fa-solid fa-spinner"></i>
-      </div>
-
-      <div id="endGameBackdrop" hidden>
-        <div id="endGamePopup">
-          <div class="title"></div>
-
-          <div id="scoreboard"></div>
-
-          <div id="buttons">
-            <a href="lobbies.html">
-              <button id="backToLobbies" class="primaryButton">
-                <p>Torna ai tavoli</p>
-              </button>
-            </a>
-
-            <a href="profile.html">
-              <button id="profile" class="primaryButton">
-                <p>Il tuo profilo</p>
-              </button>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div id="tableContainer">
-        <header id="topButtons">
-          <button id="openChat" class="primaryButton">
-            <i class="fa-solid fa-comments"></i>
-          </button>
-
-          <div id="logo" href="index.html">
-            <img src="./media/logo.svg" alt="STELLA'S" />
-            <p>BISCA</p>
-          </div>
-
-          <a href="lobbies.html">
-            <button id="quitLobby" class="dangerButton">
-              <i class="fa-solid fa-arrow-right-from-bracket"></i></button
-          ></a>
-        </header>
-
-        <div id="table-rim">
-          <div id="centerPopup" class="hidden"></div>
-          <div id="table"></div>
-        </div>
-      </div>
-
-      <div id="mySeat">
-        <div id="middleContainer">
-          <div id="myStats">
-            <div id="myUsername"></div>
-            <div id="myLives">
-              <i class="fa-solid fa-heart"></i>
-              <div class="value"></div>
+    <body>
+        <main id="baseContainer">
+            <div id="loadingCover">
+                <i class="fa-solid fa-spinner"></i>
             </div>
-            <div id="myBids">
-              <div class="bidsIcon"></div>
-              <div class="value"></div>
+
+            <div id="endGameBackdrop" hidden>
+                <div id="endGamePopup">
+                    <div class="title"></div>
+
+                    <div id="scoreboard"></div>
+
+                    <div id="buttons">
+                        <a href="lobbies.html">
+                            <button id="backToLobbies" class="primaryButton">
+                                <p>Torna ai tavoli</p>
+                            </button>
+                        </a>
+
+                        <a href="profile.html">
+                            <button id="profile" class="primaryButton">
+                                <p>Il tuo profilo</p>
+                            </button>
+                        </a>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <div id="bottom">
-            <button id="bottomButton" class="secondaryButton disabled" hidden>
-              <p>Attendi il tuo turno</p>
-            </button>
-          </div>
-        </div>
+            <div id="tableContainer">
+                <header id="topButtons">
+                    <button id="openChat" class="primaryButton">
+                        <i class="fa-solid fa-comments"></i>
+                    </button>
 
-        <div id="myCardsContainer">
-          <div id="myCards"></div>
-        </div>
+                    <div id="logo" href="index.html">
+                        <img src="./media/logo.svg" alt="STELLA'S" />
+                        <p>BISCA</p>
+                    </div>
 
-        <aside id="chatContainer">
-          <button id="expandChat" class="secondaryButton">
-            <i class="fa-solid fa-angle-up"></i>
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+                    <a href="lobbies.html">
+                        <button id="quitLobby" class="dangerButton">
+                            <i
+                                class="fa-solid fa-arrow-right-from-bracket"></i></button
+                    ></a>
+                </header>
 
-          <div id="oldMessages"></div>
+                <div id="table-rim">
+                    <div id="centerPopup" class="hidden"></div>
+                    <div id="table"></div>
+                </div>
+            </div>
 
-          <div id="newMessageContainer">
-            <input
-              type="text"
-              id="messageContent"
-              placeholder="Scrivi qualcosa..."
-            />
-            <button id="sendMessage" class="primaryButton">
-              <i class="fa-solid fa-paper-plane"></i>
-            </button>
-          </div>
-        </aside>
-      </div>
-    </main>
-  </body>
+            <div id="mySeat">
+                <div id="middleContainer">
+                    <div id="myStats">
+                        <div id="myUsername"></div>
+                        <div id="myLives">
+                            <i class="fa-solid fa-heart"></i>
+                            <div class="value"></div>
+                        </div>
+                        <div id="myBids">
+                            <div class="bidsIcon"></div>
+                            <div class="value"></div>
+                        </div>
+                    </div>
+
+                    <div id="bottom">
+                        <button
+                            id="bottomButton"
+                            class="secondaryButton disabled"
+                            hidden>
+                            <p>Attendi il tuo turno</p>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="myCardsContainer">
+                    <div id="myCards"></div>
+                </div>
+
+                <aside id="chatContainer">
+                    <button id="expandChat" class="secondaryButton">
+                        <i class="fa-solid fa-angle-up"></i>
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                    <div id="oldMessages"></div>
+
+                    <div id="newMessageContainer">
+                        <input
+                            type="text"
+                            id="messageContent"
+                            placeholder="Scrivi qualcosa..." />
+                        <button id="sendMessage" class="primaryButton">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </body>
 </html>

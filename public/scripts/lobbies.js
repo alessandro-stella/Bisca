@@ -121,7 +121,7 @@ function setupSocket() {
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
-    reconnectionAttempts: 5,
+    reconnectionAttempts: Infinity,
     transports: ["websocket", "polling"],
   });
 
@@ -181,7 +181,11 @@ function setupSocket() {
   });
 
   socket.on("lobby:create:error", (data) => {
-    displayErrors(data.errors);
+    if (data.errors) {
+      displayErrors(data.errors);
+    } else {
+      window.alert(data.message);
+    }
   });
 
   socket.on("lobbies:update", (lobbies) => {
@@ -204,7 +208,11 @@ function setupSocket() {
   });
 
   socket.on("lobby:update:error", (data) => {
-    displayErrors(data.errors);
+    if (data.errors) {
+      displayErrors(data.errors);
+    } else {
+      window.alert(data.message);
+    }
   });
 
   socket.on("lobby:delete:error", (data) => {

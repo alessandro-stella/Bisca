@@ -87,8 +87,6 @@ function formatDate(rawDate) {
 }
 
 function displayProfileInfo(userInfo, isOwnProfile) {
-  console.log(userInfo);
-
   const usernameInfo = document.getElementById("usernameInfo");
   const emailInfo = document.getElementById("emailInfo");
   const placement = document.getElementById("playerPlacement");
@@ -209,6 +207,44 @@ async function fetchGamePlayers(gameId) {
   }
 }
 
+function buildRow(label, player) {
+  const row = document.createElement("div");
+  row.classList.add("row");
+  if (!player) row.classList.add("playerNotFound");
+
+  const placementContainer = document.createElement("div");
+  placementContainer.classList.add("placement");
+  placementContainer.textContent = label;
+
+  const playerContainer = document.createElement("div");
+  playerContainer.classList.add("player");
+  playerContainer.textContent = player ? player.username : "User not found";
+
+  const eloContainer = document.createElement("div");
+  eloContainer.classList.add("eloChange");
+
+  const newElo = document.createElement("div");
+  newElo.classList.add("oldElo");
+  newElo.textContent = player ? player.new_elo : "/";
+
+  const eloDelta = document.createElement("div");
+  eloDelta.classList.add("eloDelta");
+
+  if (player) {
+    eloDelta.textContent = (player.elo_change >= 0 ? "+" : "") + player.elo_change;
+    eloDelta.classList.add(player.elo_change >= 0 ? "gain" : "loss");
+    row.addEventListener("click", () => {
+      window.location.href = `/profile.html?id=${player.id}`;
+    });
+  } else {
+    eloDelta.textContent = "/";
+  }
+
+  eloContainer.append(newElo, eloDelta);
+  row.append(placementContainer, playerContainer, eloContainer);
+  return row;
+}
+
 function renderPlayers(players, totalPlayers) {
   opponentsContainer.hidden = false;
   opponentsLoader.classList.add("hidden");
@@ -218,64 +254,14 @@ function renderPlayers(players, totalPlayers) {
     opponentsLoader.classList.remove("hidden");
   }, 300);
 
-  let allPlayersStats = [];
+  const sorted = [...players].sort((a, b) => a.placement - b.placement);
 
-  for (let i = 0; i < totalPlayers; i++) {
-    const row = document.createElement("div");
-    console.log(row);
-    row.classList.add("row", "playerNotFound");
-
-    const placementContainer = document.createElement("div");
-    placementContainer.classList.add("placement");
-    placementContainer.textContent = `${i + 1}°`;
-
-    const playerContainer = document.createElement("div");
-    playerContainer.classList.add("player");
-    playerContainer.textContent = "User not found";
-
-    const eloContainer = document.createElement("div");
-    eloContainer.classList.add("eloChange");
-
-    const oldElo = document.createElement("div");
-    oldElo.classList.add("oldElo");
-    oldElo.innerHTML = "/";
-
-    const eloDelta = document.createElement("div");
-    eloDelta.classList.add("eloDelta");
-    eloDelta.innerHTML = "/";
-
-    eloContainer.appendChild(oldElo);
-    eloContainer.appendChild(eloDelta);
-
-    row.appendChild(placementContainer);
-    row.appendChild(playerContainer);
-    row.appendChild(eloContainer);
-
-    allPlayersStats.push(row);
+  for (const player of sorted) {
+    opponentsContainer.appendChild(buildRow(`${player.placement}°`, player));
   }
 
-  for (const player of players) {
-    const row = allPlayersStats[player.placement - 1];
-    row.classList.remove("playerNotFound");
-
-    const playerContainer = row.querySelector(".player");
-    playerContainer.textContent = player.username;
-
-    const oldElo = row.querySelector(".oldElo");
-    oldElo.innerHTML = player.new_elo;
-
-    const eloDelta = row.querySelector(".eloDelta");
-    eloDelta.innerHTML =
-      (player.elo_change >= 0 ? "+" : "") + player.elo_change;
-    eloDelta.classList.add(player.elo_change >= 0 ? "gain" : "loss");
-
-    row.addEventListener("click", () => {
-      window.location.href = `/profile.html?id=${player.id}`;
-    });
-  }
-
-  for (const row of allPlayersStats) {
-    opponentsContainer.appendChild(row);
+  for (let i = sorted.length; i < totalPlayers; i++) {
+    opponentsContainer.appendChild(buildRow("-", null));
   }
 }
 
@@ -692,7 +678,6 @@ confirmDeleteButton.addEventListener("click", async () => {
     });
 
     const data = await response.json();
-    console.log(data);
 
     if (response.ok && data.success) {
       window.location.replace("/login.html");

@@ -29,17 +29,14 @@ async function getUserFromSession(
   sessionId,
   client = db,
   requireVerified = true,
+  withPlacement = false,
 ) {
   if (!sessionId) {
     return null;
   }
 
   const sessionResult = await client.query(
-    `
-      SELECT user_id
-      FROM sessions
-      WHERE id = $1 AND expires_at > NOW()
-    `,
+    `SELECT user_id FROM sessions WHERE id = $1 AND expires_at > NOW()`,
     [sessionId],
   );
 
@@ -49,30 +46,30 @@ async function getUserFromSession(
 
   const userId = sessionResult.rows[0].user_id;
 
-  const userResult = await client.query(
-    `
-      WITH ranked_users AS (
-        SELECT
-          u.id,
-          u.username,
-          u.email,
-          u.elo,
-          u.email_verified,
-          RANK() OVER (
-            ORDER BY u.elo DESC, 
-                     COUNT(eh.game_id) DESC, 
-                     u.created_at ASC
-          ) AS placement
-        FROM users u
-        LEFT JOIN elo_history eh ON u.id = eh.user_id
-        GROUP BY u.id, u.username, u.email, u.elo, u.email_verified, u.created_at
-      )
-      SELECT id, username, email, elo, email_verified, placement
-      FROM ranked_users
-      WHERE id = $1;
-    `,
-    [userId],
-  );
+  const userResult = withPlacement
+    ? await client.query(
+      `
+          WITH ranked_users AS (
+            SELECT
+              u.id, u.username, u.email, u.elo, u.email_verified,
+              RANK() OVER (
+                ORDER BY u.elo DESC, COUNT(eh.game_id) DESC, u.created_at ASC
+              )::int AS placement
+            FROM users u
+            LEFT JOIN elo_history eh ON u.id = eh.user_id AND eh.new_elo IS NOT NULL
+            WHERE u.email_verified = TRUE
+            GROUP BY u.id, u.username, u.email, u.elo, u.email_verified, u.created_at
+          )
+          SELECT id, username, email, elo, email_verified, placement
+          FROM ranked_users
+          WHERE id = $1
+        `,
+      [userId],
+    )
+    : await client.query(
+      `SELECT id, username, email, elo, email_verified FROM users WHERE id = $1`,
+      [userId],
+    );
 
   if (userResult.rows.length === 0) {
     return null;
@@ -93,7 +90,7 @@ router.get("/me", async (req, res) => {
   const sessionId = req.cookies?.sessionId;
 
   try {
-    const user = await getUserFromSession(sessionId, db, true);
+    const user = await getUserFromSession(sessionId, db, true, true);
 
     if (!user) {
       if (sessionId) {
@@ -133,16 +130,14 @@ router.post("/logout", async (req, res) => {
   }
 
   try {
-    await db.query(
-      `
-        DELETE FROM sessions
-        WHERE id = $1
-      `,
-      [sessionId],
-    );
+    await db.query(`DELETE FROM sessions WHERE id = $1`, [sessionId]);
+
+    const io = req.app.get("io");
+    for (const s of io.sockets.sockets.values()) {
+      if (s.sessionId === sessionId) s.disconnect(true);
+    }
 
     res.clearCookie("sessionId");
-
     return res.sendStatus(204);
   } catch (error) {
     console.error("Logout error:", error);

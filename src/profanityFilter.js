@@ -59,17 +59,14 @@ function isProfane(testo, customThreshold = null) {
 
   const allBadWords = [...badWords.italian, ...badWords.english];
 
-  for (let badWord of allBadWords) {
-    if (badWord.length > 2) {
-      if (normalized.includes(badWord)) {
-        return true;
-      }
+  for (const badWord of allBadWords) {
+    if (badWord.length <= 2) continue;
+    if (normalized.includes(badWord)) return true;
 
-      for (let userWord of words) {
-        if (similarity(userWord, badWord) >= threshold) {
-          return true;
-        }
-      }
+    for (const userWord of words) {
+      const maxLen = Math.max(userWord.length, badWord.length);
+      if (Math.abs(userWord.length - badWord.length) > maxLen * (1 - threshold / 100)) continue;
+      if (similarity(userWord, badWord) >= threshold) return true;
     }
   }
 
@@ -88,6 +85,7 @@ function getThreshold() {
 loadProfanityList();
 
 module.exports = {
+  isLoaded: () => badWords.italian.length + badWords.english.length > 0,
   isProfane,
   reloadList: loadProfanityList,
   setThreshold,

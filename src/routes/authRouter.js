@@ -6,7 +6,6 @@ const { sendEmail } = require("../email/mailService");
 const {
   generateVerificationToken,
   verifyEmailToken,
-  cleanupExpiredUnverifiedAccounts,
   createPasswordResetToken,
   verifyPasswordResetToken,
   createAccountDeletionCode,
@@ -14,18 +13,12 @@ const {
 } = require("../email/verificationUtils");
 const { getUserFromSession } = require("./sessionRouter");
 const { isProfane } = require("../profanityFilter");
+const { USERNAME_REGEX } = require("../validation");
 
 const db = require("../db");
 
 // Error code from PostgreSQL
 const UNIQUE_CONSTRAINT = "23505";
-
-setInterval(
-  () => {
-    cleanupExpiredUnverifiedAccounts();
-  },
-  1 * 60 * 1000,
-);
 
 // Utility for registration (check existing credentials)
 router.post("/checkUser", async (req, res) => {
@@ -105,6 +98,12 @@ router.post("/register", async (req, res) => {
     });
   }
 
+  if (!USERNAME_REGEX.test(username)) {
+    return res.status(400).json({
+      errors: { username: { msg: "Lo username può contenere solo lettere, numeri, _ . -" } },
+    });
+  }
+
   if (isProfane(username)) {
     return res.status(400).json({
       errors: {
@@ -149,13 +148,22 @@ router.post("/register", async (req, res) => {
     await dbClient.query("COMMIT");
 
     const verificationLink = `${process.env.CLIENT_URL}/verify-email.html?token=${verificationToken}`;
-    sendEmail(user.email, "Verifica il tuo account BISCA", "verify_email", {
+
+    const mailResult = await sendEmail(user.email, "Verifica il tuo account BISCA", "verify_email", {
       username: user.username,
       verificationLink,
       expirationMinutes: 5,
-    }).catch((error) => {
-      console.error("Failed to send verification email:", error);
     });
+
+    if (!mailResult.success) {
+      await db.query("DELETE FROM users WHERE id = $1", [user.id]);
+
+      return res.status(503).json({
+        errors: {
+          general: { msg: "Impossibile inviare l'email di verifica. Riprova più tardi" },
+        },
+      });
+    }
 
     return res.status(201).json({
       message:
@@ -218,6 +226,7 @@ router.post("/verify-email", async (req, res) => {
   if (!verificationResult.success) {
     return res.status(400).json({
       error: verificationResult.error,
+      code: verificationResult.code
     });
   }
 
@@ -235,8 +244,9 @@ router.post("/verify-email", async (req, res) => {
 
     sendEmail(user.email, "Benvenuto su BISCA!", "welcome", {
       username: user.username,
-    }).catch((error) => {
-      console.error("Failed to send welcome email:", error);
+      appUrl: process.env.CLIENT_URL,
+    }).then((r) => {
+      if (!r.success) console.error("Failed to send welcome email:", r.error);
     });
 
     return res.status(200).json({
@@ -359,8 +369,8 @@ router.post("/forgot-password", async (req, res) => {
       username: tokenResult.username,
       resetLink,
       expirationMinutes: 5,
-    }).catch((error) => {
-      console.error("Failed to send reset email:", error);
+    }).then((r) => {
+      if (!r.success) console.error("Failed to send reset email:", r.error);
     });
 
     return res.status(200).json({
@@ -393,6 +403,7 @@ router.post("/verify-password-reset-token", async (req, res) => {
     return res.status(400).json({
       success: false,
       error: verificationResult.error,
+      code: verificationResult.code
     });
   }
 
@@ -431,6 +442,7 @@ router.post("/reset-password", async (req, res) => {
       return res.status(400).json({
         success: false,
         error: verificationResult.error,
+        code: verificationResult.code
       });
     }
 
@@ -457,6 +469,8 @@ router.post("/reset-password", async (req, res) => {
       [user.id],
     );
 
+    req.app.get("io").in(`user:${user.id}`).disconnectSockets(true);
+
     return res.status(200).json({
       success: true,
       message:
@@ -482,7 +496,7 @@ router.post("/request-account-deletion", async (req, res) => {
       return res.status(401).json({ error: "Non autorizzato" });
     }
 
-    const codeResult = await createAccountDeletionCode(user.id, 15);
+    const codeResult = await createAccountDeletionCode(user.id, 5);
 
     if (!codeResult.success) {
       return res.status(500).json({
@@ -584,13 +598,15 @@ router.post("/confirm-account-deletion", async (req, res) => {
 
     await dbClient.query("COMMIT");
 
+    req.app.get("io").in(`user:${user.id}`).disconnectSockets(true);
+
     // Clear session cookie
     res.clearCookie("sessionId");
 
     sendEmail(user.email, "Account BISCA eliminato", "account_deleted", {
       username: user.username,
-    }).catch((error) => {
-      console.error("Failed to send account deleted email:", error);
+    }).then((r) => {
+      if (!r.success) console.error("Failed to send account deleted email:", r.error);
     });
 
     return res.status(200).json({

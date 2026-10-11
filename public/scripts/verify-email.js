@@ -32,16 +32,10 @@ async function verifyEmail() {
         window.location.replace("/lobbies.html");
       }, 3000);
     } else {
-      const error = data.error || "Errore sconosciuto";
-
-      if (
-        error.includes("non valido") ||
-        error.includes("scaduto") ||
-        error.includes("verificato")
-      ) {
+      if (data.code === "INVALID_TOKEN") {
         showState("invalid");
       } else {
-        showState("error", error);
+        showState("error", data.error || "Errore sconosciuto");
       }
     }
   } catch (error) {

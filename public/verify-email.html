@@ -1,108 +1,105 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <!-- Charset and Viewport -->
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    />
+<html lang="it">
+    <head>
+        <!-- Charset and Viewport -->
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- SEO: Prevent indexing of this service page -->
-    <meta name="robots" content="noindex, nofollow" />
+        <!-- SEO: Prevent indexing of this service page -->
+        <meta name="robots" content="noindex, nofollow" />
 
-    <!-- Icons: SVG for browser tab, PNGs for PWA -->
-    <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/media/app/icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="512x512"
-      href="/media/app/icon-512x512.png"
-    />
-    <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
+        <!-- Icons: SVG for browser tab, PNGs for PWA -->
+        <link rel="icon" type="image/svg+xml" href="./media/favicon.svg" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="/media/app/icon-192x192.png" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="/media/app/icon-512x512.png" />
+        <link rel="apple-touch-icon" href="/media/app/icon-192x192.png" />
 
-    <!-- PWA Manifest and Theme settings -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#302e2b" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+        <!-- PWA Manifest and Theme settings -->
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#302e2b" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent" />
 
-    <!-- Page Title -->
-    <title>BISCA | Verifica Email</title>
+        <!-- Page Title -->
+        <title>BISCA | Verifica Email</title>
 
-    <!-- Stylesheets and External Scripts -->
-    <link rel="stylesheet" href="styles/reset.css" />
-    <link rel="stylesheet" href="styles/shared-style.css" />
-    <link rel="stylesheet" href="styles/login-register.css" />
-    <link rel="stylesheet" href="styles/verify-email.css" />
-    <script
-      src="https://kit.fontawesome.com/df57a58519.js"
-      crossorigin="anonymous"
-    ></script>
+        <!-- Stylesheets and External Scripts -->
+        <link rel="stylesheet" href="styles/reset.css" />
+        <link rel="stylesheet" href="styles/shared-style.css" />
+        <link rel="stylesheet" href="styles/login-register.css" />
+        <link rel="stylesheet" href="styles/verify-email.css" />
+        <script
+            src="https://kit.fontawesome.com/df57a58519.js"
+            crossorigin="anonymous"></script>
 
-    <!-- Session Management -->
-    <script>
-      async function checkSession() {
-        const response = await fetch("/api/session/me", {
-          method: "GET",
-          credentials: "include",
-        });
-        if (response.ok) {
-          window.location.replace("/lobbies.html");
-        }
-      }
-      checkSession();
-    </script>
-    <script src="scripts/verify-email.js" defer></script>
-  </head>
+        <!-- Session Management -->
+        <script>
+            async function checkSession() {
+                const response = await fetch("/api/session/me", {
+                    method: "GET",
+                    credentials: "include",
+                });
+                if (response.ok) {
+                    window.location.replace("/lobbies.html");
+                }
+            }
+            checkSession();
+        </script>
+        <script src="scripts/verify-email.js" defer></script>
+    </head>
 
-  <body>
-    <main id="baseContainer">
-      <a id="loginTitle" href="index.html">
-        <img src="./media/logo.svg" alt="Logo" />
-        <p>BISCA</p>
-      </a>
+    <body>
+        <main id="baseContainer">
+            <a id="loginTitle" href="index.html">
+                <img src="./media/logo.svg" alt="Logo" />
+                <p>BISCA</p>
+            </a>
 
-      <section id="verificationContainer">
-        <div id="loadingState" class="state">
-          <i class="fa-solid fa-spinner fa-spin"></i>
-          Verifica in corso...
-        </div>
+            <section id="verificationContainer">
+                <div id="loadingState" class="state">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Verifica in corso...
+                </div>
 
-        <div id="successState" class="state" hidden>
-          <i class="fa-solid fa-check-circle success"></i>
-          Email verificata!
-          <span>Reindirizzamento a breve...</span>
-        </div>
+                <div id="successState" class="state" hidden>
+                    <i class="fa-solid fa-check-circle success"></i>
+                    Email verificata!
+                    <span>Reindirizzamento a breve...</span>
+                </div>
 
-        <div id="errorState" class="state" hidden>
-          <i class="fa-solid fa-times-circle error"></i>
-          <span id="errorMessage">Si è verificato un errore</span>
-          <div class="actions">
-            <a href="register.html" class="secondaryButton">Registrati</a>
-            <a href="login.html" class="primaryButton">Accedi</a>
-          </div>
-        </div>
+                <div id="errorState" class="state" hidden>
+                    <i class="fa-solid fa-times-circle error"></i>
+                    <span id="errorMessage">Si è verificato un errore</span>
+                    <div class="actions">
+                        <a href="register.html" class="secondaryButton"
+                            >Registrati</a
+                        >
+                        <a href="login.html" class="primaryButton">Accedi</a>
+                    </div>
+                </div>
 
-        <div id="invalidTokenState" class="state" hidden>
-          <i class="fa-solid fa-exclamation-circle warning"></i>
-          Link non valido o scaduto
-          <span>I link scadono dopo 5 minuti</span>
-          <div class="actions">
-            <a href="register.html" class="primaryButton"
-              >Registrati di nuovo</a
-            >
-          </div>
-        </div>
-      </section>
-    </main>
-  </body>
+                <div id="invalidTokenState" class="state" hidden>
+                    <i class="fa-solid fa-exclamation-circle warning"></i>
+                    Link non valido o scaduto
+                    <span>I link scadono dopo 5 minuti</span>
+                    <div class="actions">
+                        <a href="register.html" class="primaryButton"
+                            >Registrati di nuovo</a
+                        >
+                    </div>
+                </div>
+            </section>
+        </main>
+    </body>
 </html>

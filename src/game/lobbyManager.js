@@ -1,4 +1,4 @@
-const { getGame } = require("./gameManager");
+const { getGame, deleteGame } = require("./gameManager");
 
 const lobbies = new Map();
 const LOBBY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
@@ -24,7 +24,7 @@ function startLobbyCleanup() {
         lobby.offlineSince = null;
       }
 
-      if (lobby.players.size === 1 && now - lobby.createdAt >= LOBBY_TIMEOUT) {
+      if (!lobby.started && lobby.players.size === 1 && now - lobby.createdAt >= LOBBY_TIMEOUT) {
         console.log(`Eliminazione lobby ferma a 1 player: ${lobbyId}`);
         deleteLobby(lobbyId);
       }
@@ -77,7 +77,8 @@ function getLobbies() {
   }));
 }
 
-async function deleteLobby(lobbyId) {
+function deleteLobby(lobbyId) {
+  deleteGame(lobbyId);
   return lobbies.delete(lobbyId);
 }
 
@@ -96,6 +97,10 @@ function addPlayer(lobbyId, userId, username) {
       success: false,
       error: "La partita è già iniziata",
     };
+  }
+
+  if (lobby.closed) {
+    return { success: false, error: "Il tavolo è chiuso" };
   }
 
   if (lobby.players.size >= lobby.maxPlayers) {

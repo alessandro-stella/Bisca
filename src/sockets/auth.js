@@ -35,6 +35,7 @@ async function authenticateSocket(socket, next) {
     }
 
     socket.user = user;
+    socket.sessionId = sessionId;
 
     socket.join(`user:${user.id}`);
 

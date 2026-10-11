@@ -6,7 +6,7 @@ const smtpConfig = {
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
   secure: process.env.SMTP_SECURE === "true",
-  ignoreTLS: process.env.IGNORETLS === "true",
+  ignoreTLS: process.env.SMTP_IGNORETLS === "true",
   connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 10000,
@@ -19,18 +19,29 @@ if (process.env.SMTP_USER && process.env.SMTP_PASS) {
   };
 }
 
-console.log("Current Transporter configuration:", smtpConfig);
+console.log("SMTP configured:", {
+  host: smtpConfig.host,
+  port: smtpConfig.port,
+  secure: smtpConfig.secure,
+  user: smtpConfig.auth?.user,
+});
+
 console.log("Sender (SMTP_FROM):", process.env.SMTP_FROM);
 
 const transporter = nodemailer.createTransport(smtpConfig);
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
 
 function loadTemplate(templateName, variables = {}) {
   const templatePath = path.join(__dirname, `./templates/${templateName}.html`);
   let html = fs.readFileSync(templatePath, "utf8");
 
-  Object.entries(variables).forEach(([key, value]) => {
-    html = html.replace(new RegExp(`{{${key}}}`, "g"), value);
-  });
+  for (const [key, value] of Object.entries(variables)) {
+    html = html.replaceAll(`{{${key}}}`, () => escapeHtml(value));
+  }
 
   return html;
 }

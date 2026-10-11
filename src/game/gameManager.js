@@ -555,12 +555,12 @@ function assignPlayersPlacement(game, playerIds) {
     .map((playerId) => game.players.get(playerId))
     .filter((player) => player && player.placement == null);
 
-  if (players.length === 0) {
-    return;
-  }
+  if (players.length === 0) return;
+
+  const bestRank = game.nextPlacement - (players.length - 1);
 
   for (const player of players) {
-    player.placement = game.nextPlacement;
+    player.placement = bestRank;
   }
 
   game.nextPlacement -= players.length;
@@ -606,6 +606,7 @@ function restartCurrentTurn(game) {
   game.totalBids = 0;
   game.playedHands = 0;
   game.playedCards.clear();
+  game.highestPlay = null;
 
   if (
     !game.players.has(game.turnStarter) ||
@@ -624,6 +625,10 @@ function restartCurrentTurn(game) {
 }
 
 function removePlayerFromGame(game, playerId) {
+  if (game.status === "finished") {
+    return { action: "none" };
+  }
+
   const playerState = game.players.get(playerId);
 
   if (!playerState) {
@@ -666,23 +671,15 @@ function removePlayerFromGame(game, playerId) {
 }
 
 async function saveGameData(game) {
-  const gameId = game.id;
-
-  const dbClient = await db.connect();
+  const client = await db.connect();
 
   try {
-    await dbClient.query("BEGIN");
+    await client.query("BEGIN");
 
-    await dbClient.query(
-      `
-        UPDATE games 
-        SET duration = $1
-        WHERE id = $2
-      `,
-      [game.duration || 0, gameId],
-    );
-
-    await dbClient.query("COMMIT");
+    await client.query(`UPDATE games SET duration = $1 WHERE id = $2`, [
+      game.duration || 0,
+      game.id,
+    ]);
 
     const playersForElo = game.players.map((p) => ({
       id: p.userId,
@@ -690,15 +687,15 @@ async function saveGameData(game) {
       leftEarly: p.leftEarly || false,
     }));
 
-    await calculateAndUpdateElo(gameId, playersForElo);
+    await calculateAndUpdateElo(game.id, playersForElo, client);
+
+    await client.query("COMMIT");
   } catch (error) {
-    await dbClient.query("ROLLBACK");
-
+    await client.query("ROLLBACK");
     console.error("Error in saveGameData & ELO calculation:", error);
-
     throw error;
   } finally {
-    dbClient.release();
+    client.release();
   }
 }
 
