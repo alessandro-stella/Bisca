@@ -47,7 +47,7 @@ Il controllo reale resta il vincolo `UNIQUE` al momento dell'`INSERT` (vedi A2).
 
 **Percorso dei dati**
 
-1. `register.js` (submit) validazione client: campi obbligatori, regex email, password ≥ 8, conferma password uguale (E-37).
+1. `register.js` (submit) validazione client: campi obbligatori, regex email, password ≥ 8, conferma password uguale.
 2. `POST /api/auth/register` `{ username, email, password }`.
 3. `authRouter.js` valida in ordine e restituisce il **primo** errore trovato: campi mancanti → lunghezza username 3-30 → spazi nello username → `isProfane(username)` → regex email → password ≥ 8.
 4. `db.connect()` → `BEGIN`.
@@ -97,7 +97,7 @@ Il controllo reale resta il vincolo `UNIQUE` al momento dell'`INSERT` (vedi A2).
 | ------------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | Token assente o < 20 caratteri        | nessuna chiamata                                                      | Stato "token non valido"                                                                 |
 | Token mancante nel body               | 400 `{ error: "Missing token" }`                                      | Stato "errore" con il messaggio                                                          |
-| Token non valido, scaduto o già usato | 400 `{ error: "Token non valido, scaduto o account già verificato" }` | Cerca "non valido", "scaduto" o "verificato" nel testo → stato "token non valido" (E-46) |
+| Token non valido, scaduto o già usato | 400 `{ error: "Token non valido, scaduto o account già verificato" }` | Cerca "non valido", "scaduto" o "verificato" nel testo → stato "token non valido" |
 | Errore DB in `verifyEmailToken`       | Catturato internamente, 400 `"Errore durante la verifica"`            | Stato "errore"                                                                           |
 | Errore in `handleSession`             | 500 (l'account risulta già verificato: l'utente può fare login)       | Stato "errore"                                                                           |
 | Rete o risposta non JSON              | –                                                                     | Stato "errore": "Errore di connessione"                                                  |
@@ -210,7 +210,7 @@ Il controllo reale resta il vincolo `UNIQUE` al momento dell'`INSERT` (vedi A2).
 | Sessione assente                | 401 `{ error: "Non autorizzato" }` |
 | Validazione                     | 400 `{ error }`                    |
 | Username già usato              | 409                                |
-| Violazione `UNIQUE` concorrente | 500 (E-36)                         |
+| Violazione `UNIQUE` concorrente | 500                                |
 
 ---
 
@@ -478,3 +478,4 @@ I valori delle carte sono corrispondenti al loro numero e incrementato in base a
 | `sessions`    | `handleSession` (login, verify-email), logout, reset password, eliminazione account, `/session/me` (se invalida) | `getUserFromSession`                                               |
 | `games`       | `startGame` (INSERT), `saveGameData` (`duration`)                                                                | `/user/:id/games`, `/user/game/:id/players`                        |
 | `elo_history` | `startGame` (INSERT provvisorio), `calculateAndUpdateElo` (UPDATE), eliminazione account                         | ranking, `eloManager`, `/user/:id/games`, `/user/game/:id/players` |
+
